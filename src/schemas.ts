@@ -30,6 +30,7 @@ export const schemas = {
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
+                "type": "object",
                 "$ref": "#/$defs/item"
             },
             "properties": {
@@ -5627,6 +5628,7 @@ export const schemas = {
             "title": "Custom item",
             "type": "object",
             "required": ["resource", "display_name"],
+            "additionalProperties": false,
             "properties": {
                 "enabled": {
                     "description": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
@@ -5656,6 +5658,7 @@ export const schemas = {
                 },
                 "mmoitem": {
                     "description": "Special property to mark item as MMOITEM https://www.spigotmc.org/resources/39267/",
+                    "additionalProperties": false,
                     "properties": {
                         "type": {
                             "description": "MMOITEM Type (check MMOItems docs)",
@@ -5673,17 +5676,19 @@ export const schemas = {
                     "required": ["generate"],
                     "properties": {
                         "material": {"$ref": "#/$defs/vanilla_materials"},
-                        "generate": {"type": "boolean", "default": true, "description": ""},
+                        "generate": {
+                            "type": "boolean",
+                            "default": true,
+                            "description": "Decide if you want to automatically generate a model from your textures or you want to create the model by yourself."
+                        },
                         "model_id": {
                             "type": "integer",
                             "description": "If you want to force the usage of a defined custom_model_data (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
                         },
-                        "model_path": {
-                            "type": "string",
-                            "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
-                        }
                     },
-                    "if": {"properties": {"generate": true}},
+                    "if": {
+                        "properties": {"generate": {"const" : true}}
+                    },
                     "then": {
                         "properties": {
                             "textures": {
@@ -5694,7 +5699,17 @@ export const schemas = {
                                 ],
                                 "default": [""]
                             }
-                        }
+                        },
+                        "required": ["textures"]
+                    },
+                    "else" : {
+                        "properties": {
+                            "model_path": {
+                                "type": "string",
+                                "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
+                            }
+                        },
+                        "required": ["model_path"]
                     }
                 },
                 "lore": {

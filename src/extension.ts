@@ -25,7 +25,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		const uri = decodeURI(e.document.uri.toString());
         // Very hacky
 		if(e.document.lineCount > 0 && e.document.lineAt(0).text.includes("info:")) {
-			iaDocuments.push(uri);
+			if(!iaDocuments.includes(uri)) {
+				vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
+				iaDocuments.push(uri);
+			}
 		} else {
 			// Remove from array
 			iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
