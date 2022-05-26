@@ -3,6 +3,7 @@
 	"displayName": "ia-vscode",
 	"description": "ItemsAdder vscode extension",
 	"version": "0.0.1",
+	"publisher": "LoneDev",
 	"icon": "images/ia-logo.png",
 	"bugs": {
 		"url": "https://github.com/ItemsAdder/ia-vscode/issues"
