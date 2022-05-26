@@ -21,10 +21,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		yamlExtensionAPI.registerContributor(SCHEMA, onRequestSchemaURI, onRequestSchemaContent);
 	}
 
+	vscode.workspace.textDocuments.forEach(document => {
+		handleDocumentRefresh(document);
+	});
+
 	vscode.workspace.onDidChangeTextDocument(function(e) {
-		const uri = decodeURI(e.document.uri.toString());
+		handleDocumentRefresh(e.document);
+    });
+
+	vscode.workspace.onDidOpenTextDocument(function(document) {
+		handleDocumentRefresh(document);
+	});
+}
+
+function handleDocumentRefresh(document: vscode.TextDocument) {
+	const uri = decodeURI(document.uri.toString());
         // Very hacky
-		if(e.document.lineCount > 0 && e.document.lineAt(0).text.includes("info:")) {
+		if(document.lineCount > 0 && document.lineAt(0).text.includes("info:")) {
 			if(!iaDocuments.includes(uri)) {
 				vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
 				iaDocuments.push(uri);
@@ -33,7 +46,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			// Remove from array
 			iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
 		}
-    });
 }
 
 // this method is called when your extension is deactivated
