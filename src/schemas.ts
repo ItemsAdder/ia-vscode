@@ -434,6 +434,30 @@ export const schemas = {
                     "$ref": "#/$defs/dictionary"
                 }
             }
+        },
+        "entities": {
+            "type": "object",
+            "description": "Create a custom entity with 3D model",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/entity"
+            },
+            "properties": {
+                "change_me": {
+                    "type": "object",
+                    "$ref": "#/$defs/entity"
+                },
+                "change_me_2": {
+                    "type": "object",
+                    "$ref": "#/$defs/entity"
+                },
+                "change_me_xxx": {
+                    "type": "object",
+                    "$ref": "#/$defs/entity"
+                }
+            }
         }
     },
     "$defs": {
@@ -8587,6 +8611,51 @@ export const schemas = {
                     }
                 }
             }
-        }
+        },
+        "entity": {
+            "$id": "entity",
+            "type": "object",
+            "required": ["model_folder"],
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "description": "Display name of the custom entity"
+                },
+                "model_folder": {
+                    "type": "string",
+                    "description": "Folder of this custom entity where all its bones models are stored",
+                    "defaultSnippets": [{"body": "entity/$0"}]
+                },
+                "type": {
+                    "description": "The base Vanilla entity type",
+                    "$ref": "#/$defs/vanilla_entity_types"
+                },
+                "silent": {
+                    "type": "boolean",
+                    "description": "Make the base Vanilla entity silent"
+                },
+                "can_sun_burn": {
+                    "type": "boolean"
+                },
+                "can_drop_loot": {
+                    "type": "boolean",
+                    "description": "Allow dropping the Vanilla entity loot on death or not."
+                },
+                "mount_on_interact": {
+                    "type": "boolean",
+                    "description": "Allow mounting (only if mount bones exists) on right click event. Set this to `false` if you want to handle it yourself via IA API or MythicMobs."
+                },
+                "shadow": {
+                    "type": "boolean"
+                },
+                "max_health": {"type": "number"},
+                "speed": {
+                    "properties": {
+                        "movement": {"type": "number"},
+                        "flying": {"type": "number"}
+                    }
+                },
+            }
+        },
     }
 }
