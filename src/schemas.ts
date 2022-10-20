@@ -6990,7 +6990,7 @@ export const schemas = {
                 "entity": {
                     "type": "string",
                     "description": "Type of entity to use to create this furniture.\n\nnWarning: \nLimitations of item_frame furnitures:\n- solid item_frame furnitures are possible only on Server version >= 1.16 (client doesn't matter).\n- invisible item_frame furnitures are possible only on Server and Client version >= 1.16. If a user connects with viaversion using an old mc version they will see the item_frame.",
-                    "enum": ["armor_stand", "item_frame"]
+                    "enum": ["armor_stand", "item_frame", "glow_item_frame"]
                 },
                 "gravity": {
                     "type": "boolean",
