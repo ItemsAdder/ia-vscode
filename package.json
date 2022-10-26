@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -19,21 +19,12 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ia-vscode.helloWorld",
     "onLanguage:yaml"
   ],
   "extensionDependencies": [
     "redhat.vscode-yaml"
   ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "ia-vscode.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",

@@ -1,57 +1,25 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
-
 import {schemas} from "./schemas";
 
 const SCHEMA = "ia-schema";
+let activeEditor : vscode.TextEditor | undefined = undefined;
 let schemaJSON = "";
 let iaDocuments: string[] = [];
+let origWordBasedSuggestions : any = 1337;
+let timeout: NodeJS.Timer | undefined = undefined;
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
-	schemaJSON = JSON.stringify(schemas);
+	activeEditor = vscode.window.activeTextEditor;
+	origWordBasedSuggestions = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
 
+	schemaJSON = JSON.stringify(schemas);
 	const vscodeYaml = vscode.extensions.getExtension("redhat.vscode-yaml");
 	if(vscodeYaml)
 	{
 		const yamlExtensionAPI = await vscodeYaml.activate();
 		yamlExtensionAPI.registerContributor(SCHEMA, onRequestSchemaURI, onRequestSchemaContent);
 	}
-
-
-    /*vscode.languages.registerHoverProvider('*', {
-        provideHover(document, position, token) {
-            const range = document.getWordRangeAtPosition(position);
-            const word = document.getText(range);
-
-            if (word === "example") {
-
-                return new vscode.Hover({
-                    language: "example",
-                    value: "example"
-                });
-            }
-        }
-    });*/
-
-
-	vscode.workspace.textDocuments.forEach(document => {
-		handleDocumentRefresh(document);
-	});
-
-	vscode.workspace.onDidChangeTextDocument(function(e) {
-		handleDocumentRefresh(e.document);
-    });
-
-	vscode.workspace.onDidOpenTextDocument(function(document) {
-		handleDocumentRefresh(document);
-	});
-
-
-	let timeout: NodeJS.Timer | undefined = undefined;
 
 	const templateItemDecorationType = vscode.window.createTextEditorDecorationType({
 		gutterIconPath: context.asAbsolutePath('images/template.png'),
@@ -116,50 +84,48 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
 		typesDecos.materials.data[element] = [];
 	});
-
-	let activeEditor = vscode.window.activeTextEditor;
-
+	
 	function updateDecorations() {
 		if (!activeEditor) {
 			return;
 		}
 		const templateItemsDecorations: vscode.DecorationOptions[] = [];
 		const templateTextsDecorations: vscode.DecorationOptions[] = [];
-
+	
 		const largeNumbers: vscode.DecorationOptions[] = [];
-
+	
 		const variantItemsDecorations: vscode.DecorationOptions[] = [];
 		const variantTextsDecorations: vscode.DecorationOptions[] = [];
-
+	
 		const greenTextsDecorations: vscode.DecorationOptions[] = [];
 		const grayTextsDecorations: vscode.DecorationOptions[] = [];
-
+	
 		const grayAreasDecorations: vscode.DecorationOptions[] = [];
-
-
+	
+	
 		handleText(activeEditor, "Template item", /    template\: true/g, templateItemsDecorations, templateTextsDecorations);
 		activeEditor.setDecorations(templateItemDecorationType, templateItemsDecorations);
 		activeEditor.setDecorations(templateTextDecorationType, templateTextsDecorations);
-
+	
 		handleText(activeEditor, "Variant item", /    variant_of\:/g, variantItemsDecorations, variantTextsDecorations);
 		activeEditor.setDecorations(variantTextDecorationType, variantTextsDecorations);
 		activeEditor.setDecorations(variantItemDecorationType, variantItemsDecorations);
-
+	
 		handleTextEnum(activeEditor, "Vanilla entity type", schemas.$defs.vanilla_entity_types.enum, typesDecos.entities);
 		handleTextEnum(activeEditor, "Vanilla material", schemas.$defs.vanilla_materials.enum, typesDecos.materials);
-
+	
 		handleGenericProperty(activeEditor, "TRUE", / true/g, greenTextsDecorations);
 		activeEditor.setDecorations(greenTextDecoType, greenTextsDecorations);
-
+	
 		handleGenericProperty(activeEditor, "FALSE", / false/g, grayTextsDecorations);
 		activeEditor.setDecorations(grayTextDecoType, grayTextsDecorations);
-
+	
 		handleGenericArea(activeEditor, "Disabled properties block", /    enabled: false/g, grayAreasDecorations);
 		activeEditor.setDecorations(grayAreaDecoType, grayAreasDecorations);
-
+	
 		//activeEditor.setDecorations(largeNumberDecorationType, largeNumbers);
 	}
-
+	
 	function triggerUpdateDecorations(throttle = false) {
 		if (timeout) {
 			clearTimeout(timeout);
@@ -176,18 +142,93 @@ export async function activate(context: vscode.ExtensionContext) {
 		triggerUpdateDecorations();
 	}
 
-	vscode.window.onDidChangeActiveTextEditor(editor => {
+	vscode.workspace.textDocuments.forEach(document => {
+		handleDocumentRefresh(document);
+	});
+
+	vscode.workspace.onDidChangeTextDocument(function(e) {
+		handleDocumentRefresh(e.document);
+    });
+
+	vscode.workspace.onDidOpenTextDocument(function(document) {
+		handleDocumentRefresh(document);
+	});
+
+	vscode.window.onDidChangeActiveTextEditor(async editor => {
 		activeEditor = editor;
 		if (editor) {
-			triggerUpdateDecorations();
+			if(isIaFile(editor.document)) {
+				setWordBasedSuggestions(false);
+				triggerUpdateDecorations();
+			} else {
+				resetWordBasedSuggestions();
+			}
 		}
 	}, null, context.subscriptions);
 
 	vscode.workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
-			triggerUpdateDecorations(true);
+			if(isIaFile(event.document)) {
+				triggerUpdateDecorations(true);
+			}
 		}
 	}, null, context.subscriptions);
+
+	vscode.workspace.onDidCloseTextDocument(async document => {
+		if(isIaFile(document)) {
+			resetWordBasedSuggestions();
+		}
+	}, null, context.subscriptions);
+}
+
+export function deactivate() {
+	resetWordBasedSuggestions();
+}
+
+/**
+ * This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
+ * YAML schema entries hard to find in the autocomplete words list.
+ * Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
+ * 
+ * @param val true to hide, false to show.
+ * @returns nothing
+ */
+async function setWordBasedSuggestions(val : boolean) {
+	if(origWordBasedSuggestions === 1337) {
+		return;
+	}
+	// Global
+	await vscode.workspace.getConfiguration('editor').update(
+		'wordBasedSuggestions', 
+		val, 
+		true
+	);
+	// If it's in a workspace
+	if(vscode.workspace.name) {
+		// Workspace
+		await vscode.workspace.getConfiguration('editor').update(
+			'wordBasedSuggestions', 
+			val, 
+			false
+		);
+	}
+}
+
+async function resetWordBasedSuggestions() {
+	setWordBasedSuggestions(origWordBasedSuggestions);
+}
+
+/**
+ * Check if the file is registered
+ * @param document
+ * @returns 
+ */
+function isIaFile(document: vscode.TextDocument) {
+	if(iaDocuments.length === 0) {
+		return false;
+	}
+	const uri = decodeURI(document.uri.toString());
+	return iaDocuments.includes(uri);
 }
 
 function handleDocumentRefresh(document: vscode.TextDocument) {
@@ -203,9 +244,6 @@ function handleDocumentRefresh(document: vscode.TextDocument) {
 			iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
 		}
 }
-
-// this method is called when your extension is deactivated
-export function deactivate() {}
 
 function onRequestSchemaURI(resource: string): string | undefined {
 	if(!resource.endsWith('.yml')) {

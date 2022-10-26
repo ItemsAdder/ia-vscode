@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export const schemas = {
     "$id": "ia-schema",
     "$schema": "file://ia-schema/schema.json",
@@ -17,11 +18,11 @@ export const schemas = {
                 "namespace": {
                     "type": "string",
                     "default": "myitems",
-                    "title": "Namespace"
+                    "markdownDescription": "Namespace"
                 },
                 "dictionary-lang": {
                     "type": "string",
-                    "description": "This special property is used by dictionaries. Add it only if you're using the 'dictionary' attribute.\nExample: dictionary-lang: \"en\""
+                    "markdownDescription": "This special property is used by dictionaries. Add it only if you're using the 'dictionary' attribute.\nExample: dictionary-lang: \"en\""
                 }
             }
         },
@@ -52,7 +53,7 @@ export const schemas = {
                     "type": "object",
                     "kind": 5,
                     "detail": "(recipes)",
-                    "description": "Crafting table recipes",
+                    "markdownDescription": "Crafting table recipes",
                     "additionalProperties": {
                         "type": "object",
                         "$ref": "#/$defs/recipe.craft"
@@ -117,12 +118,35 @@ export const schemas = {
                             "$ref": "#/$defs/recipe.anvil_repair"
                         }
                     }
+                },
+                "smithing": {
+                    "type": "object",
+                    "kind": 5,
+                    "detail": "(recipes)",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/recipe.smithing"
+                    },
+                    "properties": {
+                        "change_me": {
+                            "type": "object",
+                            "$ref": "#/$defs/recipe.smithing"
+                        },
+                        "change_me_2": {
+                            "type": "object",
+                            "$ref": "#/$defs/recipe.smithing"
+                        },
+                        "change_me_xxx": {
+                            "type": "object",
+                            "$ref": "#/$defs/recipe.smithing"
+                        }
+                    }
                 }
             }
         },
         "loots": {
             "type": "object",
-            "description": "Create loots (item drop) based on broken block, killed entity and on fishing",
+            "markdownDescription": "Create loots (item drop) based on broken block, killed entity and on fishing",
             "properties": {
                 "blocks": {
                     "type": "object",
@@ -197,7 +221,7 @@ export const schemas = {
         },
         "worlds_populators": {
             "type": "object",
-            "description": "Create rules to spawn custom ores around your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
+            "markdownDescription": "Create rules to spawn custom ores around your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -221,7 +245,7 @@ export const schemas = {
         },
         "trees_populators": {
             "type": "object",
-            "description": "Create rules to spawn custom trees around your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
+            "markdownDescription": "Create rules to spawn custom trees around your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -245,7 +269,7 @@ export const schemas = {
         },
         "surface_decorators": {
             "type": "object",
-            "description": "Create rules to spawn custom blocks on the surface of your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
+            "markdownDescription": "Create rules to spawn custom blocks on the surface of your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -269,7 +293,7 @@ export const schemas = {
         },
         "cave_decorators": {
             "type": "object",
-            "description": "Create rules to spawn custom blocks in the caves of your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
+            "markdownDescription": "Create rules to spawn custom blocks in the caves of your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -293,7 +317,7 @@ export const schemas = {
         },
         "font_images": {
             "type": "object",
-            "description": "Create your own font characters. You can use them as emoji, GUI texture, HUD...\nIt's basically an image shown in texts.",
+            "markdownDescription": "Create your own font characters. You can use them as emoji, GUI texture, HUD...\nIt's basically an image shown in texts.",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -317,7 +341,7 @@ export const schemas = {
         },
         "huds": {
             "type": "object",
-            "description": "Create your own HUDs. You will be able to show mana on screen, fuel, current minigame level, heat and anything you want to add!",
+            "markdownDescription": "Create your own HUDs. You will be able to show mana on screen, fuel, current minigame level, heat and anything you want to add!",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -341,7 +365,7 @@ export const schemas = {
         },
         "categories": {
             "type": "object",
-            "description": "Create your own categories and show them in /ia command",
+            "markdownDescription": "Create your own categories and show them in /ia command",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -365,7 +389,7 @@ export const schemas = {
         },
         "liquids": {
             "type": "object",
-            "description": "Create your own colored liquids",
+            "markdownDescription": "Create your own colored liquids",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -389,7 +413,7 @@ export const schemas = {
         },
         "minecraft_lang_overwrite": {
             "type": "object",
-            "description": "Replace language attributes to your custom value.",
+            "markdownDescription": "Replace language attributes to your custom value.",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -413,7 +437,7 @@ export const schemas = {
         },
         "dictionary": {
             "type": "object",
-            "description": "Create a special list of texts to be used (almost) anywhere and get translated automatically by the plugin.\nFor example: in items names, lores, /ia menu categories names",
+            "markdownDescription": "Create a special list of texts to be used (almost) anywhere and get translated automatically by the plugin.\nFor example: in items names, lores, /ia menu categories names",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -437,7 +461,7 @@ export const schemas = {
         },
         "entities": {
             "type": "object",
-            "description": "Create a custom entity with 3D model",
+            "markdownDescription": "Create a custom entity with 3D model",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
@@ -464,7 +488,7 @@ export const schemas = {
         "attribute_modifiers": {
             "$id": "attribute_modifiers",
             "type": "object",
-            "description": "These are the vanilla attribute modifiers, you can get more info here https://minecraft.gamepedia.com/Attribute#Attributes_available_on_all_living_entities",
+            "markdownDescription": "These are the vanilla attribute modifiers, you can get more info here https://minecraft.gamepedia.com/Attribute#Attributes_available_on_all_living_entities",
             "properties": {
                 "attackDamage": {"$ref": "#/$defs/attribute_modifier"},
                 "attackSpeed": {"$ref": "#/$defs/attribute_modifier"},
@@ -478,7 +502,7 @@ export const schemas = {
         },
         "attribute_modifier": {
             "$id": "attribute_modifier",
-            "description": "You can directly set a value or press ENTER and specify value and operation.",
+            "markdownDescription": "You can directly set a value or press ENTER and specify value and operation.",
             "anyOf": [
                 {
                     "type": "object",
@@ -486,7 +510,7 @@ export const schemas = {
                     "properties": {
                         "value": {"type": "number", "default": 1},
                         "operation": {
-                            "description": "More info here: https://minecraft.fandom.com/wiki/Attribute#Operations",
+                            "markdownDescription": "More info here: https://minecraft.fandom.com/wiki/Attribute#Operations",
                             "type": "string",
                             "enum": ["add", "multiply_base", "multiply"],
                             "default": "add"
@@ -494,7 +518,7 @@ export const schemas = {
                     }
                 },
                 {
-                    "description": "You can directly set a value or press ENTER and specify value and operation.",
+                    "markdownDescription": "You can directly set a value or press ENTER and specify value and operation.",
                     "type": "number"
                 }
             ]
@@ -547,7 +571,7 @@ export const schemas = {
         "vanilla_materials_and_customitems": {
             "$id": "vanilla_materials_and_customitems",
             "title": "Vanilla / ItemsAdder custom item",
-            "description": "Examples: **STONE**, **itemsadder:ruby**, **ruby**",
+            "markdownDescription": "Examples: **STONE**, **itemsadder:ruby**, **ruby**",
             "type": "string",
             "anyOf": [
                 {
@@ -1638,7 +1662,7 @@ export const schemas = {
         "vanilla_and_custom_blocks": {
             "$id": "vanilla_and_custom_blocks",
             "title": "Vanilla / ItemsAdder custom blocks",
-            "description": "Examples: **STONE**, **itemsadder:ruby_block**, **crying_obsidian**",
+            "markdownDescription": "Examples: **STONE**, **itemsadder:ruby_block**, **crying_obsidian**",
             "type": "string",
             "anyOf": [
                 {
@@ -2222,7 +2246,7 @@ export const schemas = {
         "vanilla_materials": {
             "$id": "vanilla_materials",
             "title": "Vanilla Materials",
-            "description": "Examples: **STONE**, **DIAMOND**",
+            "markdownDescription": "Examples: **STONE**, **DIAMOND**",
             "type": "string",
             "enum": [
                 "AIR",
@@ -3307,7 +3331,7 @@ export const schemas = {
         "vanilla_blocks": {
             "$id": "vanilla_blocks",
             "title": "Vanilla blocks",
-            "description": "Examples: **STONE**, **DIAMOND_BLOCK**",
+            "markdownDescription": "Examples: **STONE**, **DIAMOND_BLOCK**",
             "type": "string",
             "anyOf": [
                 {
@@ -3891,7 +3915,7 @@ export const schemas = {
         "vanilla_potion_types": {
             "$id": "vanilla_potion_types",
             "type": "string",
-            "description": "Vanilla potion types",
+            "markdownDescription": "Vanilla potion types",
             "enum": [
                 "UNCRAFTABLE",
                 "WATER",
@@ -3919,7 +3943,7 @@ export const schemas = {
         "vanilla_sounds": {
             "$id": "vanilla_sounds",
             "type": "string",
-            "description": "Vanilla sounds",
+            "markdownDescription": "Vanilla sounds",
             "enum": [
                 "ambient.basalt_deltas.additions",
                 "ambient.basalt_deltas.loop",
@@ -4911,13 +4935,13 @@ export const schemas = {
         "vanilla_sounds_and_custom": {
             "$id": "vanilla_sounds_and_custom",
             "type": "string",
-            "description": "Vanilla sounds",
+            "markdownDescription": "Vanilla sounds",
             "anyOf": [{"$ref": "#/$defs/vanilla_sounds"}, {"type": "string"}]
         },
         "vanilla_entity_types": {
             "$id": "vanilla_entity_types",
             "type": "string",
-            "description": "Vanilla entities",
+            "markdownDescription": "Vanilla entities",
             "enum": [
                 "DROPPED_ITEM",
                 "EXPERIENCE_ORB",
@@ -5033,7 +5057,7 @@ export const schemas = {
         "vanilla_particles": {
             "$id": "vanilla_particles",
             "type": "string",
-            "description": "Vanilla particles",
+            "markdownDescription": "Vanilla particles",
             "enum": [
                 "EXPLOSION_NORMAL",
                 "EXPLOSION_LARGE",
@@ -5105,7 +5129,7 @@ export const schemas = {
         "vanilla_effects": {
             "$id": "vanilla_effects",
             "type": "string",
-            "description": "Vanilla effects",
+            "markdownDescription": "Vanilla effects",
             "enum": [
                 "CLICK2",
                 "CLICK1",
@@ -5157,7 +5181,7 @@ export const schemas = {
         "vanilla_potion_effects": {
             "$id": "vanilla_potion_effects",
             "type": "string",
-            "description": "Vanilla potion effects",
+            "markdownDescription": "Vanilla potion effects",
             "enum": [
                 "SPEED",
                 "SLOW",
@@ -5196,7 +5220,7 @@ export const schemas = {
         "vanilla_biomes": {
             "$id": "vanilla_biomes",
             "type": "string",
-            "description": "Vanilla biomes",
+            "markdownDescription": "Vanilla biomes",
             "enum": [
                 "OCEAN",
                 "PLAINS",
@@ -5281,7 +5305,7 @@ export const schemas = {
         },
         "colors": {
             "$id": "colors",
-            "description": "Valid colors can be obtained from here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html\nIf you want very precise color you can use this website to get the Decimal value: https://www.mathsisfun.com/hexadecimal-decimal-colors.html",
+            "markdownDescription": "Valid colors can be obtained from here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Color.html\nIf you want very precise color you can use this website to get the Decimal value: https://www.mathsisfun.com/hexadecimal-decimal-colors.html",
             "kind": 19,
             "default": "WHITE",
             "anyOf": [
@@ -5332,50 +5356,77 @@ export const schemas = {
                                         "FIRE"
                                     ],
                                     "default": "REAL_NOTE",
-                                    "description": "(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
+                                    "markdownDescription": "(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
                                 },
                                 "break_particles": {
-                                    "description": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
+                                    "markdownDescription": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
                                     "type": "string",
                                     "enum": ["VANILLA", "BLOCK", "ITEM"]
                                 },
                                 "break_particles_material": {
-                                    "description": "Alternative to 'break_particles' property.\n\nSpecify which texture the break particle will have (more control compared to break_particles).\n**Accepts only vanilla blocks and custom items!**",
+                                    "markdownDescription": "Alternative to 'break_particles' property.\n\nSpecify which texture the break particle will have (more control compared to break_particles).\n**Accepts only vanilla blocks and custom items!**",
                                     "$ref": "#/$defs/vanilla_and_custom_blocks"
                                 },
                                 "shift_up": {
                                     "type": "boolean",
-                                    "description": "This allows to make some blocks placed one block up. This is useful for REAL_WIRE blocks to create tall plants."
+                                    "markdownDescription": "This allows to make some blocks placed one block up. This is useful for REAL_WIRE blocks to create tall plants."
                                 },
                                 "placeable_on_other_real_wire": {
                                     "type": "boolean",
-                                    "description": "This allows to make this REAL_WIRE block placeable on top of another REAL_WIRE block."
+                                    "markdownDescription": "This allows to make this REAL_WIRE block placeable on top of another REAL_WIRE block."
                                 },
                                 "placeable_on_water": {
                                     "type": "boolean",
-                                    "description": "This allows to make this block placeable directly on water surface."
+                                    "markdownDescription": "This allows to make this block placeable directly on water surface."
                                 },
                                 "placeable_on_lava": {
                                     "type": "boolean",
-                                    "description": "This allows to make this block placeable directly on lava surface."
+                                    "markdownDescription": "This allows to make this block placeable directly on lava surface."
+                                },
+                                "custom_variants" : {
+                                    "type": "object",
+                                    "kind": 5,
+                                    "detail": "(Custom block variant)",
+                                    "additionalProperties": {
+                                        "type": "object",
+                                        "$ref": "#/$defs/custom_block_variant"
+                                    },
+                                    "properties": {
+                                        "variant_1": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/custom_block_variant"
+                                        },
+                                        "variant_2": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/custom_block_variant"
+                                        },
+                                        "variant_3": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/custom_block_variant"
+                                        },
+                                        "variant_xxx": {
+                                            "type": "object",
+                                            "$ref": "#/$defs/custom_block_variant"
+                                        }
+                                    }
                                 },
                                 "rotx": {
                                     "type": "integer",
-                                    "description": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
+                                    "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
                                 },
                                 "roty": {
                                     "type": "integer",
-                                    "description": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
+                                    "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
                                 }
                             }
                         },
-                        "hardness": {"description": "Mining hardness", "type": "number"},
+                        "hardness": {"markdownDescription": "Mining hardness", "type": "number"},
                         "blast_resistance": {
-                            "description": "Explosion resistance. It is hardness*3 by default if you don't set blast_resistance.",
+                            "markdownDescription": "Explosion resistance. It is hardness*3 by default if you don't set blast_resistance.",
                             "type": "number"
                         },
                         "no_explosion": {
-                            "description": "Totally immune from explosions, ignoring blast_resistance",
+                            "markdownDescription": "Totally immune from explosions, ignoring blast_resistance",
                             "type": "boolean"
                         },
                         "sound": {
@@ -5399,17 +5450,17 @@ export const schemas = {
                         "cancel_drop": {
                             "type": "boolean",
                             "default": false,
-                            "description": "Default is false. If true the custom block won't be dropped when a player mines it"
+                            "markdownDescription": "Default is false. If true the custom block won't be dropped when a player mines it"
                         },
                         "light_level": {
                             "type": "integer",
-                            "description": "Set this to make the block emit light.",
+                            "markdownDescription": "Set this to make the block emit light.",
                             "minimum": 1,
                             "maximum": 15
                         },
                         "break_tools_blacklist": {
                             "type": "array",
-                            "description": "Blacklist of tools that cannot break this block",
+                            "markdownDescription": "Blacklist of tools that cannot break this block",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -5436,7 +5487,7 @@ export const schemas = {
                         },
                         "break_tools_whitelist": {
                             "type": "array",
-                            "description": "Whitelist of tools that cannot break this block",
+                            "markdownDescription": "Whitelist of tools that cannot break this block",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -5463,7 +5514,7 @@ export const schemas = {
                         },
                         "events_tools_whitelist": {
                             "type": "array",
-                            "description": "Whitelist of tools that cannot run events on this block (placed_block.interact)",
+                            "markdownDescription": "Whitelist of tools that cannot run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -5490,7 +5541,7 @@ export const schemas = {
                         },
                         "events_tools_blacklist": {
                             "type": "array",
-                            "description": "Blacklist of tools that cannot run events on this block (placed_block.interact)",
+                            "markdownDescription": "Blacklist of tools that cannot run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -5557,7 +5608,7 @@ export const schemas = {
                             ]
                         },
                         "results": {
-                            "description": "List of the possible result drops and their chances",
+                            "markdownDescription": "List of the possible result drops and their chances",
                             "type": "object",
                             "additionalProperties": {
                                 "type": "object",
@@ -5575,7 +5626,7 @@ export const schemas = {
                     "properties": {
                         "custom_armor": {
                             "type": "string",
-                            "description": "Minecraft 1.17+ only!\n\nThis property makes the plugin use the specified 'armors_rendering' textures for this armor piece.\nNote: you must create an 'armors_rendering' setting in order to reference it here. Read more: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-armors/\n\nIf you decide to specify 'custom_armor' you can avoid setting the 'color' property here."
+                            "markdownDescription": "Minecraft 1.17+ only!\n\nThis property makes the plugin use the specified 'armors_rendering' textures for this armor piece.\nNote: you must create an 'armors_rendering' setting in order to reference it here. Read more: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-armors/\n\nIf you decide to specify 'custom_armor' you can avoid setting the 'color' property here."
                         },
                         "slot": {
                             "type": "string",
@@ -5649,13 +5700,13 @@ export const schemas = {
         },
         "item": {
             "$id": "item",
-            "title": "Custom item",
+            "markdownDescription": "Custom item",
             "type": "object",
             "required": ["resource", "display_name"],
             "additionalProperties": false,
             "properties": {
                 "enabled": {
-                    "description": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
+                    "markdownDescription": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
                     "type": "boolean",
                     "default": true,
                     "kind": 0
@@ -5663,60 +5714,61 @@ export const schemas = {
                 "template": {
                     "type": "boolean",
                     "kind": 7,
-                    "description": "Templates are special items that won't appear ingame, they are used as properties holders for other items.\nThey allow you to write common properties in one item and add them automatically to other items without constant copy and paste.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
+                    "markdownDescription": "Templates are special items that won't appear ingame, they are used as properties holders for other items.\nThey allow you to write common properties in one item and add them automatically to other items without constant copy and paste.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
                 },
                 "variant_of": {
                     "type": "string",
                     "kind": 5,
-                    "description": "Name of the template you want to use.\nVariants are items that will appear ingame and will inherit properties of template items.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
+                    "markdownDescription": "Name of the template you want to use.\nVariants are items that will appear ingame and will inherit properties of template items.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
                 },
                 "display_name": {
-                    "description": "Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "markdownDescription": "Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
                     "type": "string",
                     "default": "display-name-",
                     "kind": 18
                 },
                 "permission": {
-                    "description": "Permission of the item",
+                    "markdownDescription": "Permission of the item",
                     "type": "string"
                 },
                 "mmoitem": {
-                    "description": "Special property to mark item as MMOITEM https://www.spigotmc.org/resources/39267/",
+                    "markdownDescription": "Special property to mark item as MMOITEM https://www.spigotmc.org/resources/39267/",
                     "additionalProperties": false,
                     "properties": {
                         "type": {
-                            "description": "MMOITEM Type (check MMOItems docs)",
+                            "markdownDescription": "MMOITEM Type (check MMOItems docs)",
                             "type": "string"
                         },
                         "$id": {
-                            "description": "MMOITEM id (check MMOItems docs)",
+                            "markdownDescription": "MMOITEM id (check MMOItems docs)",
                             "type": "string"
                         }
                     }
                 },
                 "resource": {
-                    "description": "Resource",
+                    "markdownDescription": "Resource",
                     "type": "object",
-                    "required": ["generate"],
                     "properties": {
                         "material": {"$ref": "#/$defs/vanilla_materials"},
                         "generate": {
                             "type": "boolean",
-                            "default": true,
-                            "description": "Decide if you want to automatically generate a model from your textures or you want to create the model by yourself."
+                            "markdownDescription": "Decide if you want to automatically generate a model from your textures or you want to create the model by yourself.\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
                         },
                         "model_id": {
                             "type": "integer",
-                            "description": "If you want to force the usage of a defined custom_model_data (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                            "markdownDescription": "If you want to force the usage of a defined custom_model_data (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
                         },
                     },
                     "if": {
-                        "properties": {"generate": {"const" : true}}
+                        "properties": {"generate": {"const" : true}},
+                        "required": ["generate"]
                     },
                     "then": {
                         "properties": {
                             "textures": {
                                 "items": {"type": "string"},
+                                "title": "Set `generate: true` to use this!",
+                                "markdownDescription": "Specifies the textures layers to be used to generate the model. You usually will need only 1 texture.\nIf you are creating a block you can set 1 texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
                                 "defaultSnippets": [
                                     {"body": "item/$0.png"},
                                     {"body": "block/$0.png"}
@@ -5730,6 +5782,7 @@ export const schemas = {
                         "properties": {
                             "model_path": {
                                 "type": "string",
+                                "title": "Set `generate: false` to use this!",
                                 "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
                             }
                         },
@@ -5737,11 +5790,11 @@ export const schemas = {
                     }
                 },
                 "lore": {
-                    "description": "Lore of the item",
+                    "markdownDescription": "Lore of the item",
                     "items": {"type": "string"}
                 },
                 "attribute_modifiers": {
-                    "description": "Slot in which the item has effect",
+                    "markdownDescription": "Slot in which the item has effect",
                     "type": "object",
                     "properties": {
                         "mainhand": {"$ref": "#/$defs/attribute_modifiers"},
@@ -5753,34 +5806,38 @@ export const schemas = {
                     }
                 },
                 "durability": {
-                    "description": "Durability of the item",
+                    "markdownDescription": "Durability of the item",
                     "type": "object",
                     "properties": {
                         "max_custom_durability": {
                             "type": "integer",
-                            "description": "Max durability of the item. If not specified ItemsAdder will use default material max durability",
+                            "markdownDescription": "Max durability of the item. If not specified ItemsAdder will use default material max durability",
                             "default": 1562
                         },
                         "custom_durability": {
                             "type": "integer",
-                            "description": "Current durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)"
+                            "markdownDescription": "Current durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)"
                         },
                         "disappear_when_broken": {
                             "type": "boolean",
-                            "description": "If the item should disappear when broken"
+                            "markdownDescription": "If the item should disappear when broken"
                         },
                         "unbreakable": {
                             "type": "boolean",
-                            "description": "If the item can get damage"
+                            "markdownDescription": "If the item can get damage"
                         },
                         "usages": {
                             "type": "integer",
-                            "description": "Usages of the item before it disappears (you must handle usages using an event and action (decrement_usages) https://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/events/actions"
+                            "markdownDescription": "Usages of the item before it disappears (you must handle usages using an event and action (decrement_usages) https://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/events/actions"
+                        },
+                        "show_custom_durability_lore": {
+                            "type": "boolean",
+                            "markdownDescription" : "Show the custom durability lore line or not. Default value is taken from config.yml `hide-custom-durability-lore` and will be used if this property is not specified."
                         }
                     }
                 },
                 "item_flags": {
-                    "description": "Vanilla Minecraft item flags.\nSpecial item flags that can hide some vanilla info of the item.\nYou can find a detailed info list here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/inventory/ItemFlag.html",
+                    "markdownDescription": "Vanilla Minecraft item flags.\nSpecial item flags that can hide some vanilla info of the item.\nYou can find a detailed info list here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/inventory/ItemFlag.html",
                     "items": {
                         "type": "string",
                         "enum": [
@@ -5794,14 +5851,14 @@ export const schemas = {
                     }
                 },
                 "enchants": {
-                    "description": "Set default enchants to this item.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html\n\nYou can set also the enchant level, for example: \n- DIG_SPEED:5\n\nYou can also set other plugins enchants (if they provide your the ID), for example:- my_custom_plugin:custom_enchant:6\n- blast_mining:1\n",
+                    "markdownDescription": "Set default enchants to this item.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html\n\nYou can set also the enchant level, for example: \n- DIG_SPEED:5\n\nYou can also set other plugins enchants (if they provide your the ID), for example:- my_custom_plugin:custom_enchant:6\n- blast_mining:1\n",
                     "type": "array",
                     "items": {
                         "anyOf": [{"$ref": "#/$defs/vanilla_enchants"}, {"type": "string"}]
                     }
                 },
                 "blocked_enchants": {
-                    "description": "Special item property that disables enchants for this item, so your users won't be able to enchant it.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html",
+                    "markdownDescription": "Special item property that disables enchants for this item, so your users won't be able to enchant it.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html",
                     "type": "array",
                     "items": {
                         "anyOf": [
@@ -5815,18 +5872,18 @@ export const schemas = {
                     "$ref": "#/$defs/specific_properties"
                 },
                 "nbt": {
-                    "description": "Custom NBT properties for this custom item. Read here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
+                    "markdownDescription": "Custom NBT properties for this custom item. Read here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
                     "type": "string"
                 },
                 "drop": {
-                    "description": "Customize some aspects of how the dropped item appears.",
+                    "markdownDescription": "Customize some aspects of how the dropped item appears.",
                     "properties": {
                         "show_name": {
-                            "description": "You can make a drop show its name.\nVery useful for rare items.",
+                            "markdownDescription": "You can make a drop show its name.\nVery useful for rare items.",
                             "type": "boolean"
                         },
                         "glow": {
-                            "description": "You can make an item glowing when dropped on the ground.\nVery useful for rare items.",
+                            "markdownDescription": "You can make an item glowing when dropped on the ground.\nVery useful for rare items.",
                             "properties": {
                                 "enabled": {"type": "boolean"},
                                 "color": {
@@ -5858,11 +5915,11 @@ export const schemas = {
                 "behaviours": {"type": "object", "$ref": "#/$defs/behaviours"},
                 "events_cooldown": {
                     "type": "integer",
-                    "description": "Cooldown in ticks before user can activate events of this item"
+                    "markdownDescription": "Cooldown in ticks before user can activate events of this item"
                 },
                 "all_actions_permission": {
                     "type": "string",
-                    "description": "Permission needed to execute any of the actions of each event.\nIf you want to set a different permission to eachaction you can add the 'permission' attribute on each action instead."
+                    "markdownDescription": "Permission needed to execute any of the actions of each event.\nIf you want to set a different permission to eachaction you can add the 'permission' attribute on each action instead."
                 },
                 "events": {"type": "object", "$ref": "#/$defs/events"}
             }
@@ -5874,30 +5931,30 @@ export const schemas = {
             "required": ["items"],
             "properties": {
                 "enabled": {
-                    "description": "Enable the category",
+                    "markdownDescription": "Enable the category",
                     "type": "boolean",
                     "default": true,
                     "kind": 0
                 },
                 "name": {
-                    "description": "Display name of the category.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "markdownDescription": "Display name of the category.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
                     "type": "string",
                     "default": "display-name-"
                 },
                 "title": {
-                    "description": "Display name of the category, inside the category view itself. Value of 'name' attribute will be used if not specified.",
+                    "markdownDescription": "Display name of the category, inside the category view itself. Value of 'name' attribute will be used if not specified.",
                     "type": "string"
                 },
                 "permission": {
-                    "description": "Permission of the category",
+                    "markdownDescription": "Permission of the category",
                     "type": "string"
                 },
                 "skip_if_already": {
                     "type": "boolean",
-                    "description": "Skip this category if ItemsAdder already registered one with the same name from another .yml file"
+                    "markdownDescription": "Skip this category if ItemsAdder already registered one with the same name from another .yml file"
                 },
                 "icon": {
-                    "description": "Icon of this category. Can be a custom item or a vanilla material",
+                    "markdownDescription": "Icon of this category. Can be a custom item or a vanilla material",
                     "$ref": "#/$defs/vanilla_materials_and_customitems"
                 },
                 "font_image": {
@@ -5905,21 +5962,21 @@ export const schemas = {
                     "properties": {
                         "name": {
                             "type": "string",
-                            "description": "Namespaced ID of the font_image to be used as background. (example: 'mcguis:blank_menu')"
+                            "markdownDescription": "Namespaced ID of the font_image to be used as background. (example: 'mcguis:blank_menu')"
                         },
                         "x_position_pixels": {
                             "type": "integer",
-                            "description": "Shift the font_image of some pixels on the X axis. Usually set to -16"
+                            "markdownDescription": "Shift the font_image of some pixels on the X axis. Usually set to -16"
                         }
                     }
                 },
                 "title_position_pixels": {
                     "type": "integer",
-                    "description": "Shift the title text of some pixels on the X axis. Usually set to 0"
+                    "markdownDescription": "Shift the title text of some pixels on the X axis. Usually set to 0"
                 },
                 "show_all_items": {
                     "type": "boolean",
-                    "description": "Show all items in this category (you can exclude some items using the hide_items attribute)"
+                    "markdownDescription": "Show all items in this category (you can exclude some items using the hide_items attribute)"
                 },
                 "items": {
                     "type": "array",
@@ -5927,7 +5984,7 @@ export const schemas = {
                 },
                 "hide_items": {
                     "type": "array",
-                    "description": "List of items to be hidden from this category (useful if you're using show_all_items property)",
+                    "markdownDescription": "List of items to be hidden from this category (useful if you're using show_all_items property)",
                     "items": {"$ref": "#/$defs/vanilla_materials_and_customitems"}
                 }
             }
@@ -5944,7 +6001,7 @@ export const schemas = {
             "properties": {
                 "enabled": {
                     "type": "boolean",
-                    "description": "Enable or disable these lang_overwrite settings."
+                    "markdownDescription": "Enable or disable these lang_overwrite settings."
                 },
                 "languages": {
                     "type": "array",
@@ -6078,10 +6135,10 @@ export const schemas = {
                 },
                 "entries": {
                     "type": "array",
-                    "description": "List of language attributes to replace with their replacement value.",
+                    "markdownDescription": "List of language attributes to replace with their replacement value.",
                     "items": {
                         "type": "string",
-                        "description": "Language attribute to replace, example: menu.shareToLan",
+                        "markdownDescription": "Language attribute to replace, example: menu.shareToLan",
                         "default": "menu.shareToLan"
                     }
                 }
@@ -6123,30 +6180,14 @@ export const schemas = {
         "recipe.craft": {
             "$id": "recipe.craft",
             "type": "object",
-            "description": "Crafting table recipe",
-            "required": ["pattern", "ingredients", "result"],
+            "markdownDescription": "Crafting table recipe",
+            "required": ["ingredients", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
                 "permission": {"type": "string"},
-                "pattern": {
-                    "type": "array",
-                    "description": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.\n\nYou can create multiple patterns per recipe, just make sure that the attribute starts with 'pattern' text. For example pattern_2.",
-                    "items": {"type": "string", "examples": ["XXX"]}
-                },
-                "pattern_1": {
-                    "type": "array",
-                    "description": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
-                    "items": {"type": "string", "examples": ["XXX"]}
-                },
-                "pattern_2": {
-                    "type": "array",
-                    "description": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
-                    "items": {"type": "string", "examples": ["XXX"]}
-                },
-                "pattern_X": {
-                    "type": "array",
-                    "description": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
-                    "items": {"type": "string", "examples": ["XXX"]}
+                "shapeless": {
+                    "markdownDescription": "Allow the player to place the ingredients anywhere in the crafting table.",
+                    "type": "boolean"
                 },
                 "ingredients": {"$ref": "#/$defs/ingredients"},
                 "result": {
@@ -6198,12 +6239,40 @@ export const schemas = {
                         }
                     }
                 }
+            },
+            "if": {
+                "properties" : { "shapeless" : {"const" : false} }
+            },
+            "then": {
+                "required": ["pattern"],
+                "properties" : { 
+                    "pattern": {
+                        "type": "array",
+                        "markdownDescription": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.\n\nYou can create multiple patterns per recipe, just make sure that the attribute starts with 'pattern' text. For example pattern_2.",
+                        "items": {"type": "string", "examples": ["XXX"]}
+                    },
+                    "pattern_1": {
+                        "type": "array",
+                        "markdownDescription": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
+                        "items": {"type": "string", "examples": ["XXX"]}
+                    },
+                    "pattern_2": {
+                        "type": "array",
+                        "markdownDescription": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
+                        "items": {"type": "string", "examples": ["XXX"]}
+                    },
+                    "pattern_X": {
+                        "type": "array",
+                        "markdownDescription": "Example:\n\npattern:\n  - XXX\n  - XOX\n  - XXX\n\nThis will make a recipe that requires 1 item in the center.",
+                        "items": {"type": "string", "examples": ["XXX"]}
+                    }
+                }
             }
         },
         "ingredients": {
             "$id": "ingredients",
             "type": "object",
-            "description": "Here you can specify what a pattern character means.\nFor example you can set **M: STONE**, which would tell ItemsAdder that the **M** in pattern is a **STONE** item",
+            "markdownDescription": "Here you can specify what a pattern character means.\nFor example you can set **M: STONE**, which would tell ItemsAdder that the **M** in pattern is a **STONE** item",
             "properties": {
                 "A": {
                     "type": "string",
@@ -6416,7 +6485,7 @@ export const schemas = {
                 "permission": {"type": "string"},
                 "machines": {
                     "type": "array",
-                    "description": "List of the machines that will have this recipe available",
+                    "markdownDescription": "List of the machines that will have this recipe available",
                     "items": {
                         "type": "string",
                         "enum": ["FURNACE", "BLAST_FURNACE", "SMOKER"]
@@ -6502,6 +6571,50 @@ export const schemas = {
                 }
             }
         },
+        "recipe.smithing": {
+            "$id": "recipe.smithing",
+            "type": "object",
+            "required": ["ingredient", "item"],
+            "properties": {
+                "enabled": {"type": "boolean", "default": true},
+                "permission": {"type": "string"},
+                "base": {
+                    "type": "string",
+                    "markdownDescription" : "The base item (can be a custom item or vanilla material) on the first slot.",
+                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                },
+                "addition": {
+                    "type": "string",
+                    "markdownDescription" : "The mineral item (can be a custom item or vanilla material) on the second slot.",
+                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                },
+                "result": {
+                    "type": "object",
+                    "markdownDescription" : "The resulting item (can be a custom item or vanilla material) which will be merged into the first slot item.",
+                    "properties": {
+                        "item": {
+                            "markdownDescription" : "The resulting item (can be a custom item or vanilla material) which will be merged into the first slot item.",
+                            "$ref": "#/$defs/vanilla_materials_and_customitems"
+                        },
+                        "amount": {"type": "integer", "default": 1},
+                        "move_attributes": {
+                            "type": "object",
+                            "markdownDescription" : "The attributes to be moved from the first item to the result item.",
+                            "properties": {
+                                "enchants": {"type": "boolean", "default": true},
+                                "durability": {"type": "boolean"},
+                                "custom_model_data": {"type": "boolean"},
+                                "material": {"type": "boolean"},
+                                "other_nbt": {
+                                    "markdownDescription" : "Move EVERY NBT data from the first item to the last item. Use this property only if you know what you are doing.",
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "loot.block": {
             "$id": "loot.block",
             "type": "object",
@@ -6509,16 +6622,16 @@ export const schemas = {
             "properties": {
                 "enabled": {"type": "boolean"},
                 "type": {
-                    "description": "**Accepts only blocks, don't set items as type!**",
+                    "markdownDescription": "**Accepts only blocks, don't set items as type!**",
                     "$ref": "#/$defs/vanilla_and_custom_blocks"
                 },
                 "nbt": {"$ref": "#/$defs/nbt"},
                 "drop_only_first": {
                     "type": "boolean",
-                    "description": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
                 },
                 "items": {
-                    "description": "List of the possible result drops and their chances",
+                    "markdownDescription": "List of the possible result drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6534,8 +6647,22 @@ export const schemas = {
                     "type": "array",
                     "items": {"$ref": "#/$defs/vanilla_biomes"}
                 },
+                "worlds": {
+                    "type": "array",
+                    "markdownDescription": "https://itemsadder.devs.beer/plugin-usage/adding-content/loots#per-world-loots\n\nLoots will drop in all worlds if you don't specify any world.\nThe special * character allows any world starting with a particular text.\nIn this example every world starting with world_ will match and will drop loots.\n\nThe special ! character denies the loot to be dropped in any world starting with a particular text.\nIn this example every world starting with private_ will match and won't allow dropping loots.\n\nYou can also specify precise world names, in this example example2 won't allow loots to be dropped.\nYou can also specify precise world names, in this example example1 will allow loots to be dropped.",
+                    "items": {
+                        "anyOf": [
+                            {"type": "string"},
+                            {
+                                "type": "string",
+                                "enum": ["world", "world_nether", "world_the_end", "!world_*", "world_*"],
+                                "default": "world"
+                            }
+                        ]
+                    }
+                },
                 "exp": {
-                    "description": "List of the possible result EXP drops and their chances",
+                    "markdownDescription": "List of the possible result EXP drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6556,15 +6683,15 @@ export const schemas = {
             "properties": {
                 "enabled": {"type": "boolean"},
                 "type": {
-                    "description": "**Accepts only vanilla mobs**",
+                    "markdownDescription": "**Accepts only vanilla mobs**",
                     "$ref": "#/$defs/vanilla_entity_types"
                 },
                 "drop_only_first": {
                     "type": "boolean",
-                    "description": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
                 },
                 "items": {
-                    "description": "List of the possible result drops and their chances",
+                    "markdownDescription": "List of the possible result drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6581,7 +6708,7 @@ export const schemas = {
                     "items": {"$ref": "#/$defs/vanilla_biomes"}
                 },
                 "exp": {
-                    "description": "List of the possible result EXP drops and their chances",
+                    "markdownDescription": "List of the possible result EXP drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6596,7 +6723,7 @@ export const schemas = {
                 "nbt": {"$ref": "#/$defs/nbt"},
                 "metadata": {
                     "type": "object",
-                    "description": "Special property to specify which metadata (Bukkit) data must match",
+                    "markdownDescription": "Special property to specify which metadata (Bukkit) data must match",
                     "additionalProperties": {
                         "type": "object",
                         "$ref": "#/$defs/metadata_matcher"
@@ -6636,10 +6763,10 @@ export const schemas = {
                 "enabled": {"type": "boolean"},
                 "drop_only_first": {
                     "type": "boolean",
-                    "description": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
                 },
                 "items": {
-                    "description": "List of the possible result drops and their chances",
+                    "markdownDescription": "List of the possible result drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6656,7 +6783,7 @@ export const schemas = {
                     "items": {"$ref": "#/$defs/vanilla_biomes"}
                 },
                 "exp": {
-                    "description": "List of the possible result EXP drops and their chances",
+                    "markdownDescription": "List of the possible result EXP drops and their chances",
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
@@ -6685,11 +6812,11 @@ export const schemas = {
             "properties": {
                 "block": {
                     "type": "string",
-                    "description": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
+                    "markdownDescription": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
                 },
                 "worlds": {
                     "type": "array",
-                    "description": "Worlds list in which you want to spawn ores",
+                    "markdownDescription": "Worlds list in which you want to spawn ores",
                     "items": {
                         "anyOf": [
                             {"type": "string"},
@@ -6702,7 +6829,7 @@ export const schemas = {
                     }
                 },
                 "replaceable_blocks": {
-                    "description": "Blocks that can be replaced when the ore vein is spawned",
+                    "markdownDescription": "Blocks that can be replaced when the ore vein is spawned",
                     "type": "array",
                     "items": {"$ref": "#/$defs/vanilla_blocks"}
                 },
@@ -6731,11 +6858,11 @@ export const schemas = {
             "properties": {
                 "block": {
                     "type": "string",
-                    "description": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
+                    "markdownDescription": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
                 },
                 "worlds": {
                     "type": "array",
-                    "description": "Worlds list in which you want to spawn blocks",
+                    "markdownDescription": "Worlds list in which you want to spawn blocks",
                     "items": {
                         "anyOf": [
                             {"type": "string"},
@@ -6748,7 +6875,7 @@ export const schemas = {
                     }
                 },
                 "bottom_blocks": {
-                    "description": "The custom block will be spawned only if one of these material is available on the surface of the chunk.",
+                    "markdownDescription": "The custom block will be spawned only if one of these material is available on the surface of the chunk.",
                     "type": "array",
                     "items": {"$ref": "#/$defs/vanilla_blocks"}
                 },
@@ -6776,11 +6903,11 @@ export const schemas = {
             "properties": {
                 "block": {
                     "type": "string",
-                    "description": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
+                    "markdownDescription": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
                 },
                 "worlds": {
                     "type": "array",
-                    "description": "Worlds list in which you want to spawn blocks",
+                    "markdownDescription": "Worlds list in which you want to spawn blocks",
                     "items": {
                         "anyOf": [
                             {"type": "string"},
@@ -6793,7 +6920,7 @@ export const schemas = {
                     }
                 },
                 "bottom_blocks": {
-                    "description": "The custom block will be spawned only if one of these material is available in the caves.",
+                    "markdownDescription": "The custom block will be spawned only if one of these material is available in the caves.",
                     "type": "array",
                     "items": {"$ref": "#/$defs/vanilla_blocks"}
                 },
@@ -6824,11 +6951,11 @@ export const schemas = {
             "properties": {
                 "log": {
                     "type": "string",
-                    "description": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
+                    "markdownDescription": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
                 },
                 "leaves": {
                     "type": "string",
-                    "description": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
+                    "markdownDescription": "Custom ItemsAdder block.\n**Do not use Vanilla blocks, they are not supported**"
                 },
                 "tree_type": {
                     "type": "string",
@@ -6853,11 +6980,11 @@ export const schemas = {
                         "CRIMSON_FUNGUS",
                         "WARPED_FUNGUS"
                     ],
-                    "description": "Big trees COULD cause some lag on generation, please use only small tree types."
+                    "markdownDescription": "Big trees COULD cause some lag on generation, please use only small tree types."
                 },
                 "worlds": {
                     "type": "array",
-                    "description": "Worlds list in which you want to spawn ores",
+                    "markdownDescription": "Worlds list in which you want to spawn ores",
                     "items": {
                         "anyOf": [
                             {"type": "string"},
@@ -6870,7 +6997,7 @@ export const schemas = {
                     }
                 },
                 "bottom_blocks": {
-                    "description": "The custom tree will be spawned only if one of these material is available on the surface of the chunk.",
+                    "markdownDescription": "The custom tree will be spawned only if one of these material is available on the surface of the chunk.",
                     "type": "array",
                     "items": {"$ref": "#/$defs/vanilla_blocks"}
                 },
@@ -6888,15 +7015,15 @@ export const schemas = {
         "behaviours": {
             "$id": "behaviours",
             "type": "object",
-            "description": "Adds special functionality to this item",
+            "markdownDescription": "Adds special functionality to this item",
             "properties": {
                 "hat": {
                     "type": "boolean",
-                    "description": "Tells ItemsAdder that this item is a hat.\nYou will be able to wear it on your head."
+                    "markdownDescription": "Tells ItemsAdder that this item is a hat.\nYou will be able to wear it on your head."
                 },
                 "keep_on_death": {
                     "type": "boolean",
-                    "description": "This allows you to let the players keep the item when they die."
+                    "markdownDescription": "This allows you to let the players keep the item when they die."
                 },
                 "music_disc": {"$ref": "#/$defs/behaviour.music_disc"},
                 "gun": {"$ref": "#/$defs/behaviour.gun"},
@@ -6908,7 +7035,7 @@ export const schemas = {
                 "mob": {"$ref": "#/$defs/behaviour.mob"},
                 "liquid_analyzer": {
                     "type": "boolean",
-                    "description": "Tells ItemsAdder that this item is a liquid analyzer.\nYou will be able to check which custom liquid you're looking at."
+                    "markdownDescription": "Tells ItemsAdder that this item is a liquid analyzer.\nYou will be able to check which custom liquid you're looking at."
                 },
                 "liquid_bucket": {"$ref": "#/$defs/behaviour.liquid_bucket"},
                 "fuel": {"$ref": "#/$defs/behaviour.fuel"},
@@ -6917,7 +7044,7 @@ export const schemas = {
                     "properties": {
                         "tree_populator": {
                             "type": "string",
-                            "description": "The tree_populator to spawn on right click."
+                            "markdownDescription": "The tree_populator to spawn on right click."
                         }
                     }
                 }
@@ -6926,22 +7053,22 @@ export const schemas = {
         "behaviour.music_disc": {
             "$id": "behaviour.music_disc",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a music disc.\nYou will be able to put it inside a jukebox and make it play a song.",
+            "markdownDescription": "Tells ItemsAdder that this item is a music disc.\nYou will be able to put it inside a jukebox and make it play a song.",
             "required": ["song"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "song": {
                     "type": "object",
-                    "description": "Song properties",
+                    "markdownDescription": "Song properties",
                     "required": ["song"],
                     "properties": {
                         "name": {
                             "type": "string",
-                            "description": "Specify a song name you defined in the songs.json file.\nPlease refer to the tutorial here: https://itemsadder.devs.beer/plugin-usage/adding-content/sounds"
+                            "markdownDescription": "Specify a song name you defined in the songs.json file.\nPlease refer to the tutorial here: https://itemsadder.devs.beer/plugin-usage/adding-content/sounds"
                         },
-                        "description": {
+                        "markdownDescription": {
                             "type": "string",
-                            "description": "Description of the song. This will be shown in Actionbar when you put the disc inside a jukebox"
+                            "markdownDescription": "markdownDescription of the song. This will be shown in Actionbar when you put the disc inside a jukebox"
                         }
                     }
                 }
@@ -6950,12 +7077,12 @@ export const schemas = {
         "behaviour.gun": {
             "$id": "behaviour.gun",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a gun.\nYou will be able to shot and reload it.",
+            "markdownDescription": "Tells ItemsAdder that this item is a gun.\nYou will be able to shot and reload it.",
             "required": ["projectile"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "projectile": {
-                    "description": "Which item will be used as projectile for the gun",
+                    "markdownDescription": "Which item will be used as projectile for the gun",
                     "$ref": "#/$defs/vanilla_materials_and_customitems"
                 }
             }
@@ -6963,60 +7090,60 @@ export const schemas = {
         "behaviour.furniture_sit": {
             "$id": "behaviour.furniture_sit",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a chair.\nYou will be able to sit on it rightclicking the furniture hitbox.",
+            "markdownDescription": "Tells ItemsAdder that this item is a chair.\nYou will be able to sit on it rightclicking the furniture hitbox.",
             "required": ["sit_height"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "sit_height": {
-                    "description": "Height of the sit position",
+                    "markdownDescription": "Height of the sit position",
                     "type": "number"
                 },
                 "opposite_direction": {
                     "type": "boolean",
-                    "description": "Default: true. Enable if you want the player rotate of 180 degrees when they sit on this furniture."
+                    "markdownDescription": "Default: true. Enable if you want the player rotate of 180 degrees when they sit on this furniture."
                 },
                 "sit_all_solid_blocks": {
                     "type": "boolean",
-                    "description": "Default: true. Enable if you want the player to be able to sit on every BARRIER block of the furniture (for multi-seats chairs).\n\nThis works only on solid furnitures!"
+                    "markdownDescription": "Default: true. Enable if you want the player to be able to sit on every BARRIER block of the furniture (for multi-seats chairs).\n\nThis works only on solid furnitures!"
                 }
             }
         },
         "behaviour.furniture": {
             "$id": "behaviour.furniture",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a furniture.\nYou will be able to place it on rightclick and remove it attacking the placed entity.\n\nLimitations of furnitures:\n- non solid furnitures can't receive interact events, they can only be removed using mouse left click but cannot be interacted with (only solid furnitures can get interact events).\n- max size of the hitbox is 3x3x3 for performance reasons",
+            "markdownDescription": "Tells ItemsAdder that this item is a furniture.\nYou will be able to place it on rightclick and remove it attacking the placed entity.\n\nLimitations of furnitures:\n- non solid furnitures can't receive interact events, they can only be removed using mouse left click but cannot be interacted with (only solid furnitures can get interact events).\n- max size of the hitbox is 3x3x3 for performance reasons",
             "properties": {
                 "enabled": {"type": "boolean"},
                 "entity": {
                     "type": "string",
-                    "description": "Type of entity to use to create this furniture.\n\nnWarning: \nLimitations of item_frame furnitures:\n- solid item_frame furnitures are possible only on Server version >= 1.16 (client doesn't matter).\n- invisible item_frame furnitures are possible only on Server and Client version >= 1.16. If a user connects with viaversion using an old mc version they will see the item_frame.",
+                    "markdownDescription": "Type of entity to use to create this furniture.\n\nnWarning: \nLimitations of item_frame furnitures:\n- solid item_frame furnitures are possible only on Server version >= 1.16 (client doesn't matter).\n- invisible item_frame furnitures are possible only on Server and Client version >= 1.16. If a user connects with viaversion using an old mc version they will see the item_frame.",
                     "enum": ["armor_stand", "item_frame", "glow_item_frame"]
                 },
                 "gravity": {
                     "type": "boolean",
-                    "description": "If the furniture has gravity"
+                    "markdownDescription": "If the furniture has gravity"
                 },
                 "small": {
                     "type": "boolean",
-                    "description": "If the furniture is small or big, be sure to base your 3D model on this setting.\nResize your model using Blockbench accordingly"
+                    "markdownDescription": "If the furniture is small or big, be sure to base your 3D model on this setting.\nResize your model using Blockbench accordingly"
                 },
                 "fixed_rotation": {
                     "type": "boolean",
-                    "description": "If the furniture has fixed rotation (to place it precisely, for example use it for a wall picture)"
+                    "markdownDescription": "If the furniture has fixed rotation (to place it precisely, for example use it for a wall picture)"
                 },
                 "light_level": {
                     "type": "integer",
-                    "description": "Set this to make the furniture emit light.",
+                    "markdownDescription": "Set this to make the furniture emit light.",
                     "minimum": 1,
                     "maximum": 15
                 },
                 "solid": {
                     "type": "boolean",
-                    "description": "If the furniture is solid. ItemsAdder will add hitbox made of BARRIER blocks to simulate furniture collisions.\nYou can customize hitbox size using 'hitbox' property."
+                    "markdownDescription": "If the furniture is solid. ItemsAdder will add hitbox made of BARRIER blocks to simulate furniture collisions.\nYou can customize hitbox size using 'hitbox' property."
                 },
                 "hitbox": {
                     "type": "object",
-                    "description": "This is the hitbox of the furniture. Hitbox is the area that the player can click to remove the furniture.\nIt can be solid if 'solid' property is 'true'",
+                    "markdownDescription": "This is the hitbox of the furniture. Hitbox is the area that the player can click to remove the furniture.\nIt can be solid if 'solid' property is 'true'",
                     "properties": {
                         "length": {"type": "number"},
                         "width": {"type": "number"},
@@ -7028,7 +7155,7 @@ export const schemas = {
                 },
                 "opposite_direction": {
                     "type": "boolean",
-                    "description": "Makes the model rotate 180 degrees automatically when placed"
+                    "markdownDescription": "Makes the model rotate 180 degrees automatically when placed"
                 },
                 "sound": {
                     "properties": {
@@ -7050,7 +7177,7 @@ export const schemas = {
                 },
                 "placeable_on": {
                     "type": "object",
-                    "description": "You can decide the valid placement locations of the furniture.\n\nTHIS IS VALID ONLY FOR item_frame FURNITURE!",
+                    "markdownDescription": "You can decide the valid placement locations of the furniture.\n\nTHIS IS VALID ONLY FOR item_frame FURNITURE!",
                     "properties": {
                         "walls": {"type": "boolean"},
                         "ceiling": {"type": "boolean"},
@@ -7059,32 +7186,32 @@ export const schemas = {
                 },
                 "cancel_drop": {
                     "type": "boolean",
-                    "description": "This option allows you to avoid furniture from being dropped when broken by players."
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players."
                 }
             }
         },
         "behaviour.trade_machine": {
             "$id": "behaviour.trade_machine",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a trade machine.\nYou will be able to trade item with this machine like a villager",
+            "markdownDescription": "Tells ItemsAdder that this item is a trade machine.\nYou will be able to trade item with this machine like a villager",
             "properties": {
                 "enabled": {"type": "boolean"},
                 "title": {"type": "string"},
                 "gui_texture": {
                     "type": "object",
-                    "description": "Reskin your trading GUI with a custom texture. Keep in mind that the title will be removed if you reskin this GUI.",
+                    "markdownDescription": "Reskin your trading GUI with a custom texture. Keep in mind that the title will be removed if you reskin this GUI.",
                     "left": {
                         "type": "string",
-                        "description": "This is the left texture of the trading GUI. Use a font_image name here."
+                        "markdownDescription": "This is the left texture of the trading GUI. Use a font_image name here."
                     },
                     "right": {
                         "type": "string",
-                        "description": "This is the right texture of the trading GUI. Use a font_image name here."
+                        "markdownDescription": "This is the right texture of the trading GUI. Use a font_image name here."
                     }
                 },
                 "trades_list": {
                     "type": "object",
-                    "description": "List of the trades this machine accepts",
+                    "markdownDescription": "List of the trades this machine accepts",
                     "kind": 5,
                     "detail": "(collection)",
                     "additionalProperties": {
@@ -7102,12 +7229,12 @@ export const schemas = {
         "trade_item": {
             "$id": "trade_item",
             "type": "object",
-            "description": "Trade recipe",
+            "markdownDescription": "Trade recipe",
             "required": ["ingredients"],
             "properties": {
                 "ingredients": {
                     "type": "object",
-                    "description": "Ingredients needed for this recipe",
+                    "markdownDescription": "Ingredients needed for this recipe",
                     "required": ["slot1"],
                     "properties": {
                         "slot1": {
@@ -7130,7 +7257,7 @@ export const schemas = {
                 },
                 "result": {
                     "type": "object",
-                    "description": "Resulting item for this recipe",
+                    "markdownDescription": "Resulting item for this recipe",
                     "required": ["item"],
                     "properties": {
                         "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -7142,34 +7269,34 @@ export const schemas = {
         "behaviour.vehicle": {
             "$id": "behaviour.vehicle",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a vehicle.\nYou will be able to sit on it and move around / in air. You can also set fuel settings.",
+            "markdownDescription": "Tells ItemsAdder that this item is a vehicle.\nYou will be able to sit on it and move around / in air. You can also set fuel settings.",
             "required": ["sit_height"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "sit_height": {
-                    "description": "Height of the sit position",
+                    "markdownDescription": "Height of the sit position",
                     "type": "number"
                 },
                 "fixed_rotation": {
                     "type": "boolean",
-                    "description": "If the vehicle has fixed rotation (to place it precisely)"
+                    "markdownDescription": "If the vehicle has fixed rotation (to place it precisely)"
                 },
                 "small": {
                     "type": "boolean",
-                    "description": "If the vehicle is small or big, be sure to base your 3D model on this setting.\nResize your model using Blockbench accordingly"
+                    "markdownDescription": "If the vehicle is small or big, be sure to base your 3D model on this setting.\nResize your model using Blockbench accordingly"
                 },
                 "step_height": {
                     "type": "number",
-                    "description": "Autojump height",
+                    "markdownDescription": "Autojump height",
                     "default": 0.3
                 },
                 "speed": {
                     "type": "object",
-                    "description": "Different speed of the vehicle based on actions",
+                    "markdownDescription": "Different speed of the vehicle based on actions",
                     "properties": {
-                        "drive": {"type": "number", "description": "Normal drive speed"},
-                        "jump": {"type": "number", "description": "Jump speed"},
-                        "fly": {"type": "number", "description": "Fly speed"}
+                        "drive": {"type": "number", "markdownDescription": "Normal drive speed"},
+                        "jump": {"type": "number", "markdownDescription": "Jump speed"},
+                        "fly": {"type": "number", "markdownDescription": "Fly speed"}
                     }
                 },
                 "sound": {
@@ -7192,18 +7319,18 @@ export const schemas = {
                 },
                 "fuel": {
                     "type": "object",
-                    "description": "Fuel settings",
+                    "markdownDescription": "Fuel settings",
                     "properties": {
                         "start": {
                             "type": "number",
-                            "description": "Start fuel value when you craft/get this vehicle"
+                            "markdownDescription": "Start fuel value when you craft/get this vehicle"
                         },
                         "max": {
                             "type": "number",
-                            "description": "Max fuel value this vehicle can reach"
+                            "markdownDescription": "Max fuel value this vehicle can reach"
                         },
                         "items": {
-                            "description": "Vehicle accepted fuel vanilla materials/custom items.\n\nYou can set **any Vanilla material** or your **custom items**. (it **won't autocomplete** everything here, just some examples)",
+                            "markdownDescription": "Vehicle accepted fuel vanilla materials/custom items.\n\nYou can set **any Vanilla material** or your **custom items**. (it **won't autocomplete** everything here, just some examples)",
                             "additionalProperties": {"type": "integer", "default": 1},
                             "properties": {
                                 "COAL": {"type": "integer", "default": 1},
@@ -7215,7 +7342,7 @@ export const schemas = {
                 },
                 "hitbox": {
                     "type": "object",
-                    "description": "Size of the vehicle. \n\nThis is the hitbox used when you drive the vehicles (hit walls/blocks).",
+                    "markdownDescription": "Size of the vehicle. \n\nThis is the hitbox used when you drive the vehicles (hit walls/blocks).",
                     "properties": {
                         "length": {"type": "number"},
                         "width": {"type": "number"},
@@ -7224,7 +7351,7 @@ export const schemas = {
                 },
                 "smoke": {
                     "type": "object",
-                    "description": "Exhaust smoke effect",
+                    "markdownDescription": "Exhaust smoke effect",
                     "properties": {
                         "amount": {"type": "number", "default": 1},
                         "x": {"type": "number"},
@@ -7237,39 +7364,39 @@ export const schemas = {
         "behaviour.mob": {
             "$id": "behaviour.mob",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
+            "markdownDescription": "Tells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
             "required": ["ai"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "ai": {
-                    "description": "AI of the mob.\n**Accepts only vanilla mobs**",
+                    "markdownDescription": "AI of the mob.\n**Accepts only vanilla mobs**",
                     "$ref": "#/$defs/vanilla_entity_types"
                 },
                 "visual": {
-                    "description": "Appearence of the mob.\nDEFAULT is ZOMBIE because it can holt items on head.\n**Accepts only vanilla mobs**\n\n",
+                    "markdownDescription": "Appearence of the mob.\nDEFAULT is ZOMBIE because it can holt items on head.\n**Accepts only vanilla mobs**\n\n",
                     "$ref": "#/$defs/vanilla_entity_types"
                 },
                 "animation": {
-                    "description": "Items models used as animation for the mob",
+                    "markdownDescription": "Items models used as animation for the mob",
                     "properties": {
                         "attack": {
                             "type": "string",
-                            "description": "Item used to represent the attack animation of this mob"
+                            "markdownDescription": "Item used to represent the attack animation of this mob"
                         },
                         "walk": {
                             "type": "string",
-                            "description": "Item used to represent the walk animation of this mob"
+                            "markdownDescription": "Item used to represent the walk animation of this mob"
                         }
                     }
                 },
                 "invisible": {
                     "type": "boolean",
-                    "description": "If the vanilla entity is invisible. **true** by default"
+                    "markdownDescription": "If the vanilla entity is invisible. **true** by default"
                 },
                 "boss_bar": {
                     "type": "object",
                     "required": ["enabled"],
-                    "description": "Show bossbar even if IA is not of a boss (WITHER, ENDER_DRAGON)",
+                    "markdownDescription": "Show bossbar even if IA is not of a boss (WITHER, ENDER_DRAGON)",
                     "properties": {
                         "enabled": {"type": "boolean"},
                         "style": {
@@ -7298,25 +7425,25 @@ export const schemas = {
                 },
                 "baby": {
                     "type": "boolean",
-                    "description": "If the vanilla entity is a baby. This is useful for ZOMBIE type to have a smaller entity"
+                    "markdownDescription": "If the vanilla entity is a baby. This is useful for ZOMBIE type to have a smaller entity"
                 },
                 "hit_color": {
                     "type": "string",
-                    "description": "Color shown when the entity takes damage.\nSet any color in HEX or name (just like armors).\n\n **DEFAULT** is: ff7e7e"
+                    "markdownDescription": "Color shown when the entity takes damage.\nSet any color in HEX or name (just like armors).\n\n **DEFAULT** is: ff7e7e"
                 },
                 "clear_inventory": {
                     "type": "boolean",
-                    "description": "Clear inventory on spawn (because sometimes ZOMBIES and other mobs spawn with swords/armors)"
+                    "markdownDescription": "Clear inventory on spawn (because sometimes ZOMBIES and other mobs spawn with swords/armors)"
                 },
                 "lock_head_rotation": {
                     "properties": {"x": {"type": "number"}, "y": {"type": "number"}}
                 },
                 "y_offset": {
                     "type": "number",
-                    "description": "This tells ItemsAdder to shift the mob on the Y axis. Useful for SQUIDs and other mobs."
+                    "markdownDescription": "This tells ItemsAdder to shift the mob on the Y axis. Useful for SQUIDs and other mobs."
                 },
-                "upside_down": {"description": "Dinnerbone", "type": "boolean"},
-                "size": {"description": "Size of Slime, Phantom...", "type": "integer"},
+                "upside_down": {"markdownDescription": "Dinnerbone", "type": "boolean"},
+                "size": {"markdownDescription": "Size of Slime, Phantom...", "type": "integer"},
                 "max_health": {"type": "number"},
                 "speed": {
                     "properties": {
@@ -7344,7 +7471,7 @@ export const schemas = {
                     "patternProperties": {
                         "^potion_effect(.*)$": {
                             "type": "object",
-                            "description": "Apply potion effect to the mob on spawn",
+                            "markdownDescription": "Apply potion effect to the mob on spawn",
                             "properties": {
                                 "every_ticks": {"type": "integer"},
                                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -7356,7 +7483,7 @@ export const schemas = {
                     "properties": {
                         "potion_effect": {
                             "type": "object",
-                            "description": "Apply potion effect to the mob on spawn",
+                            "markdownDescription": "Apply potion effect to the mob on spawn",
                             "properties": {
                                 "every_ticks": {"type": "integer"},
                                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -7382,7 +7509,7 @@ export const schemas = {
             "type": "object",
             "properties": {
                 "type": {
-                    "description": "**Accepts only vanilla mobs**",
+                    "markdownDescription": "**Accepts only vanilla mobs**",
                     "$ref": "#/$defs/vanilla_entity_types"
                 },
                 "reason": {
@@ -7424,7 +7551,7 @@ export const schemas = {
                 "chance": {"type": "number", "default": 99.9},
                 "max_sky_light": {
                     "type": "integer",
-                    "description": "Max light that triggers this action. 15 is outside",
+                    "markdownDescription": "Max light that triggers this action. 15 is outside",
                     "minimum": -1,
                     "maximum": 16
                 },
@@ -7439,25 +7566,25 @@ export const schemas = {
         "behaviour.liquid_bucket": {
             "$id": "behaviour.liquid_bucket",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a liquid bucket.\nYou will be able to place a custom liquid and get it back.",
+            "markdownDescription": "Tells ItemsAdder that this item is a liquid bucket.\nYou will be able to place a custom liquid and get it back.",
             "properties": {
                 "enabled": {"type": "boolean"},
-                "name": {"type": "string", "description": "Liquid identifier."}
+                "name": {"type": "string", "markdownDescription": "Liquid identifier."}
             }
         },
         "behaviour.fuel": {
             "$id": "behaviour.fuel",
             "type": "object",
-            "description": "Tells ItemsAdder that this item is a custom fuel.\nYou will be able to place a this item in furnaces. PLEASE MAKE SURE TO USE ONLY MATERAILS THAT ARE ALREADY FUEL IN MINECRAFT! For example COAL, COAL_BLOCK, LAVA_BUCKET...",
+            "markdownDescription": "Tells ItemsAdder that this item is a custom fuel.\nYou will be able to place a this item in furnaces. PLEASE MAKE SURE TO USE ONLY MATERAILS THAT ARE ALREADY FUEL IN MINECRAFT! For example COAL, COAL_BLOCK, LAVA_BUCKET...",
             "properties": {
                 "enabled": {"type": "boolean"},
                 "burn_ticks": {
                     "type": "integer",
-                    "description": "Duration of the fuel in ticks (20 ticks = 1 second). Vanilla COAL burns for 1600 ticks"
+                    "markdownDescription": "Duration of the fuel in ticks (20 ticks = 1 second). Vanilla COAL burns for 1600 ticks"
                 },
                 "machines": {
                     "type": "array",
-                    "description": "List of the machines that will accept this fuel",
+                    "markdownDescription": "List of the machines that will accept this fuel",
                     "items": {
                         "type": "string",
                         "enum": ["FURNACE", "BLAST_FURNACE", "SMOKER"]
@@ -7470,187 +7597,187 @@ export const schemas = {
             "type": "object",
             "properties": {
                 "block_break": {
-                    "description": "Triggered when you break a block with this item",
+                    "markdownDescription": "Triggered when you break a block with this item",
                     "$ref": "#/$defs/actions"
                 },
                 "attack": {
-                    "description": "Triggered when you attack an entity with this item",
+                    "markdownDescription": "Triggered when you attack an entity with this item",
                     "$ref": "#/$defs/actions"
                 },
                 "kill": {
-                    "description": "Triggered when you kill an entity with this item",
+                    "markdownDescription": "Triggered when you kill an entity with this item",
                     "$ref": "#/$defs/actions"
                 },
                 "interact": {
                     "type": "object",
-                    "description": "Triggered when you interact ...",
+                    "markdownDescription": "Triggered when you interact ...",
                     "properties": {
                         "entity": {
-                            "description": "... with an entity with this item",
+                            "markdownDescription": "... with an entity with this item",
                             "$ref": "#/$defs/actions"
                         },
                         "left": {
-                            "description": "... with a block (left click) with this item",
+                            "markdownDescription": "... with a block (left click) with this item",
                             "$ref": "#/$defs/actions"
                         },
                         "right": {
-                            "description": "... with a block (right click) with this item",
+                            "markdownDescription": "... with a block (right click) with this item",
                             "$ref": "#/$defs/actions"
                         },
                         "left_shift": {
-                            "description": "... with a block (left shift click) with this item",
+                            "markdownDescription": "... with a block (left shift click) with this item",
                             "$ref": "#/$defs/actions"
                         },
                         "right_shift": {
-                            "description": "... with a block (right shift click) with this item",
+                            "markdownDescription": "... with a block (right shift click) with this item",
                             "$ref": "#/$defs/actions"
                         }
                     }
                 },
                 "drop": {
-                    "description": "Triggered when you drop this item",
+                    "markdownDescription": "Triggered when you drop this item",
                     "$ref": "#/$defs/actions"
                 },
                 "pickup": {
-                    "description": "Triggered when you pickup this item",
+                    "markdownDescription": "Triggered when you pickup this item",
                     "$ref": "#/$defs/actions"
                 },
                 "eat": {
-                    "description": "Triggered when you eat this item",
+                    "markdownDescription": "Triggered when you eat this item",
                     "$ref": "#/$defs/actions"
                 },
                 "drink": {
-                    "description": "Triggered when you drink this item",
+                    "markdownDescription": "Triggered when you drink this item",
                     "$ref": "#/$defs/actions"
                 },
                 "bow_shot": {
-                    "description": "Triggered when you shot with this item (works only if it's a **BOW**)",
+                    "markdownDescription": "Triggered when you shot with this item (works only if it's a **BOW**)",
                     "$ref": "#/$defs/actions"
                 },
                 "gun_shot": {
-                    "description": "Triggered when you shot with this item (works only if this item has the **gun behaviour**)",
+                    "markdownDescription": "Triggered when you shot with this item (works only if this item has the **gun behaviour**)",
                     "$ref": "#/$defs/actions"
                 },
                 "gun_no_ammo": {
-                    "description": "Triggered when you shot with this item and you have no ammo (works only if this item has the **gun behaviour**)",
+                    "markdownDescription": "Triggered when you shot with this item and you have no ammo (works only if this item has the **gun behaviour**)",
                     "$ref": "#/$defs/actions"
                 },
                 "gun_reload": {
-                    "description": "Triggered when you shot with this item and you reload (works only if this item has the **gun behaviour**)",
+                    "markdownDescription": "Triggered when you shot with this item and you reload (works only if this item has the **gun behaviour**)",
                     "$ref": "#/$defs/actions"
                 },
                 "book_write": {
-                    "description": "Triggered when you write this book (works only if this item is a **WRITABLE_BOOK**)",
+                    "markdownDescription": "Triggered when you write this book (works only if this item is a **WRITABLE_BOOK**)",
                     "$ref": "#/$defs/actions"
                 },
                 "book_read": {
-                    "description": "Triggered when you read this book (works only if this item is a **WRITTEN_BOOK**)",
+                    "markdownDescription": "Triggered when you read this book (works only if this item is a **WRITTEN_BOOK**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_start": {
-                    "description": "Triggered when you start fishing with this item (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when you start fishing with this item (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_caught": {
-                    "description": "Triggered when you get a fish with this item (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when you get a fish with this item (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_failed": {
-                    "description": "Triggered when you fail fishing with this item (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when you fail fishing with this item (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_cancel": {
-                    "description": "Triggered when you cancel fishing with this item (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when you cancel fishing with this item (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_bite": {
-                    "description": "Triggered when a fish bites the hook of this item (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when a fish bites the hook of this item (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "fishing_in_ground": {
-                    "description": "Triggered when the hook of this item hits the ground (works only if this item is a **FISHING_ROD**)",
+                    "markdownDescription": "Triggered when the hook of this item hits the ground (works only if this item is a **FISHING_ROD**)",
                     "$ref": "#/$defs/actions"
                 },
                 "wear": {
-                    "description": "Triggered when you wear this item",
+                    "markdownDescription": "Triggered when you wear this item",
                     "$ref": "#/$defs/actions"
                 },
                 "unwear": {
-                    "description": "Triggered when you unwear this item",
+                    "markdownDescription": "Triggered when you unwear this item",
                     "$ref": "#/$defs/actions"
                 },
                 "held": {
-                    "description": "Triggered when you held this item",
+                    "markdownDescription": "Triggered when you held this item",
                     "$ref": "#/$defs/actions"
                 },
                 "unheld": {
-                    "description": "Triggered when you unheld this item",
+                    "markdownDescription": "Triggered when you unheld this item",
                     "$ref": "#/$defs/actions"
                 },
                 "item_throw": {
-                    "description": "Triggered when you throw this item (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
+                    "markdownDescription": "Triggered when you throw this item (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
                     "$ref": "#/$defs/actions"
                 },
                 "item_hit_ground": {
-                    "description": "Triggered when this item hits the ground after you have thrown it (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
+                    "markdownDescription": "Triggered when this item hits the ground after you have thrown it (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
                     "$ref": "#/$defs/actions"
                 },
                 "item_hit_entity": {
-                    "description": "Triggered when this item hits an entity after you have thrown it (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
+                    "markdownDescription": "Triggered when this item hits an entity after you have thrown it (works only with ARROW material and throwable items like **SNOWBALL**, **ENDER_PEARL**...)",
                     "$ref": "#/$defs/actions"
                 },
                 "item_break": {
-                    "description": "Triggered when an item is broken (has 0 durability and disappears)",
+                    "markdownDescription": "Triggered when an item is broken (has 0 durability and disappears)",
                     "$ref": "#/$defs/actions"
                 },
                 "placed_block": {
                     "type": "object",
-                    "description": "Placed Custom block actions",
+                    "markdownDescription": "Placed Custom block actions",
                     "properties": {
                         "interact": {
-                            "description": "Triggered when you interact this placed item. **Must be a custom block**",
+                            "markdownDescription": "Triggered when you interact this placed item. **Must be a custom block**",
                             "$ref": "#/$defs/actions"
                         },
                         "break": {
-                            "description": "Triggered when you break this placed item. **Must be a custom block**",
+                            "markdownDescription": "Triggered when you break this placed item. **Must be a custom block**",
                             "$ref": "#/$defs/actions"
                         }
                     }
                 },
                 "placed_armorstand": {
                     "type": "object",
-                    "description": "Placed armorstand actions (furniture, vehicles or normal armorstands with a custom item inside)",
+                    "markdownDescription": "Placed armorstand actions (furniture, vehicles or normal armorstands with a custom item inside)",
                     "properties": {
                         "interact": {
-                            "description": "Triggered when you interact with an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
+                            "markdownDescription": "Triggered when you interact with an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
                             "$ref": "#/$defs/actions"
                         },
                         "break": {
-                            "description": "Triggered when you break an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
+                            "markdownDescription": "Triggered when you break an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
                             "$ref": "#/$defs/actions"
                         }
                     }
                 },
                 "placed_itemframe": {
                     "type": "object",
-                    "description": "Placed itemframe actions (furniture or normal itemframes with a custom item inside...)",
+                    "markdownDescription": "Placed itemframe actions (furniture or normal itemframes with a custom item inside...)",
                     "properties": {
                         "interact": {
-                            "description": "Triggered when you interact with an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
+                            "markdownDescription": "Triggered when you interact with an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
                             "$ref": "#/$defs/actions"
                         },
                         "break": {
-                            "description": "Triggered when you break an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
+                            "markdownDescription": "Triggered when you break an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
                             "$ref": "#/$defs/actions"
                         }
                     }
                 },
                 "bucket_empty": {
-                    "description": "Triggered when this bucket is empty (works only with **WATER_BUCKET** and **MILK_BUCKET**)",
+                    "markdownDescription": "Triggered when this bucket is empty (works only with **WATER_BUCKET** and **MILK_BUCKET**)",
                     "$ref": "#/$defs/actions"
                 },
                 "bucket_fill": {
-                    "description": "Triggered when this bucket is filled (works only with **BUCKET**)",
+                    "markdownDescription": "Triggered when this bucket is filled (works only with **BUCKET**)",
                     "$ref": "#/$defs/actions"
                 }
             }
@@ -7658,7 +7785,7 @@ export const schemas = {
         "actions": {
             "$id": "actions",
             "type": "object",
-            "description": "Actions to be executed on this event.\n\nYou can set as many actions as you wish, you can event put the **same action multiple times**, you just have to make them start with the correct name, then append a _1, _2, _3...\nExample: play_sound_1, play_sound_2, play_sound_3\n\nMore info here: https://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/events/actions",
+            "markdownDescription": "Actions to be executed on this event.\n\nYou can set as many actions as you wish, you can event put the **same action multiple times**, you just have to make them start with the correct name, then append a _1, _2, _3...\nExample: play_sound_1, play_sound_2, play_sound_3\n\nMore info here: https://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/events/actions",
             "patternProperties": {
                 "^play_sound(.*)$": {"$ref": "#/$defs/play_sound"},
                 "^stop_sound(.*)$": {"$ref": "#/$defs/stop_sound"},
@@ -7752,28 +7879,28 @@ export const schemas = {
             "properties": {
                 "command": {
                     "type": "string",
-                    "description": "Command to be executed (**without** the **/**)\n\nYou can use these placeholders:\n{player} is the player who used this item\n{target-player} is the player interacted/attacked\n{target-x} is the x location of player/block interacted/attacked\n{target-y} is the x location of player/block interacted/attacked\n{target-z} is the x location of player/block interacted/attacked\n\n\nExample: tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}"
+                    "markdownDescription": "Command to be executed (**without** the **/**)\n\nYou can use these placeholders:\n{player} is the player who used this item\n{target-player} is the player interacted/attacked\n{target-x} is the x location of player/block interacted/attacked\n{target-y} is the x location of player/block interacted/attacked\n{target-z} is the x location of player/block interacted/attacked\n\n\nExample: tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}"
                 },
                 "as_console": {"type": "boolean", "examples": [false]},
                 "delay": {
                     "type": "integer",
-                    "description": "Delay in ticks before starting this action"
+                    "markdownDescription": "Delay in ticks before starting this action"
                 }
             }
         },
         "action_delay.prop": {
             "$id": "action_delay.prop",
             "type": "integer",
-            "description": "Delay in ticks before starting this action"
+            "markdownDescription": "Delay in ticks before starting this action"
         },
         "action_permission.prop": {
             "$id": "action_permission.prop",
             "type": "string",
-            "description": "Permission needed to execute this action"
+            "markdownDescription": "Permission needed to execute this action"
         },
         "play_sound": {
             "$id": "play_sound",
-            "description": "Play a Vanilla sound or Custom sound",
+            "markdownDescription": "Play a Vanilla sound or Custom sound",
             "required": ["name", "volume", "pitch"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
@@ -7785,7 +7912,7 @@ export const schemas = {
         },
         "stop_sound": {
             "$id": "stop_sound",
-            "description": "Stop a Vanilla sound or Custom sound",
+            "markdownDescription": "Stop a Vanilla sound or Custom sound",
             "required": ["name"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
@@ -7796,12 +7923,12 @@ export const schemas = {
         "cancel": {
             "$id": "cancel",
             "type": "boolean",
-            "description": "Cancel the event that triggered this action",
+            "markdownDescription": "Cancel the event that triggered this action",
             "examples": [true]
         },
         "execute_commands": {
             "$id": "execute_commands",
-            "description": "Execute these commands",
+            "markdownDescription": "Execute these commands",
             "additionalProperties": {"$ref": "#/$defs/command"},
             "properties": {
                 "change_me_1": {"$ref": "#/$defs/command"},
@@ -7811,7 +7938,7 @@ export const schemas = {
         },
         "play_particle": {
             "$id": "play_particle",
-            "description": "Play this particle",
+            "markdownDescription": "Play this particle",
             "required": ["name"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_particles"},
@@ -7821,7 +7948,7 @@ export const schemas = {
         },
         "shoot_particle": {
             "$id": "shoot_particle",
-            "description": "Shoot this particle",
+            "markdownDescription": "Shoot this particle",
             "required": ["name", "distance"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_particles"},
@@ -7832,7 +7959,7 @@ export const schemas = {
         },
         "play_effect": {
             "$id": "play_effect",
-            "description": "Play this effect",
+            "markdownDescription": "Play this effect",
             "required": ["name"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_effects"},
@@ -7842,7 +7969,7 @@ export const schemas = {
         },
         "decrement_increment_durability": {
             "$id": "decrement_increment_durability",
-            "description": "Decrement/increment this item durability",
+            "markdownDescription": "Decrement/increment this item durability",
             "required": ["amount"],
             "properties": {
                 "amount": {"type": "integer"},
@@ -7852,7 +7979,7 @@ export const schemas = {
         },
         "decrement_usages": {
             "$id": "decrement_usages",
-            "description": "Decrement this item usages",
+            "markdownDescription": "Decrement this item usages",
             "required": ["amount"],
             "properties": {
                 "amount": {"type": "integer"},
@@ -7862,7 +7989,7 @@ export const schemas = {
         },
         "increment_amount": {
             "$id": "increment_amount",
-            "description": "Increment this item amount",
+            "markdownDescription": "Increment this item amount",
             "required": ["amount"],
             "properties": {
                 "amount": {"type": "integer"},
@@ -7872,7 +7999,7 @@ export const schemas = {
         },
         "decrement_amount": {
             "$id": "decrement_amount",
-            "description": "Decrement this item amount",
+            "markdownDescription": "Decrement this item amount",
             "required": ["amount"],
             "properties": {
                 "amount": {"type": "integer"},
@@ -7882,7 +8009,7 @@ export const schemas = {
         },
         "drop_exp": {
             "$id": "drop_exp",
-            "description": "Drop exp",
+            "markdownDescription": "Drop exp",
             "required": ["chance", "min_amount", "max_amount"],
             "properties": {
                 "chance": {"type": "number"},
@@ -7894,16 +8021,16 @@ export const schemas = {
         },
         "feed": {
             "$id": "feed",
-            "description": "Feed player",
+            "markdownDescription": "Feed player",
             "required": ["amount"],
             "properties": {
                 "amount": {
                     "type": "integer",
-                    "description": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
+                    "markdownDescription": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
                 },
                 "saturation": {
                     "type": "integer",
-                    "description": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
+                    "markdownDescription": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -7911,7 +8038,7 @@ export const schemas = {
         },
         "replace_properties": {
             "$id": "replace_properties",
-            "description": "Replace this item properties",
+            "markdownDescription": "Replace this item properties",
             "required": ["custom_model_data"],
             "properties": {
                 "custom_model_data": {
@@ -7921,7 +8048,7 @@ export const schemas = {
                         "copy_from_item": {"type": "string"},
                         "restorable": {
                             "type": "boolean",
-                            "description": "Can this change be reverted?"
+                            "markdownDescription": "Can this change be reverted?"
                         },
                         "delay": {"$ref": "#/$defs/action_delay.prop"},
                         "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -7931,7 +8058,7 @@ export const schemas = {
         },
         "give_item": {
             "$id": "give_item",
-            "description": "Give this player an item",
+            "markdownDescription": "Give this player an item",
             "required": ["item"],
             "properties": {
                 "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -7942,14 +8069,14 @@ export const schemas = {
         },
         "replace_near_blocks": {
             "$id": "replace_near_blocks",
-            "description": "Replace vanilla/custom blocks near interact location (or near the player if this event is not an interact one)",
+            "markdownDescription": "Replace vanilla/custom blocks near interact location (or near the player if this event is not an interact one)",
             "oneOf": [{"required": ["from"]}, {"required": ["from_multiple"]}],
             "required": ["to", "radius", "decrement_durability"],
             "properties": {
                 "from": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
                 "from_multiple": {
                     "type": "array",
-                    "description": "List of vanilla/custom blocks to replace",
+                    "markdownDescription": "List of vanilla/custom blocks to replace",
                     "items": {"$ref": "#/$defs/vanilla_and_custom_blocks"}
                 },
                 "to": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
@@ -7964,7 +8091,7 @@ export const schemas = {
                 },
                 "decrement_durability": {
                     "type": "integer",
-                    "description": "Decrement durability amount"
+                    "markdownDescription": "Decrement durability amount"
                 },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
@@ -7974,7 +8101,7 @@ export const schemas = {
         "glow_near_blocks": {
             "$id": "glow_near_blocks",
             "type": "object",
-            "description": "Glow blocks near interact location (or near the player if this event is not an interact one)",
+            "markdownDescription": "Glow blocks near interact location (or near the player if this event is not an interact one)",
             "required": ["radius", "material"],
             "properties": {
                 "material": {"$ref": "#/$defs/vanilla_blocks"},
@@ -7993,14 +8120,14 @@ export const schemas = {
         },
         "replace_block": {
             "$id": "replace_block",
-            "description": "Replace vanilla/custom blocks in interact location (or on the player location if this event is not an interact one)",
+            "markdownDescription": "Replace vanilla/custom blocks in interact location (or on the player location if this event is not an interact one)",
             "required": ["from", "to", "decrement_durability"],
             "properties": {
                 "from": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
                 "to": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
                 "decrement_durability": {
                     "type": "integer",
-                    "description": "Decrement durability amount"
+                    "markdownDescription": "Decrement durability amount"
                 },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
@@ -8009,7 +8136,7 @@ export const schemas = {
         },
         "multiple_break": {
             "$id": "multiple_break",
-            "description": "Break multiple blocks around the center of broken block",
+            "markdownDescription": "Break multiple blocks around the center of broken block",
             "required": ["size", "keep_ores", "drop_all_blocks"],
             "properties": {
                 "size": {"type": "integer", "default": 3},
@@ -8029,7 +8156,7 @@ export const schemas = {
         },
         "potion_effect": {
             "$id": "potion_effect",
-            "description": "Apply potion effect to player",
+            "markdownDescription": "Apply potion effect to player",
             "properties": {
                 "every_ticks": {"type": "integer"},
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -8039,7 +8166,7 @@ export const schemas = {
         },
         "remove_potion_effect": {
             "$id": "remove_potion_effect",
-            "description": "Remove potion effect",
+            "markdownDescription": "Remove potion effect",
             "required": ["type"],
             "properties": {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -8049,7 +8176,7 @@ export const schemas = {
         },
         "explosion": {
             "$id": "explosion",
-            "description": "Spawn explosion",
+            "markdownDescription": "Spawn explosion",
             "required": ["power"],
             "properties": {
                 "power": {"type": "integer", "default": 1},
@@ -8062,7 +8189,7 @@ export const schemas = {
         "damage_near_entities": {
             "$id": "damage_near_entities",
             "type": "object",
-            "description": "Damage near entities",
+            "markdownDescription": "Damage near entities",
             "required": ["damage", "radius"],
             "properties": {
                 "damage": {"type": "number", "default": 1},
@@ -8078,7 +8205,7 @@ export const schemas = {
         "damage_entity_in_sight": {
             "$id": "damage_entity_in_sight",
             "type": "object",
-            "description": "Damage entity you're looking at",
+            "markdownDescription": "Damage entity you're looking at",
             "required": ["damage", "distance"],
             "properties": {
                 "damage": {"type": "number", "default": 1},
@@ -8089,7 +8216,7 @@ export const schemas = {
         },
         "damage_entity": {
             "$id": "damage_entity",
-            "description": "Damage the entity of this event. For example on interact or attack or on event item_hit_entity",
+            "markdownDescription": "Damage the entity of this event. For example on interact or attack or on event item_hit_entity",
             "required": ["damage"],
             "properties": {
                 "damage": {"type": "number", "default": 1},
@@ -8099,7 +8226,7 @@ export const schemas = {
         },
         "target_potion_effect": {
             "$id": "target_potion_effect",
-            "description": "Apply potion effect to target entity",
+            "markdownDescription": "Apply potion effect to target entity",
             "required": ["type"],
             "properties": {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -8112,7 +8239,7 @@ export const schemas = {
         "target_remove_potion_effect": {
             "$id": "target_remove_potion_effect",
             "type": "object",
-            "description": "Remove potion effect from target entity",
+            "markdownDescription": "Remove potion effect from target entity",
             "required": ["type"],
             "properties": {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
@@ -8122,7 +8249,7 @@ export const schemas = {
         },
         "increment_player_stat": {
             "$id": "increment_player_stat",
-            "description": "Increment player stat (ItemsAdder stats, used by HUDs)",
+            "markdownDescription": "Increment player stat (ItemsAdder stats, used by HUDs)",
             "required": ["name", "amount"],
             "properties": {
                 "name": {"type": "string"},
@@ -8134,7 +8261,7 @@ export const schemas = {
         "decrement_player_stat": {
             "$id": "decrement_player_stat",
             "type": "object",
-            "description": "Decrement player stat (ItemsAdder stats, used by HUDs)",
+            "markdownDescription": "Decrement player stat (ItemsAdder stats, used by HUDs)",
             "required": ["name", "amount"],
             "properties": {
                 "name": {"type": "string"},
@@ -8146,11 +8273,11 @@ export const schemas = {
         "play_totem_animation": {
             "$id": "play_totem_animation",
             "type": "string",
-            "description": "Play the totem animation with a particular item texture."
+            "markdownDescription": "Play the totem animation with a particular item texture."
         },
         "set_block": {
             "$id": "set_block",
-            "description": "Sets a block. Useful on interact events to place a custom/vanilla block.",
+            "markdownDescription": "Sets a block. Useful on interact events to place a custom/vanilla block.",
             "required": ["block"],
             "properties": {
                 "block": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
@@ -8162,7 +8289,7 @@ export const schemas = {
         },
         "place_furniture": {
             "$id": "place_furniture",
-            "description": "Places a furniture. Useful on interact events to place a custom furniture.",
+            "markdownDescription": "Places a furniture. Useful on interact events to place a custom furniture.",
             "required": ["furniture"],
             "properties": {
                 "furniture": {"type": "string"},
@@ -8173,7 +8300,7 @@ export const schemas = {
         },
         "drop_item": {
             "$id": "drop_item",
-            "description": "Drops a vanilla/custom item.",
+            "markdownDescription": "Drops a vanilla/custom item.",
             "required": ["item"],
             "properties": {
                 "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -8191,56 +8318,56 @@ export const schemas = {
             "properties": {
                 "permission": {
                     "type": "string",
-                    "description": "Usage permission for this emoji. States if a player can use the shorthand to write the emoji on signs, books, chat..."
+                    "markdownDescription": "Usage permission for this emoji. States if a player can use the shorthand to write the emoji on signs, books, chat..."
                 },
                 "show_in_gui": {
                     "type": "boolean",
-                    "description": "Decide if you want to show this font image inside the **emojis** GUI (the one you open with **/e** command)"
+                    "markdownDescription": "Decide if you want to show this font image inside the **emojis** GUI (the one you open with **/e** command)"
                 },
                 "suggest_in_command": {
                     "type": "boolean",
-                    "description": "Decide if you want to show this font image in the list of suggestions when you press TAB using the **/e** command"
+                    "markdownDescription": "Decide if you want to show this font image in the list of suggestions when you press TAB using the **/e** command"
                 },
                 "symbol": {
                     "type": "string",
-                    "description": "This allows you to specify a character to be retextured using an image https://emojipedia.org/ 🥤‼️😅🤨🥶This supports emojis (some emojis are not supported if they're make of multiple characters).You can also specify a unicode value directly, example: \\u1F47D",
+                    "markdownDescription": "This allows you to specify a character to be retextured using an image https://emojipedia.org/ 🥤‼️😅🤨🥶This supports emojis (some emojis are not supported if they're make of multiple characters).You can also specify a unicode value directly, example: \\u1F47D",
                     "defaultSnippets": [{"body": "\\u$0"}, {"body": "🥶"}]
                 },
                 "path": {
                     "type": "string",
-                    "description": "png file partial path. \n\nExample: **font/my_emojis/smile**. This will be translated to **plugins\\ItemsAdder\\data\\resource_pack\\assets\\NAMESPACE\\textures\\font\\my_emojis\\smile.png**",
+                    "markdownDescription": "png file partial path. \n\nExample: **font/my_emojis/smile**. This will be translated to **plugins\\ItemsAdder\\data\\resource_pack\\assets\\NAMESPACE\\textures\\font\\my_emojis\\smile.png**",
                     "defaultSnippets": [{"body": "font/$0"}]
                 },
                 "scale_ratio": {
                     "type": "integer",
                     "default": 9,
-                    "description": "Height of the image in pixels. ItemsAdder will auto-scale the width accordingly\nIf you're making an **emoji** a value of **9** is enough"
+                    "markdownDescription": "Height of the image in pixels. ItemsAdder will auto-scale the width accordingly\nIf you're making an **emoji** a value of **9** is enough"
                 },
                 "y_position": {
                     "type": "integer",
                     "default": 8,
-                    "description": "Y position of this image on screen. This can't be changed at runtime and must be decided now.\nYou can shift this image up or down using this value.\nIf you're making an **emoji** a value of **8** is enough"
+                    "markdownDescription": "Y position of this image on screen. This can't be changed at runtime and must be decided now.\nYou can shift this image up or down using this value.\nIf you're making an **emoji** a value of **8** is enough"
                 }
             }
         },
         "generic_over_time": {
             "$id": "generic_over_time",
-            "description": "Decrement/increment HUD value over time",
+            "markdownDescription": "Decrement/increment HUD value over time",
             "properties": {
                 "every_ticks": {
                     "type": "integer",
-                    "description": "Decrement interval (ticks)"
+                    "markdownDescription": "Decrement interval (ticks)"
                 },
-                "amount": {"type": "integer", "description": "Decrement amount"},
+                "amount": {"type": "integer", "markdownDescription": "Decrement amount"},
                 "min_sky_light": {
                     "type": "integer",
-                    "description": "Min light that triggers this action. 15 is outside",
+                    "markdownDescription": "Min light that triggers this action. 15 is outside",
                     "minimum": -1,
                     "maximum": 16
                 },
                 "max_sky_light": {
                     "type": "integer",
-                    "description": "Max light that triggers this action. 15 is outside",
+                    "markdownDescription": "Max light that triggers this action. 15 is outside",
                     "minimum": -1,
                     "maximum": 16
                 }
@@ -8248,23 +8375,23 @@ export const schemas = {
         },
         "biome_over_time": {
             "$id": "biome_over_time",
-            "description": "Decrement/increment HUD value over time",
+            "markdownDescription": "Decrement/increment HUD value over time",
             "properties": {
                 "biome": {"$ref": "#/$defs/vanilla_biomes"},
                 "every_ticks": {
                     "type": "integer",
-                    "description": "Decrement interval (ticks)"
+                    "markdownDescription": "Decrement interval (ticks)"
                 },
-                "amount": {"type": "integer", "description": "Decrement amount"},
+                "amount": {"type": "integer", "markdownDescription": "Decrement amount"},
                 "min_sky_light": {
                     "type": "integer",
-                    "description": "Min light that triggers this action. 15 is outside",
+                    "markdownDescription": "Min light that triggers this action. 15 is outside",
                     "minimum": -1,
                     "maximum": 16
                 },
                 "max_sky_light": {
                     "type": "integer",
-                    "description": "Max light that triggers this action. 15 is outside",
+                    "markdownDescription": "Max light that triggers this action. 15 is outside",
                     "minimum": -1,
                     "maximum": 16
                 }
@@ -8272,30 +8399,30 @@ export const schemas = {
         },
         "food_level_change": {
             "$id": "food_level_change",
-            "description": "When food level decreases (player starves or eats food)",
+            "markdownDescription": "When food level decreases (player starves or eats food)",
             "properties": {
                 "amount": {
-                    "description": "Decrement this hud value by amount",
+                    "markdownDescription": "Decrement this hud value by amount",
                     "type": "number"
                 }
             }
         },
         "player_respawn": {
             "$id": "player_respawn",
-            "description": "When the player respawns",
+            "markdownDescription": "When the player respawns",
             "properties": {
-                "amount": {"description": "Increment amount", "type": "number"}
+                "amount": {"markdownDescription": "Increment amount", "type": "number"}
             }
         },
         "damage_player": {
             "$id": "damage_player",
-            "description": "Deal damage to player",
+            "markdownDescription": "Deal damage to player",
             "properties": {
                 "every_ticks": {
-                    "description": "Deal damage to player (interval in ticks)",
+                    "markdownDescription": "Deal damage to player (interval in ticks)",
                     "type": "integer"
                 },
-                "damage": {"description": "Deal damage to player", "type": "number"}
+                "damage": {"markdownDescription": "Deal damage to player", "type": "number"}
             }
         },
         "hud": {
@@ -8306,7 +8433,7 @@ export const schemas = {
                 "enabled": {"type": "boolean"},
                 "worlds": {
                     "type": "array",
-                    "description": "Not mandatory! You can avoid setting this if you want to enable hud in all the worlds.\nWorlds list in which you want to enable huds.\n\n Please read here for advanced rules: \nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/huds",
+                    "markdownDescription": "Not mandatory! You can avoid setting this if you want to enable hud in all the worlds.\nWorlds list in which you want to enable huds.\n\n Please read here for advanced rules: \nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/huds",
                     "items": {
                         "anyOf": [
                             {"type": "string"},
@@ -8332,19 +8459,19 @@ export const schemas = {
                     "properties": {
                         "auto": {
                             "type": "boolean",
-                            "description": "Is this HUD automatically shown for each player?"
+                            "markdownDescription": "Is this HUD automatically shown for each player?"
                         },
                         "creative": {
                             "type": "boolean",
-                            "description": "Show the HUD on creative"
+                            "markdownDescription": "Show the HUD on creative"
                         },
                         "underwater": {
                             "type": "boolean",
-                            "description": "Show the HUD when player is underwater"
+                            "markdownDescription": "Show the HUD when player is underwater"
                         },
                         "riding": {
                             "type": "boolean",
-                            "description": "Show the HUD when player is riding an entity"
+                            "markdownDescription": "Show the HUD when player is riding an entity"
                         }
                     }
                 },
@@ -8354,23 +8481,23 @@ export const schemas = {
                         {
                             "const": "STATUS",
                             "type": "string",
-                            "description": "This HUD type has multiple icons with 3 states (full, half and empty). Can be used for thirst, life..."
+                            "markdownDescription": "This HUD type has multiple icons with 3 states (full, half and empty). Can be used for thirst, life..."
                         },
                         {
                             "const": "FRAMES",
                             "type": "string",
-                            "description": "This HUD type has multiple images, one for each value the HUD will have."
+                            "markdownDescription": "This HUD type has multiple images, one for each value the HUD will have."
                         },
                         {
                             "const": "CUSTOM",
                             "type": "string",
-                            "description": "This HUD type is handled manually by an Addon. You have to be a Java/Skript developer to use this one."
+                            "markdownDescription": "This HUD type is handled manually by an Addon. You have to be a Java/Skript developer to use this one."
                         }
                     ]
                 },
                 "x_position_pixels": {
                     "type": "integer",
-                    "description": "Shift this HUD on screen X (starting from the exact center of the screen).",
+                    "markdownDescription": "Shift this HUD on screen X (starting from the exact center of the screen).",
                     "minimum": -2048,
                     "maximum": 2048
                 },
@@ -8380,21 +8507,21 @@ export const schemas = {
                     "properties": {
                         "player_stat_name": {
                             "type": "string",
-                            "description": "Stat name you can use to identify this HUD.\nYou can use this value in items actions to increment/decrement this HUD value based on item action."
+                            "markdownDescription": "Stat name you can use to identify this HUD.\nYou can use this value in items actions to increment/decrement this HUD value based on item action."
                         },
                         "start": {
                             "type": "integer",
-                            "description": "Starting value for this HUD"
+                            "markdownDescription": "Starting value for this HUD"
                         },
-                        "max": {"type": "integer", "description": "Max value for this HUD"},
-                        "min": {"type": "integer", "description": "Min value for this HUD"},
+                        "max": {"type": "integer", "markdownDescription": "Max value for this HUD"},
+                        "min": {"type": "integer", "markdownDescription": "Min value for this HUD"},
                         "triggers": {
                             "type": "object",
-                            "description": "Dynamicize your HUD",
+                            "markdownDescription": "Dynamicize your HUD",
                             "properties": {
                                 "decrement": {
                                     "type": "object",
-                                    "description": "Decrement HUD value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
+                                    "markdownDescription": "Decrement HUD value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
                                     "patternProperties": {
                                         "^generic_over_time(.*)$": {
                                             "$ref": "#/$defs/generic_over_time"
@@ -8424,7 +8551,7 @@ export const schemas = {
                                 },
                                 "increment": {
                                     "type": "object",
-                                    "description": "Increment HUD value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
+                                    "markdownDescription": "Increment HUD value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
                                     "patternProperties": {
                                         "^food_level_change(.*)$": {
                                             "$ref": "#/$defs/food_level_change"
@@ -8444,7 +8571,7 @@ export const schemas = {
                                 },
                                 "on_min_value": {
                                     "type": "object",
-                                    "description": "Do these actions when HUD reaches its min value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
+                                    "markdownDescription": "Do these actions when HUD reaches its min value. Remember you can add as many copies of the action you want.\nFor example if you want to have more than one **'generic_over_time'** you just have to create a new one named **generic_over_time_2**.\nThe important thing is that it starts with **generic_over_time**",
                                     "patternProperties": {
                                         "^damage_player(.*)$": {"$ref": "#/$defs/damage_player"},
                                         "^potion_effect(.*)$": {"$ref": "#/$defs/potion_effect"}
@@ -8464,26 +8591,26 @@ export const schemas = {
                 },
                 "images": {
                     "type": "object",
-                    "description": "font_images used to draw this HUD",
+                    "markdownDescription": "font_images used to draw this HUD",
                     "properties": {
                         "positive": {
                             "type": "string",
-                            "description": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
+                            "markdownDescription": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
                         },
                         "half": {
                             "type": "string",
-                            "description": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
+                            "markdownDescription": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
                         },
                         "negative": {
                             "type": "string",
-                            "description": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
+                            "markdownDescription": "**USE ONLY IF TYPE IS 'STATUS'**. \nName of the font_image (not its file path)"
                         },
                         "frames": {
                             "type": "array",
-                            "description": "**USE ONLY IF TYPE IS 'FRAMES'**",
+                            "markdownDescription": "**USE ONLY IF TYPE IS 'FRAMES'**",
                             "items": {
                                 "type": "string",
-                                "description": "Name of the font_image (not its file path)"
+                                "markdownDescription": "Name of the font_image (not its file path)"
                             }
                         }
                     }
@@ -8497,30 +8624,30 @@ export const schemas = {
             "properties": {
                 "display-category-EXAMPLE": {
                     "type": "string",
-                    "description": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
                 "display-category-EXAMPLE_2": {
                     "type": "string",
-                    "description": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
                 "display-name-EXAMPLE_ITEM": {
                     "type": "string",
-                    "description": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
                 "display-lore-EXAMPLE_ITEM": {
                     "type": "string",
-                    "description": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
                 "EXAMPLE": {
                     "type": "string",
-                    "description": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 }
             }
         },
         "nbt": {
             "$id": "nbt",
             "type": "object",
-            "description": "Special property to specify which NBT data must match",
+            "markdownDescription": "Special property to specify which NBT data must match",
             "additionalProperties": {"type": "object", "$ref": "#/$defs/nbt_matcher"},
             "properties": {
                 "change_me": {"type": "object", "$ref": "#/$defs/nbt_matcher"},
@@ -8576,37 +8703,37 @@ export const schemas = {
             "properties": {
                 "layer_1": {
                     "type": "string",
-                    "description": "The path to the texture for the first layer of this armor"
+                    "markdownDescription": "The path to the texture for the first layer of this armor"
                 },
                 "layer_2": {
                     "type": "string",
-                    "description": "The path to the texture for the second layer of this armor"
+                    "markdownDescription": "The path to the texture for the second layer of this armor"
                 },
                 "emissive_1": {
                     "type": "string",
-                    "description": "The path to the emissive texture for the first layer of this armor"
+                    "markdownDescription": "The path to the emissive texture for the first layer of this armor"
                 },
                 "emissive_2": {
                     "type": "string",
-                    "description": "The path to the emissive texture for the second layer of this armor"
+                    "markdownDescription": "The path to the emissive texture for the second layer of this armor"
                 },
                 "use_color": {
                     "type": "boolean",
-                    "description": "Check if the texture must be recolored based on the value of 'color' attribute or not (false by default)"
+                    "markdownDescription": "Check if the texture must be recolored based on the value of 'color' attribute or not (false by default)"
                 },
                 "emissive_type": {
                     "type": "integer",
-                    "description": "Decide how this texture emission will be shown on screen. 0 = no emission, 1 = full emissivity (default, if emissive textures are provided), 2+ = partial emissivity"
+                    "markdownDescription": "Decide how this texture emission will be shown on screen. 0 = no emission, 1 = full emissivity (default, if emissive textures are provided), 2+ = partial emissivity"
                 },
                 "animation": {
                     "properties": {
                         "speed": {
                             "type": "integer",
-                            "description": "The speed of the armor animation. Default speed is 24, but you can customize it until you find the right speed value"
+                            "markdownDescription": "The speed of the armor animation. Default speed is 24, but you can customize it until you find the right speed value"
                         },
                         "interpolation": {
                             "type": "boolean",
-                            "description": "This option makes the texture frames smoothly change or not. Default value is false"
+                            "markdownDescription": "This option makes the texture frames smoothly change or not. Default value is false"
                         }
                     }
                 }
@@ -8619,31 +8746,31 @@ export const schemas = {
             "properties": {
                 "display_name": {
                     "type": "string",
-                    "description": "Display name of the custom entity"
+                    "markdownDescription": "Display name of the custom entity"
                 },
                 "model_folder": {
                     "type": "string",
-                    "description": "Folder of this custom entity where all its bones models are stored",
+                    "markdownDescription": "Folder of this custom entity where all its bones models are stored",
                     "defaultSnippets": [{"body": "entity/$0"}]
                 },
                 "type": {
-                    "description": "The base Vanilla entity type",
+                    "markdownDescription": "The base Vanilla entity type",
                     "$ref": "#/$defs/vanilla_entity_types"
                 },
                 "silent": {
                     "type": "boolean",
-                    "description": "Make the base Vanilla entity silent"
+                    "markdownDescription": "Make the base Vanilla entity silent"
                 },
                 "can_sun_burn": {
                     "type": "boolean"
                 },
                 "can_drop_loot": {
                     "type": "boolean",
-                    "description": "Allow dropping the Vanilla entity loot on death or not."
+                    "markdownDescription": "Allow dropping the Vanilla entity loot on death or not."
                 },
                 "mount_on_interact": {
                     "type": "boolean",
-                    "description": "Allow mounting (only if mount bones exists) on right click event. Set this to `false` if you want to handle it yourself via IA API or MythicMobs."
+                    "markdownDescription": "Allow mounting (only if mount bones exists) on right click event. Set this to `false` if you want to handle it yourself via IA API or MythicMobs."
                 },
                 "shadow": {
                     "type": "boolean"
@@ -8657,5 +8784,37 @@ export const schemas = {
                 },
             }
         },
+        "custom_block_variant": {
+            "$id": "custom_block_variant",
+            "type": "object",
+            "required": ["model"],
+            "properties": {
+                "display_name": {
+                    "type": "string",
+                    "markdownDescription": "Display name of the custom entity"
+                },
+                "model": {
+                    "type": "string",
+                    "markdownDescription": "Specifies the path to the model file of the block, in form of a resource location.\nExamples: \nblock/my_block\nminecraft:block/stone",
+                    "defaultSnippets": [{"body": "block/$0"}, {"body": "minecraft:block/$0"}]
+                },
+                "weight": {
+                    "type": "integer",
+                    "markdownDescription": "Sets the probability of the model for being used in the game, defaults to 1 (=100%). If more than one model is used for the same variant, the probability is calculated by dividing the individual model's weight by the sum of the weights of all models. (For example, if three models are used with weights 1, 1, and 2, then their combined weight would be 4 (1+1+2). The probability of each model being used would then be determined by dividing each weight by 4: 1/4, 1/4 and 2/4, or 25%, 25% and 50%, respectively.)"
+                },
+                "x": {
+                    "type": "integer",
+                    "markdownDescription": "Rotation of the model on the x-axis in increments of 90 degrees."
+                },
+                "y": {
+                    "type": "integer",
+                    "markdownDescription": "Rotation of the model on the y-axis in increments of 90 degrees."
+                },
+                "uvlock": {
+                    "type": "boolean",
+                    "markdownDescription": "Can be true or false (default). Locks the rotation of the texture of a block, if set to true. This way the texture does not rotate with the block when using the x and y-tags above."
+                }
+            }
+        }
     }
 }
