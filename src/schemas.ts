@@ -5746,13 +5746,13 @@ export const schemas = {
                     }
                 },
                 "resource": {
-                    "markdownDescription": "Resource",
+                    "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item but armors. Armors default item material will be leather if not specified.",
                     "type": "object",
                     "properties": {
                         "material": {"$ref": "#/$defs/vanilla_materials"},
                         "generate": {
                             "type": "boolean",
-                            "markdownDescription": "Decide if you want to automatically generate a model from your textures or you want to create the model by yourself.\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
+                            "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
                         },
                         "model_id": {
                             "type": "integer",
@@ -5772,6 +5772,14 @@ export const schemas = {
                                 "defaultSnippets": [
                                     {"body": "item/$0.png"},
                                     {"body": "block/$0.png"}
+                                ],
+                                "default": [""]
+                            },
+                            "parent": {
+                                "type": "string",
+                                "markdownDescription": "The `parent` value to be set in the automatically generated JSON model." ,
+                                "defaultSnippets": [
+                                    {"body": "builtin/generated"},
                                 ],
                                 "default": [""]
                             }
@@ -6574,7 +6582,7 @@ export const schemas = {
         "recipe.smithing": {
             "$id": "recipe.smithing",
             "type": "object",
-            "required": ["ingredient", "item"],
+            "required": ["base", "addition", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
                 "permission": {"type": "string"},
@@ -6591,6 +6599,7 @@ export const schemas = {
                 "result": {
                     "type": "object",
                     "markdownDescription" : "The resulting item (can be a custom item or vanilla material) which will be merged into the first slot item.",
+                    "required": ["item"],
                     "properties": {
                         "item": {
                             "markdownDescription" : "The resulting item (can be a custom item or vanilla material) which will be merged into the first slot item.",
