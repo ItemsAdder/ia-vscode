@@ -482,7 +482,27 @@ export const schemas = {
                     "$ref": "#/$defs/entity"
                 }
             }
-        }
+        },
+        "emotes": {
+            "type": "object",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/emote"
+            },
+            "properties": {
+                "emote": {
+                    "$ref": "#/$defs/emote"
+                },
+                "emote_2": {
+                    "$ref": "#/$defs/emote"
+                },
+                "emote_3": {
+                    "$ref": "#/$defs/emote"
+                }
+            }
+        },
     },
     "$defs": {
         "attribute_modifiers": {
@@ -5450,7 +5470,7 @@ export const schemas = {
                         "cancel_drop": {
                             "type": "boolean",
                             "default": false,
-                            "markdownDescription": "Default is false. If true the custom block won't be dropped when a player mines it"
+                            "markdownDescription": "Default is `false`. If `true` the custom block won't be dropped when a player mines it"
                         },
                         "light_level": {
                             "type": "integer",
@@ -5739,7 +5759,7 @@ export const schemas = {
                             "markdownDescription": "MMOITEM Type (check MMOItems docs)",
                             "type": "string"
                         },
-                        "$id": {
+                        "id": {
                             "markdownDescription": "MMOITEM id (check MMOItems docs)",
                             "type": "string"
                         }
@@ -6006,16 +6026,17 @@ export const schemas = {
         "minecraft_lang_overwrite": {
             "$id": "minecraft_lang_overwrite",
             "type": "object",
+            "markdownDescription": "Easily customize entries in the Minecraft languages files.",
             "properties": {
                 "enabled": {
-                    "type": "boolean",
-                    "markdownDescription": "Enable or disable these lang_overwrite settings."
+                    "type": "boolean"
                 },
                 "languages": {
                     "type": "array",
+                    "markdownDescription": "All the languages where you want to change these text in.\n\nYou should set it to only the languages of your playerbase to avoid useless resourcepack size increase. Set to `ALL` to support every user possible language.",
                     "items": {
                         "anyOf": [
-                            {"type": "string", "enum": ["ALL"], "default": "ALL"},
+                            {"type": "string", "enum": ["ALL"], "default": "ALL", "markdownDescription": "Set to `ALL` to support every user possible language. No need to add other languages in this list."},
                             {
                                 "type": "string",
                                 "enum": [
@@ -6142,12 +6163,20 @@ export const schemas = {
                     }
                 },
                 "entries": {
-                    "type": "array",
+                    "type": "object",
+                    "kind": 5,
                     "markdownDescription": "List of language attributes to replace with their replacement value.",
-                    "items": {
+                    "additionalProperties": {
                         "type": "string",
                         "markdownDescription": "Language attribute to replace, example: menu.shareToLan",
                         "default": "menu.shareToLan"
+                    },
+                    "properties": {
+                        "menu.shareToLan": {
+                            "type": "string",
+                            "markdownDescription": "Example language attribute to replace",
+                            "default": "Open to LAN"
+                        }
                     }
                 }
             }
@@ -6202,47 +6231,47 @@ export const schemas = {
                     "required": ["item"],
                     "properties": {
                         "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
-                        "amount": {"type": "integer", "default": 1},
-                        "return_items": {
-                            "properties": {
-                                "decrement_durability": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "object",
-                                        "properties": {
-                                            "item": {
-                                                "$ref": "#/$defs/vanilla_materials_and_customitems"
-                                            },
-                                            "amount": {"type": "integer", "default": 1}
-                                        }
-                                    }
-                                },
-                                "increment_durability": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "object",
-                                        "properties": {
-                                            "item": {
-                                                "$ref": "#/$defs/vanilla_materials_and_customitems"
-                                            },
-                                            "amount": {"type": "integer", "default": 1}
-                                        }
-                                    }
-                                },
-                                "replace": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "string",
+                        "amount": {"type": "integer", "default": 1}
+                    }
+                },
+                "return_items": {
+                    "properties": {
+                        "decrement_durability": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "item": {
                                         "$ref": "#/$defs/vanilla_materials_and_customitems"
-                                    }
-                                },
-                                "play_sound": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
+                                    },
+                                    "amount": {"type": "integer", "default": 1}
                                 }
+                            }
+                        },
+                        "increment_durability": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "item": {
+                                        "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                    },
+                                    "amount": {"type": "integer", "default": 1}
+                                }
+                            }
+                        },
+                        "replace": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string",
+                                "$ref": "#/$defs/vanilla_materials_and_customitems"
+                            }
+                        },
+                        "play_sound": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
                             }
                         }
                     }
@@ -7146,6 +7175,10 @@ export const schemas = {
                     "minimum": 1,
                     "maximum": 15
                 },
+                "shift_interact_rotate": {
+                    "type": "boolean",
+                    "markdownDescription": "Default is `true`. If `true` the custom `item_frame` furniture can be rotated on shift interaction (right-click)."
+                },
                 "solid": {
                     "type": "boolean",
                     "markdownDescription": "If the furniture is solid. ItemsAdder will add hitbox made of BARRIER blocks to simulate furniture collisions.\nYou can customize hitbox size using 'hitbox' property."
@@ -7716,11 +7749,19 @@ export const schemas = {
                     "$ref": "#/$defs/actions"
                 },
                 "held": {
-                    "markdownDescription": "Triggered when you held this item",
+                    "markdownDescription": "Triggered when you held this item in mainhand",
+                    "$ref": "#/$defs/actions"
+                },
+                "held_offhand": {
+                    "markdownDescription": "Triggered when you held this item in offhand",
                     "$ref": "#/$defs/actions"
                 },
                 "unheld": {
-                    "markdownDescription": "Triggered when you unheld this item",
+                    "markdownDescription": "Triggered when you unheld this item from mainhand",
+                    "$ref": "#/$defs/actions"
+                },
+                "unheld_offhand": {
+                    "markdownDescription": "Triggered when you unheld this item from offhand",
                     "$ref": "#/$defs/actions"
                 },
                 "item_throw": {
@@ -7777,6 +7818,33 @@ export const schemas = {
                         },
                         "break": {
                             "markdownDescription": "Triggered when you break an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
+                            "$ref": "#/$defs/actions"
+                        }
+                    }
+                },
+                "holding_item": {
+                    "type": "object",
+                    "properties": {
+                        "player_damaged_by_entity": {
+                            "markdownDescription": "Triggered while the player is holding this item in the mainhand and gets attacked by an entity.",
+                            "$ref": "#/$defs/actions"
+                        }
+                    }
+                },
+                "holding_item_offhand": {
+                    "type": "object",
+                    "properties": {
+                        "player_damaged_by_entity": {
+                            "markdownDescription": "Triggered while the player is holding this item in the offhand and gets attacked by an entity.",
+                            "$ref": "#/$defs/actions"
+                        }
+                    }
+                },
+                "equipped_armor_item": {
+                    "type": "object",
+                    "properties": {
+                        "player_damaged_by_entity": {
+                            "markdownDescription": "Triggered while the player is wearing this armor piece and gets attacked by an entity.",
                             "$ref": "#/$defs/actions"
                         }
                     }
@@ -7888,7 +7956,7 @@ export const schemas = {
             "properties": {
                 "command": {
                     "type": "string",
-                    "markdownDescription": "Command to be executed (**without** the **/**)\n\nYou can use these placeholders:\n{player} is the player who used this item\n{target-player} is the player interacted/attacked\n{target-x} is the x location of player/block interacted/attacked\n{target-y} is the x location of player/block interacted/attacked\n{target-z} is the x location of player/block interacted/attacked\n\n\nExample: tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}"
+                    "markdownDescription": "Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:\n\n`{player}` is the player who used this item\n\n`{target-player}` is the player interacted/attacked\n\n`{target-x}` is the x location of player/block interacted/attacked\n\n`{target-y}` is the x location of player/block interacted/attacked\n\n`{target-z}` is the x location of player/block interacted/attacked\n\n`{debug-event-name}` is the current Bukkit event which triggered the action (useful only to devs).\n\n\nExample: `tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}`"
                 },
                 "as_console": {"type": "boolean", "examples": [false]},
                 "delay": {
@@ -8824,6 +8892,68 @@ export const schemas = {
                     "markdownDescription": "Can be true or false (default). Locks the rotation of the texture of a block, if set to true. This way the texture does not rotate with the block when using the x and y-tags above."
                 }
             }
-        }
+        },
+        "emote": {
+            "$id": "emote",
+            "markdownDescription": "Custom emote properties",
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "kind": 5,
+                    "markdownDescription": "Emote identifier. Example: `death`"
+                },
+                "enabled": {
+                    "markdownDescription": "With this setting you can disable an emote completely without deleting it in the emotes file using Blockbench.",
+                    "type": "boolean",
+                    "kind": 0
+                },
+                "hide_equipment": {
+                    "type": "object",
+                    "markdownDescription": "Hide some equipment pieces during animation.",
+                    "properties": {
+                        "helmet": {
+                            "type": "boolean",
+                            "markdownDescription": "Helmet item will be hidden during animation if set to `true`.",
+                        },
+                        "mainhand": {
+                            "type": "boolean",
+                            "markdownDescription": "Main hand item will be hidden during animation if set to `true`.",
+                        },
+                        "offhand": {
+                            "type": "boolean",
+                            "markdownDescription": "Off hand item will be hidden during animation if set to `true`.",
+                        }
+                    }
+                },
+                "can_player_move": {
+                    "type": "boolean",
+                    "markdownDescription": "If player can move around and jump during animation."
+                },
+                "cancel_conditions": {
+                    "type": "object",
+                    "properties": {
+                        "sneak": {
+                            "type": "boolean",
+                            "markdownDescription": "Cancel the animation when player toggles sneak."
+                        },
+                        "take_damage": {
+                            "type": "boolean",
+                            "markdownDescription": "Cancel the animation when player takes damage."
+                        },
+                        "deal_damage": {
+                            "type": "boolean",
+                            "markdownDescription": "Cancel the animation when player deals damage to another entity."
+                        },
+                        "in_air": {
+                            "type": "boolean",
+                            "markdownDescription": "Do not start animation when the player is falling, this avoids players from exploiting animations to remove fall damage (if the `can_player_move` is `true`)."
+                        }
+                    }
+                }
+            }
+        },
     }
 }

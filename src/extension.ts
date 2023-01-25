@@ -276,7 +276,7 @@ function handleText(activeEditor : vscode.TextEditor, description : string, regE
 		const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
 		propertyDeco.push(decoration);
 
-		const regExParent = /  [a-zA-z]+\:\n/g;
+		const regExParent = /  [a-z0-9_]+\:\n/g;
 		let matchParent;
 		let prevText = "";
 		let matchedParent = false;
@@ -349,7 +349,7 @@ function handleGenericArea(activeEditor : vscode.TextEditor, description : strin
 	while ((match = regEx.exec(text))) {
 
 		// Find the parent YAML block
-		const regExParent = /  [a-zA-z]+\:\n/g;
+		const regExParent = /  [a-z0-9_]+\:\n/g;
 		let matchParent;
 		let matchedParent = false;
 		let i = 1;
@@ -371,7 +371,7 @@ function handleGenericArea(activeEditor : vscode.TextEditor, description : strin
 		}
 
 		// Find the next YAML block parent
-		const regExNext = /\n  [a-zA-z]+\:\n/g;
+		const regExNext = /\n  [a-z0-9_]+\:\n/g;
 		let matchNext;
 		let j = 1;
 		while (!(match.index + j > text.length - 1))
