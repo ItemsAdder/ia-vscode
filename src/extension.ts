@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 import {schemas} from "./schemas";
+const yaml = require('js-yaml');
 
 const SCHEMA = "ia-schema";
 let activeEditor : vscode.TextEditor | undefined = undefined;
@@ -54,6 +55,10 @@ export async function activate(context: vscode.ExtensionContext) {
 			data: []
 		}
 	};
+
+	const diagnostics = vscode.languages.createDiagnosticCollection('ia_diagnostics');
+	let diagnosticsArr : vscode.Diagnostic[] = [];
+
 	schemas.$defs.vanilla_entity_types.enum.forEach(element => {
 		typesDecos.entities.decos[element] = vscode.window.createTextEditorDecorationType({
 			gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/mc-entities-icons/master/icons/${element}.gif`),
@@ -70,8 +75,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		typesDecos.entities.data[element] = [];
 	});
 	schemas.$defs.vanilla_materials.enum.forEach(element => {
+
+		let fileName = element.toLowerCase().replace(/_/g, '-')
+
 		typesDecos.materials.decos[element] = vscode.window.createTextEditorDecorationType({
-			gutterIconPath: vscode.Uri.parse(`https://ide.devs.beer/api-mcicons/${element.toLowerCase().replace(/_/g, '-')}`),
+			gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/crafting-icons/master/32/${fileName}/${fileName}.png`),
 			gutterIconSize: "contain",
 			overviewRulerColor: 'blue',
 			overviewRulerLane: vscode.OverviewRulerLane.Right,
@@ -101,8 +109,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const grayTextsDecorations: vscode.DecorationOptions[] = [];
 	
 		const grayAreasDecorations: vscode.DecorationOptions[] = [];
-	
-	
+
 		handleText(activeEditor, "Template item", /    template\: true/g, templateItemsDecorations, templateTextsDecorations);
 		activeEditor.setDecorations(templateItemDecorationType, templateItemsDecorations);
 		activeEditor.setDecorations(templateTextDecorationType, templateTextsDecorations);
@@ -122,6 +129,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 		handleGenericArea(activeEditor, "Disabled properties block", /    enabled: false/g, grayAreasDecorations);
 		activeEditor.setDecorations(grayAreaDecoType, grayAreasDecorations);
+
+		handleForcedDiagnostics(activeEditor, diagnostics, diagnosticsArr);
 	
 		//activeEditor.setDecorations(largeNumberDecorationType, largeNumbers);
 	}
@@ -266,6 +275,51 @@ function onRequestSchemaContent(schemaUri: string): string | undefined {
 	return schemaJSON;
 }
 
+/**
+ * This function handles customized rules to hint about errors that are not handled by the YAML schema.
+ * @param activeEditor the editor
+ * @param diagnostics the diagnostics object
+ * @param diagnosticsArr the diagnostics array
+ */
+function handleForcedDiagnostics(activeEditor : vscode.TextEditor, diagnostics : vscode.DiagnosticCollection, diagnosticsArr : vscode.Diagnostic[]) {
+	diagnostics.clear();
+	diagnosticsArr = [];
+
+	const text = activeEditor.document.getText();
+	let yy = yaml.load(text);
+	if(!yy?.items) {
+		return;
+	}
+
+	Object.keys(yy.items).forEach((key : any) => {
+		let value = yy.items[key];
+
+		// Must underline the resources to warn about the missing material property and are not custom armors
+		if(!value?.resource?.material && !value?.specific_properties?.armor) {
+			// Search for the specified item key. 
+			// Warning: this might find the wrong thing if there is something else with the same key name before the items list. //TODO: FIX THIS
+			let match;
+			let regEx = new RegExp("  " + key + ":", "g");
+			while ((match = regEx.exec(text))) {
+
+				// Search for the nearest "resource" property to underline it. No need to loop it, stop at the first found one.
+				let match2;
+				let regEx2 = new RegExp("    resource:", "g");
+				if ((match2 = regEx2.exec(text.substring(match.index)))) {
+
+					const startPos = activeEditor.document.positionAt(4 + match.index + match2.index); // 4spaces in front of "resource:"
+					const endPos = activeEditor.document.positionAt(match.index + match2.index + match2[0].length);
+					
+					const diagnostic = new vscode.Diagnostic(new vscode.Range(startPos, endPos), "Missing `material` property for `resource`", vscode.DiagnosticSeverity.Error);
+					diagnosticsArr.push(diagnostic);
+				}
+			}
+		}
+	});
+
+	diagnostics.set(activeEditor.document.uri, diagnosticsArr);
+}
+
 function handleText(activeEditor : vscode.TextEditor, description : string, regEx : RegExp, itemsDeco: vscode.DecorationOptions[], propertyDeco: vscode.DecorationOptions[]) {
 	const text = activeEditor.document.getText();
 	let match;
@@ -316,7 +370,9 @@ function handleTextEnum(activeEditor : vscode.TextEditor, description : string, 
 
 		decos.data[element] = [];
 
-		var regEx = new RegExp(element + "\n", 'g');
+		// Space is important to match the property after : only and not random texts containing the enum.
+		// For example it will match `property: ZOMBIE` and not `RANDOMSTRINGZOMBIE1234`.
+		var regEx = new RegExp(" " + element + "\n", 'g');
 		let match;
 		while ((match = regEx.exec(text))) {
 	

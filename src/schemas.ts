@@ -5618,7 +5618,7 @@ export const schemas = {
                                         "COCOA",
                                         "BAMBOO",
                                         "SUGAR_CANE",
-                                        "SWEET_BERRIES",
+                                        "SWEET_BERRY_BUSH",
                                         "KELP_PLANT",
                                         "SEA_PICKLE",
                                         "NETHER_WART"
@@ -5766,7 +5766,7 @@ export const schemas = {
                     }
                 },
                 "resource": {
-                    "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item but armors. Armors default item material will be leather if not specified.",
+                    "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item.\nHowever custom armors do not require this setting.\nCustom armors default item material will be leather if not specified.",
                     "type": "object",
                     "properties": {
                         "material": {"$ref": "#/$defs/vanilla_materials"},
@@ -8106,7 +8106,7 @@ export const schemas = {
                     "markdownDescription": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
                 },
                 "saturation": {
-                    "type": "integer",
+                    "type": "number",
                     "markdownDescription": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
