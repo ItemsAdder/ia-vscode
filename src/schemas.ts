@@ -503,6 +503,27 @@ export const schemas = {
                 }
             }
         },
+        "armors_rendering": {
+            "$id": "armors_rendering",
+            "type": "object",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/armors_rendering_entry"
+            },
+            "properties": {
+                "change_me": {"type": "object", "$ref": "#/$defs/armors_rendering_entry"},
+                "change_me_2": {
+                    "type": "object",
+                    "$ref": "#/$defs/armors_rendering_entry"
+                },
+                "change_me_xxx": {
+                    "type": "object",
+                    "$ref": "#/$defs/armors_rendering_entry"
+                }
+            }
+        }
     },
     "$defs": {
         "attribute_modifiers": {
@@ -5762,7 +5783,11 @@ export const schemas = {
                         "id": {
                             "markdownDescription": "MMOITEM id (check MMOItems docs)",
                             "type": "string"
-                        }
+                        },
+                        "use_mmoitem_displayname": {
+                            "markdownDescription": "Use the display name of MMOitems item instead of the one from ItemsAdder. Default `false`.",
+                            "type": "string"
+                        },
                     }
                 },
                 "resource": {
@@ -7981,7 +8006,7 @@ export const schemas = {
             "required": ["name", "volume", "pitch"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
-                "volume": {"type": "integer", "minimum": 0},
+                "volume": {"type": "number", "minimum": 0},
                 "pitch": {"type": "number", "minimum": 0, "maximum": 2},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8745,34 +8770,8 @@ export const schemas = {
                 }
             }
         },
-        "armors_renderings": {
-            "$id": "armors_renderings",
-            "type": "object",
-            "properties": {
-                "armors_rendering": {
-                    "type": "object",
-                    "kind": 5,
-                    "detail": "(collection)",
-                    "additionalProperties": {
-                        "type": "object",
-                        "$ref": "#/$defs/armors_rendering"
-                    },
-                    "properties": {
-                        "change_me": {"type": "object", "$ref": "#/$defs/armors_rendering"},
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/armors_rendering"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/armors_rendering"
-                        }
-                    }
-                }
-            }
-        },
-        "armors_rendering": {
-            "$id": "armors_rendering",
+        "armors_rendering_entry": {
+            "$id": "armors_rendering_entry",
             "type": "object",
             "kind": 2,
             "detail": "(object)",
