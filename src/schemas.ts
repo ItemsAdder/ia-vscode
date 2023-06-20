@@ -7819,30 +7819,16 @@ export const schemas = {
                         }
                     }
                 },
-                "placed_armorstand": {
+                "placed_furniture": {
                     "type": "object",
-                    "markdownDescription": "Placed armorstand actions (furniture, vehicles or normal armorstands with a custom item inside)",
+                    "markdownDescription": "Placed furniture actions",
                     "properties": {
                         "interact": {
-                            "markdownDescription": "Triggered when you interact with an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
+                            "markdownDescription": "Triggered when you interact with furniture.",
                             "$ref": "#/$defs/actions"
                         },
                         "break": {
-                            "markdownDescription": "Triggered when you break an **armorstand** that has this item on head. (works with **furnitures**, **vehicles** but also with **normal armorstands** which have this **custom item** equipped as **helmet**)",
-                            "$ref": "#/$defs/actions"
-                        }
-                    }
-                },
-                "placed_itemframe": {
-                    "type": "object",
-                    "markdownDescription": "Placed itemframe actions (furniture or normal itemframes with a custom item inside...)",
-                    "properties": {
-                        "interact": {
-                            "markdownDescription": "Triggered when you interact with an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
-                            "$ref": "#/$defs/actions"
-                        },
-                        "break": {
-                            "markdownDescription": "Triggered when you break an **itemframe** that has this item inside. (works with **furnitures** but also with **normal itemframes** which have this **custom item** inside)",
+                            "markdownDescription": "Triggered when you break a furniture.",
                             "$ref": "#/$defs/actions"
                         }
                     }
@@ -7881,7 +7867,35 @@ export const schemas = {
                 "bucket_fill": {
                     "markdownDescription": "Triggered when this bucket is filled (works only with **BUCKET**)",
                     "$ref": "#/$defs/actions"
-                }
+                },
+                "item_frame": {
+                    "type": "object",
+                    "markdownDescription": "Events related to vanilla item_frame",
+                    "properties": {
+                        "put_item": {
+                            "markdownDescription": "Triggered when you put this item on an item_frame.",
+                            "$ref": "#/$defs/actions"
+                        },
+                        "remove_item": {
+                            "markdownDescription": "Triggered when you remove this item from an item_frame.",
+                            "$ref": "#/$defs/actions"
+                        }
+                    }
+                },
+                "armor_stand": {
+                    "type": "object",
+                    "markdownDescription": "Events related to vanilla armor_stand",
+                    "properties": {
+                        "put_item": {
+                            "markdownDescription": "Triggered when you put this item on an armor_stand.",
+                            "$ref": "#/$defs/actions"
+                        },
+                        "remove_item": {
+                            "markdownDescription": "Triggered when you remove this item from an armor_stand.",
+                            "$ref": "#/$defs/actions"
+                        }
+                    }
+                },
             }
         },
         "actions": {
