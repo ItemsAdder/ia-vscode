@@ -3953,6 +3953,17 @@ export const schemas = {
                 {"type": "string", "default": "STONE"}
             ]
         },
+        "custom_potion_effect": {
+            "$id": "custom_potion_effect",
+            "type": "object",
+            "description": "Attach a specific potion effect to this potion.",
+            "properties": {
+                "type": { "$ref": "#/$defs/vanilla_potion_effects" },
+                "amplifier": { "type": "integer" },
+                "duration": { "type": "integer" },
+                "ambient": { "type": "boolean" }
+            }
+        },
         "vanilla_potion_types": {
             "$id": "vanilla_potion_types",
             "type": "string",
@@ -5715,7 +5726,28 @@ export const schemas = {
                 "potion": {
                     "properties": {
                         "type": {"$ref": "#/$defs/vanilla_potion_types"},
-                        "color": {"$ref": "#/$defs/colors"}
+                        "color": {"$ref": "#/$defs/colors"},
+                        "effects": {
+                            "type": "object",
+                            "kind": 5,
+                            "detail": "(collection)",
+                            "description": "Attach multiple potion effects to this potion to create a completely custom potion.",
+                            "additionalProperties": {
+                                "type": "object",
+                                "$ref": "#/$defs/custom_potion_effect"
+                            },
+                            "properties": {
+                                "effect_1": {
+                                    "$ref": "#/$defs/custom_potion_effect"
+                                },
+                                "effect_2": {
+                                    "$ref": "#/$defs/custom_potion_effect"
+                                },
+                                "effect_xxx": {
+                                    "$ref": "#/$defs/custom_potion_effect"
+                                }
+                            }
+                        }
                     }
                 },
                 "leather_horse_armor": {
