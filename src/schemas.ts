@@ -5566,7 +5566,7 @@ export const schemas = {
                         },
                         "events_tools_whitelist": {
                             "type": "array",
-                            "markdownDescription": "Whitelist of tools that cannot run events on this block (placed_block.interact)",
+                            "markdownDescription": "Whitelist of tools that can run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -5593,7 +5593,7 @@ export const schemas = {
                         },
                         "events_tools_blacklist": {
                             "type": "array",
-                            "markdownDescription": "Blacklist of tools that cannot run events on this block (placed_block.interact)",
+                            "markdownDescription": "Blacklist of tools that can't run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
                                     {"$ref": "#/$defs/vanilla_materials_and_customitems"},
@@ -8842,6 +8842,32 @@ export const schemas = {
                 "use_color": {
                     "type": "boolean",
                     "markdownDescription": "Check if the texture must be recolored based on the value of 'color' attribute or not (false by default)"
+                },
+                "color": {
+                    "kind": 19,
+                    "default": "ff0000",
+                    "anyOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "ff7e7e",
+                                "75bebe",
+                                "16d4ff",
+                                "530766",
+                                "00ff72",
+                                "010002",
+                                "570e11",
+                                "d36823",
+                                "ff0000"
+                            ]
+                        },
+                        {"type": "integer"},
+                        {
+                            "patternProperties": {
+                                "^(#|)[0-9a-f]{3,6}$": {"type": "string"}
+                            }
+                        }
+                    ]
                 },
                 "emissive_type": {
                     "type": "integer",
