@@ -8241,6 +8241,10 @@ export const schemas = {
                     "type": "integer",
                     "markdownDescription": "Decrement durability amount"
                 },
+                "decrement_amount": {
+                    "type": "integer",
+                    "markdownDescription": "Decrement item amount"
+                },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8276,6 +8280,10 @@ export const schemas = {
                 "decrement_durability": {
                     "type": "integer",
                     "markdownDescription": "Decrement durability amount"
+                },
+                "decrement_amount": {
+                    "type": "integer",
+                    "markdownDescription": "Decrement item amount"
                 },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
