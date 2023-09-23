@@ -4990,6 +4990,13 @@ export const schemas = {
             "markdownDescription": "Vanilla sounds",
             "anyOf": [{"$ref": "#/$defs/vanilla_sounds"}, {"type": "string"}]
         },
+        "vanilla_sound_category": {
+            "$id": "vanilla_sound_category",
+            "markdownDescription": "Category of the sound.", 
+            "type": "string",
+            "enum": ["MASTER", "MUSIC", "RECORDS", "WEATHER", "BLOCKS", "HOSTILE", "NEUTRAL", "PLAYERS", "AMBIENT", "VOICE"]
+        },
+        
         "vanilla_entity_types": {
             "$id": "vanilla_entity_types",
             "type": "string",
@@ -5510,6 +5517,18 @@ export const schemas = {
                             "minimum": 1,
                             "maximum": 15
                         },
+                        "permission_suffix": {
+                            "properties": {
+                                "break": {
+                                    "type": "string",
+                                    "markdownDescription": "Partial permission used to allow a player to break the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.break.iasurvival.ruby_block`."
+                                },
+                                "place": {
+                                    "type": "string",
+                                    "markdownDescription": "Partial permission used to allow a player to place the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.place.iasurvival.ruby_block`."
+                                }
+                            }
+                        },
                         "break_tools_blacklist": {
                             "type": "array",
                             "markdownDescription": "Blacklist of tools that cannot break this block",
@@ -5776,7 +5795,7 @@ export const schemas = {
             "markdownDescription": "Custom item",
             "type": "object",
             "required": ["resource", "display_name"],
-            "additionalProperties": false,
+            "additionalProperties": true,
             "properties": {
                 "enabled": {
                     "markdownDescription": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
@@ -5800,9 +5819,9 @@ export const schemas = {
                     "default": "display-name-",
                     "kind": 18
                 },
-                "permission": {
-                    "markdownDescription": "Permission of the item",
-                    "type": "string"
+                "permission_suffix": {
+                    "type": "string",
+                    "markdownDescription": "Partial permission of the item.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.ia.seeitem.iasurvival.ruby_block` and might be extended in the future for new plugin permissions."
                 },
                 "mmoitem": {
                     "markdownDescription": "Special property to mark item as MMOITEM https://www.spigotmc.org/resources/39267/",
@@ -6006,7 +6025,11 @@ export const schemas = {
                     "type": "string",
                     "markdownDescription": "Permission needed to execute any of the actions of each event.\nIf you want to set a different permission to eachaction you can add the 'permission' attribute on each action instead."
                 },
-                "events": {"type": "object", "$ref": "#/$defs/events"}
+                "events": {"type": "object", "$ref": "#/$defs/events"},
+                "permission": {
+                    "type": "string",
+                    "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead."
+                }
             }
         },
         "ia_categories": {
@@ -6328,7 +6351,8 @@ export const schemas = {
                             "properties": {
                                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
                                 "volume": {"type": "number"},
-                                "pitch": {"type": "number"}
+                                "pitch": {"type": "number"},
+                                "category": {"$ref": "#/$defs/vanilla_sound_category"}
                             }
                         }
                     }
@@ -6639,7 +6663,8 @@ export const schemas = {
                                     "properties": {
                                         "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
                                         "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
+                                        "pitch": {"type": "number"},
+                                        "category": {"$ref": "#/$defs/vanilla_sound_category"}
                                     }
                                 }
                             }
@@ -7256,6 +7281,18 @@ export const schemas = {
                     "type": "boolean",
                     "markdownDescription": "Makes the model rotate 180 degrees automatically when placed"
                 },
+                "permission_suffix": {
+                    "properties": {
+                        "break": {
+                            "type": "string",
+                            "markdownDescription": "Partial permission used to allow a player to break the furniture.\n\nFor example `example.red_chair` is a suffix permission for `ia.user.furniture.break.example.red_chair`."
+                        },
+                        "place": {
+                            "type": "string",
+                            "markdownDescription": "Partial permission used to allow a player to place the furniture.\n\nFor example `example.red_chair` is a suffix permission for `ia.user.furniture.place.example.red_chair`."
+                        }
+                    }
+                },
                 "sound": {
                     "properties": {
                         "break": {
@@ -7575,7 +7612,8 @@ export const schemas = {
                                 "every_ticks": {"type": "integer"},
                                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                                 "amplifier": {"type": "integer"},
-                                "duration": {"type": "integer"}
+                                "duration": {"type": "integer"},
+                                "ambient": {"type": "boolean"}
                             }
                         }
                     },
@@ -7587,7 +7625,8 @@ export const schemas = {
                                 "every_ticks": {"type": "integer"},
                                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                                 "amplifier": {"type": "integer"},
-                                "duration": {"type": "integer"}
+                                "duration": {"type": "integer"},
+                                "ambient": {"type": "boolean"}
                             }
                         }
                     }
@@ -7708,30 +7747,16 @@ export const schemas = {
                     "$ref": "#/$defs/actions"
                 },
                 "interact": {
-                    "type": "object",
-                    "markdownDescription": "Triggered when you interact ...",
-                    "properties": {
-                        "entity": {
-                            "markdownDescription": "... with an entity with this item",
-                            "$ref": "#/$defs/actions"
-                        },
-                        "left": {
-                            "markdownDescription": "... with a block (left click) with this item",
-                            "$ref": "#/$defs/actions"
-                        },
-                        "right": {
-                            "markdownDescription": "... with a block (right click) with this item",
-                            "$ref": "#/$defs/actions"
-                        },
-                        "left_shift": {
-                            "markdownDescription": "... with a block (left shift click) with this item",
-                            "$ref": "#/$defs/actions"
-                        },
-                        "right_shift": {
-                            "markdownDescription": "... with a block (right shift click) with this item",
-                            "$ref": "#/$defs/actions"
-                        }
-                    }
+                    "$ref": "#/$defs/interact",
+                    "markdownDescription": "Triggered when you interact...\n\n**(both mainhand and offhand trigger this event)**",
+                },
+                "interact_mainhand": {
+                    "$ref": "#/$defs/interact",
+                    "markdownDescription": "Triggered when you interact...\n\n**(only mainhand triggers this event)**",
+                },
+                "interact_offhand": {
+                    "$ref": "#/$defs/interact",
+                    "markdownDescription": "Triggered when you interact...\n\n**(only offhand triggers this event)**",
                 },
                 "drop": {
                     "markdownDescription": "Triggered when you drop this item",
@@ -8020,6 +8045,33 @@ export const schemas = {
                 "place_furniture": {"$ref": "#/$defs/place_furniture"}
             }
         },
+        "interact": {
+            "$id": "interact",
+            "type": "object",
+            "markdownDescription": "Triggered when you interact ...",
+            "properties": {
+                "entity": {
+                    "markdownDescription": "... with an entity with this item",
+                    "$ref": "#/$defs/actions"
+                },
+                "left": {
+                    "markdownDescription": "... with a block (left click) with this item",
+                    "$ref": "#/$defs/actions"
+                },
+                "right": {
+                    "markdownDescription": "... with a block (right click) with this item",
+                    "$ref": "#/$defs/actions"
+                },
+                "left_shift": {
+                    "markdownDescription": "... with a block (left shift click) with this item",
+                    "$ref": "#/$defs/actions"
+                },
+                "right_shift": {
+                    "markdownDescription": "... with a block (right shift click) with this item",
+                    "$ref": "#/$defs/actions"
+                }
+            }
+        },
         "command": {
             "$id": "command",
             "type": "object",
@@ -8055,6 +8107,7 @@ export const schemas = {
                 "volume": {"type": "number", "minimum": 0},
                 "pitch": {"type": "number", "minimum": 0, "maximum": 2},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "category": {"$ref": "#/$defs/vanilla_sound_category"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8317,7 +8370,8 @@ export const schemas = {
                 "every_ticks": {"type": "integer"},
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                 "amplifier": {"type": "integer"},
-                "duration": {"type": "integer"}
+                "duration": {"type": "integer"},
+                "ambient": {"type": "boolean"}
             }
         },
         "remove_potion_effect": {
@@ -8388,6 +8442,7 @@ export const schemas = {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                 "amplifier": {"type": "integer"},
                 "duration": {"type": "integer"},
+                "ambient": {"type": "boolean"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
@@ -8937,6 +8992,18 @@ export const schemas = {
                         "movement": {"type": "number"},
                         "flying": {"type": "number"}
                     }
+                },
+                "invulnerable": {
+                    "type": "boolean",
+                    "markdownDescription": "Default: `false`"
+                },
+                "gravity": {
+                    "type": "boolean",
+                    "markdownDescription": "Default: `true`"
+                },
+                "ai": {
+                    "type": "boolean",
+                    "markdownDescription": "Default: `true`"
                 },
             }
         },
