@@ -441,21 +441,29 @@ export const schemas = {
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
-                "type": "object",
-                "$ref": "#/$defs/dictionary"
+                "type": "string",
+                "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/dictionary"
+                "display-category-EXAMPLE": {
+                    "type": "string",
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/dictionary"
+                "display-category-EXAMPLE_2": {
+                    "type": "string",
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/dictionary"
+                "display-name-EXAMPLE_ITEM": {
+                    "type": "string",
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                },
+                "display-lore-EXAMPLE_ITEM": {
+                    "type": "string",
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                },
+                "EXAMPLE": {
+                    "type": "string",
+                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 }
             }
         },
@@ -6019,7 +6027,29 @@ export const schemas = {
                 "behaviours": {"type": "object", "$ref": "#/$defs/behaviours"},
                 "events_cooldown": {
                     "type": "integer",
-                    "markdownDescription": "Cooldown in ticks before user can activate events of this item"
+                    "markdownDescription": "**OLD NAME** OF THE property `events_settings.cooldown.ticks`.\n\nUse it instead."
+                },
+                "events_settings": {
+                    "type": "object",
+                    "properties": {
+                        "cooldown": {
+                            "type": "object",
+                            "properties": {
+                                "ticks": {
+                                    "type": "integer",
+                                    "markdownDescription": "Cooldown in ticks before user can activate events of this item"
+                                },
+                                "indicator": {
+                                    "type": "string",
+                                    "markdownDescription": "Type of cooldown indicator, for now there is only HIDDEN and TITLE",
+                                    "enum": [
+                                        "HIDDEN",
+                                        "TITLE"
+                                    ]
+                                }
+                            }
+                        }
+                    }
                 },
                 "all_actions_permission": {
                     "type": "string",
@@ -8085,13 +8115,191 @@ export const schemas = {
                 "delay": {
                     "type": "integer",
                     "markdownDescription": "Delay in ticks before starting this action"
-                }
+                },
+                "flow": { "$ref": "#/$defs/flow.prop" }
             }
         },
         "action_delay.prop": {
             "$id": "action_delay.prop",
             "type": "integer",
             "markdownDescription": "Delay in ticks before starting this action"
+        },
+        "flow.prop": {
+            "$id": "flow.prop",
+            "type": "object",
+            "markdownDescription": "Advanced options to change the flow of actions for this event section.",
+            "properties": {
+                "stop_if_last_success": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this and the next actions if the previous action **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "stop_if_last_fail": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this and the next actions if the previous action **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_last_success": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this action if the previous action **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_last_fail": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this action if the previous action **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "stop_if_any_success": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this and the next actions if **ANY** of the previous actions **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "stop_if_any_fail": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this and the next actions if **ANY** of the previous actions **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_any_success": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this action if **ANY** of the previous actions **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_any_fail": {
+                    "type": "boolean",
+                    "markdownDescription": "Doesn't execute this action if **ANY** of the previous actions **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "stop_if_success": {
+                    "type": "string",
+                    "markdownDescription": "Doesn't execute this and the next actions if a specific previous action **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "stop_if_fail": {
+                    "type": "string",
+                    "markdownDescription": "Doesn't execute this and the next actions if a specific previous action **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_success": {
+                    "type": "string",
+                    "markdownDescription": "Doesn't execute this action if a specific previous action **succeeded**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                },
+                "skip_if_fail": {
+                    "type": "string",
+                    "markdownDescription": "Doesn't execute this action if a specific previous action **failed**.\n\nUSE ONLY ONE OF `stop_` or `skip_`."
+                }
+            },
+            /*"oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_last_success": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this and the next actions if the previous action **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_last_fail": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this and the next actions if the previous action **failed**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_last_success": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this action if the previous action **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_last_fail": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this action if the previous action **failed**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_any_success": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this and the next actions if **ANY** of the previous actions **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_any_fail": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this and the next actions if **ANY** of the previous actions **failed**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_any_success": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this action if **ANY** of the previous actions **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_any_fail": {
+                            "type": "boolean",
+                            "markdownDescription": "Doesn't execute this action if **ANY** of the previous actions **failed**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_success": {
+                            "type": "string",
+                            "markdownDescription": "Doesn't execute this and the next actions if a specific previous action **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "stop_if_fail": {
+                            "type": "string",
+                            "markdownDescription": "Doesn't execute this and the next actions if a specific previous action **failed**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_success": {
+                            "type": "string",
+                            "markdownDescription": "Doesn't execute this action if a specific previous action **succeeded**."
+                        },
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "skip_if_fail": {
+                            "type": "string",
+                            "markdownDescription": "Doesn't execute this action if a specific previous action **failed**."
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ],*/
         },
         "action_permission.prop": {
             "$id": "action_permission.prop",
@@ -8107,6 +8315,7 @@ export const schemas = {
                 "volume": {"type": "number", "minimum": 0},
                 "pitch": {"type": "number", "minimum": 0, "maximum": 2},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "category": {"$ref": "#/$defs/vanilla_sound_category"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
@@ -8118,6 +8327,7 @@ export const schemas = {
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8144,6 +8354,7 @@ export const schemas = {
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_particles"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8155,6 +8366,7 @@ export const schemas = {
                 "name": {"$ref": "#/$defs/vanilla_particles"},
                 "distance": {"type": "integer", "default": 7},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8165,6 +8377,7 @@ export const schemas = {
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_effects"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8175,6 +8388,7 @@ export const schemas = {
             "properties": {
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8185,6 +8399,7 @@ export const schemas = {
             "properties": {
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8195,6 +8410,7 @@ export const schemas = {
             "properties": {
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8205,6 +8421,7 @@ export const schemas = {
             "properties": {
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8217,6 +8434,7 @@ export const schemas = {
                 "min_amount": {"type": "integer"},
                 "max_amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8234,6 +8452,7 @@ export const schemas = {
                     "markdownDescription": "Vanilla saturation and feed values: https://minecraft.gamepedia.com/Hunger#Food_level_and_saturation_level_restoration"
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8252,6 +8471,7 @@ export const schemas = {
                             "markdownDescription": "Can this change be reverted?"
                         },
                         "delay": {"$ref": "#/$defs/action_delay.prop"},
+                        "flow": {"$ref": "#/$defs/flow.prop"},
                         "permission": {"$ref": "#/$defs/action_permission.prop"}
                     }
                 }
@@ -8265,6 +8485,7 @@ export const schemas = {
                 "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8300,6 +8521,7 @@ export const schemas = {
                 },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8320,6 +8542,7 @@ export const schemas = {
                     }
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8340,6 +8563,7 @@ export const schemas = {
                 },
                 "no_physics": {"type": "boolean", "examples": [false]},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8360,6 +8584,7 @@ export const schemas = {
                     }
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8381,6 +8606,7 @@ export const schemas = {
             "properties": {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8393,6 +8619,7 @@ export const schemas = {
                 "fire": {"type": "boolean", "default": false},
                 "break_blocks": {"type": "boolean", "default": false},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8409,6 +8636,7 @@ export const schemas = {
                     "enum": ["HOSTILE", "PLAYERS", "PASSIVE"]
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8421,6 +8649,7 @@ export const schemas = {
                 "damage": {"type": "number", "default": 1},
                 "distance": {"type": "integer", "default": 3},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8431,6 +8660,7 @@ export const schemas = {
             "properties": {
                 "damage": {"type": "number", "default": 1},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8444,6 +8674,7 @@ export const schemas = {
                 "duration": {"type": "integer"},
                 "ambient": {"type": "boolean"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8455,6 +8686,7 @@ export const schemas = {
             "properties": {
                 "type": {"$ref": "#/$defs/vanilla_potion_effects"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8466,6 +8698,7 @@ export const schemas = {
                 "name": {"type": "string"},
                 "amount": {"type": "number"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8478,6 +8711,7 @@ export const schemas = {
                 "name": {"type": "string"},
                 "amount": {"type": "number"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8495,6 +8729,7 @@ export const schemas = {
                 "target": {"type": "string", "enum": ["RELATIVE", "CLICKED"]},
                 "decrement_amount": {"type": "boolean"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8506,6 +8741,7 @@ export const schemas = {
                 "furniture": {"type": "string"},
                 "decrement_amount": {"type": "boolean"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8519,6 +8755,7 @@ export const schemas = {
                 "max_amount": {"type": "integer", "default": 1},
                 "chance": {"type": "number", "default": 99.9},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
@@ -8825,33 +9062,6 @@ export const schemas = {
                             }
                         }
                     }
-                }
-            }
-        },
-        "dictionary": {
-            "$id": "dictionary",
-            "type": "object",
-            "required": ["path"],
-            "properties": {
-                "display-category-EXAMPLE": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "display-category-EXAMPLE_2": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "display-name-EXAMPLE_ITEM": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "display-lore-EXAMPLE_ITEM": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "EXAMPLE": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 }
             }
         },

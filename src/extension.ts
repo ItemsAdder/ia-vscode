@@ -286,36 +286,83 @@ function handleForcedDiagnostics(activeEditor : vscode.TextEditor, diagnostics :
 	diagnosticsArr = [];
 
 	const text = activeEditor.document.getText();
-	let yy = yaml.load(text);
-	if(!yy?.items) {
+	let yy : any = null;
+	try
+	{
+		yy = yaml.load(text);
+		if(!yy?.items) {
+			return;
+		}
+	}
+	catch(ex : any)
+	{
+		//console.log(ex);
+		//vscode.window.showErrorMessage('Error parsing ItemsAdder yml configuration!', ex.message);
 		return;
 	}
 
 	Object.keys(yy.items).forEach((key : any) => {
 		let value = yy.items[key];
 
+		//#region Handle `material` property in `resource`.
 		// Must underline the resources to warn about the missing material property and are not custom armors
 		if(!value?.resource?.material && !value?.specific_properties?.armor) {
 			// Search for the specified item key. 
 			// Warning: this might find the wrong thing if there is something else with the same key name before the items list. //TODO: FIX THIS
-			let match;
-			let regEx = new RegExp("  " + key + ":", "g");
-			while ((match = regEx.exec(text))) {
-
+			let matchItem;
+			let regexItem = new RegExp("  " + key + ":", "g");
+			while ((matchItem = regexItem.exec(text))) {
 				// Search for the nearest "resource" property to underline it. No need to loop it, stop at the first found one.
 				let match2;
 				let regEx2 = new RegExp("    resource:", "g");
-				if ((match2 = regEx2.exec(text.substring(match.index)))) {
-
-					const startPos = activeEditor.document.positionAt(4 + match.index + match2.index); // 4spaces in front of "resource:"
-					const endPos = activeEditor.document.positionAt(match.index + match2.index + match2[0].length);
+				if ((match2 = regEx2.exec(text.substring(matchItem.index)))) {
+					const startPos = activeEditor.document.positionAt(4 + matchItem.index + match2.index); // 4spaces in front of "resource:"
+					const endPos = activeEditor.document.positionAt(matchItem.index + match2.index + match2[0].length);
 					
 					const diagnostic = new vscode.Diagnostic(new vscode.Range(startPos, endPos), "Missing `material` property for `resource`", vscode.DiagnosticSeverity.Error);
 					diagnosticsArr.push(diagnostic);
 				}
 			}
 		}
+		//#endregion
 	});
+
+	//#region Handle `flow` and allo only one flow rule. 
+	let regEx = new RegExp("(.*)flow:", "g");
+	let allLines = text.split("\n");
+	regexLines(text, regEx, (entry) => {
+		if(!entry) {
+			return false;
+		}
+
+		let lines = allLines.slice(entry.line);
+		let count = 0;
+		for(let i = 1; i < lines.length; i++) {
+			let line = lines[i];
+			if(new RegExp("(.*)(skip|stop)_if(.*)(_success|_fail):", "g").test(line)) {
+				count++;
+			} else {
+				// To detect if reached the end of the current action.
+				if(count > 0) {
+					break;
+				}
+			}
+		}
+
+		if(count > 1) {
+			const range = activeEditor.document.lineAt(entry.line).range;
+			const diagnostic = new vscode.Diagnostic(
+				new vscode.Range(range.start.translate(0, entry.text.search(/\S/)), range.end),
+				"Multiple `stop_` or `skip_` flow attributes found in action.\nUse only one of them for this action.",
+				vscode.DiagnosticSeverity.Error
+			);
+			diagnosticsArr.push(diagnostic);
+			return false;
+		}
+
+		return false;
+	});
+	//#endregion
 
 	diagnostics.set(activeEditor.document.uri, diagnosticsArr);
 }
@@ -455,3 +502,22 @@ function handleGenericArea(activeEditor : vscode.TextEditor, description : strin
 		}
 	}
 }
+
+function regexLines(str : string, re : RegExp, x: (obj : any) => boolean) {
+	let finishAll = false;
+	return str.split(/\r?\n/).map(function (text, i) {
+		// Shit, but there is no other way to stop the map function.
+		if(finishAll) {
+			return;
+		}
+		
+		const match = re.exec(text);
+		if(match) {
+			finishAll = x({
+				text: text,
+				line: i,
+				match: match[0]
+			});
+		}
+	});
+};
