@@ -6331,7 +6331,7 @@ export const schemas = {
             "required": ["ingredients", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
-                "permission": {"type": "string"},
+                "permission_suffix": {"type": "string"},
                 "shapeless": {
                     "markdownDescription": "Allow the player to place the ingredients anywhere in the crafting table.",
                     "type": "boolean"
@@ -6630,7 +6630,7 @@ export const schemas = {
             "required": ["machines", "ingredient", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
-                "permission": {"type": "string"},
+                "permission_suffix": {"type": "string"},
                 "machines": {
                     "type": "array",
                     "markdownDescription": "List of the machines that will have this recipe available",
@@ -6709,7 +6709,7 @@ export const schemas = {
             "required": ["ingredient", "item"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
-                "permission": {"type": "string"},
+                "permission_suffix": {"type": "string"},
                 "ingredient": {
                     "type": "string",
                     "$ref": "#/$defs/vanilla_materials_and_customitems"
@@ -6726,7 +6726,7 @@ export const schemas = {
             "required": ["base", "addition", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
-                "permission": {"type": "string"},
+                "permission_suffix": {"type": "string"},
                 "base": {
                     "type": "string",
                     "markdownDescription" : "The base item (can be a custom item or vanilla material) on the first slot.",
