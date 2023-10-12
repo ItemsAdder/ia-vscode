@@ -3972,6 +3972,54 @@ export const schemas = {
                 "ambient": { "type": "boolean" }
             }
         },
+        "potion_types": {
+            "$id": "potion_types",
+            "type": "string",
+            "enum": [
+                "minecraft:water",
+                "minecraft:mundane",
+                "minecraft:thick",
+                "minecraft:awkward",
+                "minecraft:night_vision",
+                "minecraft:long_night_vision",
+                "minecraft:invisibility",
+                "minecraft:long_invisibility",
+                "minecraft:leaping",
+                "minecraft:long_leaping",
+                "minecraft:strong_leaping",
+                "minecraft:fire_resistance",
+                "minecraft:long_fire_resistance",
+                "minecraft:swiftness",
+                "minecraft:long_swiftness",
+                "minecraft:strong_swiftness",
+                "minecraft:slowness",
+                "minecraft:long_slowness",
+                "minecraft:strong_slowness",
+                "minecraft:turtle_master",
+                "minecraft:long_turtle_master",
+                "minecraft:strong_turtle_master",
+                "minecraft:water_breathing",
+                "minecraft:long_water_breathing",
+                "minecraft:healing",
+                "minecraft:strong_healing",
+                "minecraft:harming",
+                "minecraft:strong_harming",
+                "minecraft:poison",
+                "minecraft:long_poison",
+                "minecraft:strong_poison",
+                "minecraft:regeneration",
+                "minecraft:long_regeneration",
+                "minecraft:strong_regeneration",
+                "minecraft:strength",
+                "minecraft:long_strength",
+                "minecraft:strong_strength",
+                "minecraft:weakness",
+                "minecraft:long_weakness",
+                "minecraft:luck",
+                "minecraft:slow_falling",
+                "minecraft:long_slow_falling",
+            ]
+        },
         "vanilla_potion_types": {
             "$id": "vanilla_potion_types",
             "type": "string",
@@ -6469,210 +6517,195 @@ export const schemas = {
                 }
             }
         },
+        "craft_recipe_ingredient": {
+            "type": ["string", "object"],
+            "$ref": "#/$defs/vanilla_materials_and_customitems",
+            "markdownDescription": "You can specify a vanilla material, custom item or potion.\n\n**Examples:**\n\n A: STONE\n\nB:\n\n  type: POTION\n\n  potion_type: fire_resistance",
+            "properties": {
+                "item": {
+                    "markdownDescription": "You can specify a vanilla material, custom item or potion.\n\n**Examples:**\n\n A: STONE\n\nB:\n\n  type: POTION\n\n  potion_type: fire_resistance",
+                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                },
+            },
+            "if": {
+                "properties": {"item": {"const" : "POTION"}}
+            },
+            "then": {
+                "required": ["potion_type"],
+                "properties": {
+                    "potion_type": {
+                        "$ref": "#/$defs/potion_types"
+                    }
+                }
+            },
+            "else": {
+                "if": {
+                    "properties": {"item": {"const" : "SPLASH_POTION"}},
+                },
+                "then": {
+                    "required": ["potion_type"],
+                    "properties": {
+                        "potion_type": {
+                            "$ref": "#/$defs/potion_types"
+                        }
+                    }
+                }
+            }
+        },
         "ingredients": {
             "$id": "ingredients",
             "type": "object",
-            "markdownDescription": "Here you can specify what a pattern character means.\nFor example you can set **M: STONE**, which would tell ItemsAdder that the **M** in pattern is a **STONE** item",
+            "markdownDescription": "Here you can specify what a pattern character means.\n\nFor example you can set **M: STONE**, which would tell ItemsAdder that the **M** in pattern is a **STONE** item\n\nYou can specify a vanilla material, custom item or potion.\n\n**Examples:**\n\n A: STONE\n\nB:\n\n  type: POTION\n\n  potion_type: fire_resistance",
             "properties": {
                 "A": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "B": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "C": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "D": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "E": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "F": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "G": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "H": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "I": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "J": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "K": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "L": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "M": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "N": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "O": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "P": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "Q": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "R": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "S": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "T": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "U": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "V": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "W": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "Y": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "Z": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "a": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "b": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "c": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "d": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "e": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "f": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "g": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "h": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "i": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "j": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "k": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "l": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "m": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "n": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "o": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "p": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "q": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "r": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "s": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "t": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "u": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "v": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "w": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "y": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 },
                 "z": {
-                    "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/craft_recipe_ingredient"
                 }
             }
         },
