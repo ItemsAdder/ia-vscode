@@ -6031,9 +6031,11 @@ export const schemas = {
                 },
                 "events_settings": {
                     "type": "object",
+                    "markdownDescription": "Special settings for events.",
                     "properties": {
                         "cooldown": {
                             "type": "object",
+                            "markdownDescription": "Cooldown settings for this item.",
                             "properties": {
                                 "ticks": {
                                     "type": "integer",
@@ -6044,8 +6046,58 @@ export const schemas = {
                                     "markdownDescription": "Type of cooldown indicator, for now there is only HIDDEN and TITLE",
                                     "enum": [
                                         "HIDDEN",
-                                        "TITLE"
+                                        "TITLE",
+                                        "BOSSBAR",
+                                        "HUD"
                                     ]
+                                }
+                            },
+                            "if": {
+                                "properties": {"indicator": {"const" : "BOSSBAR"}}
+                            },
+                            "then": {
+                                "properties": {
+                                    "bossbar": {
+                                        "type": "object",
+                                        "markdownDescription": "Properties for the bossbar indicator.",
+                                        "properties": {
+                                            "color": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "PINK",
+                                                    "BLUE",
+                                                    "RED",
+                                                    "GREEN",
+                                                    "YELLOW",
+                                                    "PURPLE",
+                                                    "WHITE"
+                                                ]
+                                            },
+                                            "style": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "SOLID",
+                                                    "SEGMENTED_6",
+                                                    "SEGMENTED_10",
+                                                    "SEGMENTED_12",
+                                                    "SEGMENTED_20"
+                                                ]
+                                            }   
+                                        }
+                                    }
+                                }
+                            },
+                            "else" : {
+                                "if": {
+                                    "properties": {"indicator": {"const" : "HUD"}}
+                                },
+                                "then": {
+                                    "properties": {
+                                        "custom_hud": {
+                                            "type": "string",
+                                            "markdownDescription": "Namespaced ID if the custom hud used for this cooldown. Default value `_iainternal:small_cooldown_bar`.",
+                                        }
+                                    }
                                 }
                             }
                         }
