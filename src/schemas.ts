@@ -5165,6 +5165,7 @@ export const schemas = {
                 "PIGLIN_BRUTE",
                 "FISHING_HOOK",
                 "LIGHTNING",
+                "WARDEN",
                 "PLAYER",
                 "UNKNOWN"
             ]
