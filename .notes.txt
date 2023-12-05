@@ -1,0 +1,41 @@
+
+// Getting enums list:
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+// https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+{
+  let str = "";
+  $(".member-name-link").each(function (i){
+      let tmp = $(this).text();
+      if(tmp.toUpperCase() == tmp && !tmp.includes("LEGACY_"))
+        str += "'" + tmp + "',\n"
+  });
+
+  console.log(str);
+}
+
+
+// Getting blocks list:
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+{
+  let str = "";
+  $(".col-first").each(function (i) {
+      if(!$(this).next('.col-last').text().includes("BlockData"))
+          return;
+      
+      let tmp = $(this).text();
+      if(tmp.toUpperCase() == tmp && !tmp.includes("LEGACY_"))
+        str += "'" + tmp + "',\n"
+  });
+
+  console.log(str);
+}
+
+// Getting sounds list
+// https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.2/assets/minecraft/sounds.json
+{
+    let str = '"enum": [\n';
+    for(var key in JSON.parse(document.getElementsByTagName("pre")[0].innerHTML)) {
+       str += '"' + key + '",\n';
+    }
+    console.log(str + '\n]');
+}
