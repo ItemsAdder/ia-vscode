@@ -1,7 +1,23 @@
 
 // Getting enums list:
-// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 // https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Particle.html
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Effect.html
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/block/Biome.html
+{
+  let str = "";
+  $(".member-name-link").each(function (i){
+      let tmp = $(this).text();
+      if(tmp.toUpperCase() == tmp)
+        str += "'" + tmp + "',\n"
+  });
+
+  console.log(str);
+}
+
+// https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 {
   let str = "";
   $(".member-name-link").each(function (i){
@@ -9,6 +25,8 @@
       if(tmp.toUpperCase() == tmp && !tmp.includes("LEGACY_"))
         str += "'" + tmp + "',\n"
   });
+
+  str += "'GRASS',"; // Legacy grass
 
   console.log(str);
 }
@@ -26,6 +44,8 @@
       if(tmp.toUpperCase() == tmp && !tmp.includes("LEGACY_"))
         str += "'" + tmp + "',\n"
   });
+
+  str += "'GRASS',"; // Legacy grass
 
   console.log(str);
 }
