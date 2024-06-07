@@ -5561,10 +5561,18 @@ export const schemas = {
                     "properties": {
                         "max_custom_durability": {
                             "type": "integer",
+                            "markdownDescription": "(Old name, please use `max_durability`).\nMax durability of the item. If not specified ItemsAdder will use default material max durability"
+                        },
+                        "custom_durability": {
+                            "type": "integer",
+                            "markdownDescription": "(Old name, please use `durability`).\nCurrent durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)"
+                        },
+                        "max_durability": {
+                            "type": "integer",
                             "markdownDescription": "Max durability of the item. If not specified ItemsAdder will use default material max durability",
                             "default": 1562
                         },
-                        "custom_durability": {
+                        "durability": {
                             "type": "integer",
                             "markdownDescription": "Current durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)"
                         },
