@@ -7909,7 +7909,10 @@ export const schemas = {
                     "type": "integer",
                     "markdownDescription": "Delay in ticks before starting this action"
                 },
-                "flow": { "$ref": "#/$defs/flow.prop" }
+                "flow_success_if_message_contains": {
+                    "type": "string",
+                    "markdownDescription": "The plugin can't automatically identify plugins commands success/fail status, so you have to specify a text that can help the plugin to identify the command status."
+                }
             }
         },
         "action_delay.prop": {
@@ -8137,7 +8140,8 @@ export const schemas = {
             "properties": {
                 "change_me_1": {"$ref": "#/$defs/command"},
                 "change_me_2": {"$ref": "#/$defs/command"},
-                "change_me_xxx": {"$ref": "#/$defs/command"}
+                "change_me_xxx": {"$ref": "#/$defs/command"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
             }
         },
         "play_particle": {
