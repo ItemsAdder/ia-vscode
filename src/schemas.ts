@@ -5416,7 +5416,14 @@ export const schemas = {
                     }
                 },
                 "leather_horse_armor": {
-                    "properties": {"color": {"$ref": "#/$defs/colors"}}
+                    "properties": {
+                        "color": {"$ref": "#/$defs/colors"},
+                        "can_be_recolored_in_crafting_table": {
+                            "markdownDescription": "Can be recolored by putting it into the crafting table with a dye item (vanilla behaviour for dyeable items).",
+                            "type": "boolean",
+                            "default": false,
+                        }
+                    }
                 },
                 "book": {
                     "properties": {
