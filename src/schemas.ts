@@ -221,25 +221,35 @@ export const schemas = {
         },
         "worlds_populators": {
             "type": "object",
+            "markdownDescription": "Legacy feature, use the new `block_populator` instead.",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/block_populator"
+            }
+        },
+        "blocks_populators": {
+            "type": "object",
             "markdownDescription": "Create rules to spawn custom ores around your worlds.\n**They will be spawned only on new chunks.**\n**Pregenerated worlds or already generated chunks won't be affected to avoid risky overwrite**",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
                 "type": "object",
-                "$ref": "#/$defs/worlds_populator"
+                "$ref": "#/$defs/block_populator"
             },
             "properties": {
                 "change_me": {
                     "type": "object",
-                    "$ref": "#/$defs/worlds_populator"
+                    "$ref": "#/$defs/block_populator"
                 },
                 "change_me_2": {
                     "type": "object",
-                    "$ref": "#/$defs/worlds_populator"
+                    "$ref": "#/$defs/block_populator"
                 },
                 "change_me_xxx": {
                     "type": "object",
-                    "$ref": "#/$defs/worlds_populator"
+                    "$ref": "#/$defs/block_populator"
                 }
             }
         },
@@ -6633,8 +6643,8 @@ export const schemas = {
                 }
             }
         },
-        "worlds_populator": {
-            "$id": "worlds_populator",
+        "block_populator": {
+            "$id": "block_populator",
             "type": "object",
             "required": [
                 "block",
