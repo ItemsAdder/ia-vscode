@@ -6224,7 +6224,8 @@ export const schemas = {
                                 "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"},
-                                "category": {"$ref": "#/$defs/vanilla_sound_category"}
+                                "category": {"$ref": "#/$defs/vanilla_sound_category"},
+                                "stop_previous": {"type": "boolean"},
                             }
                         }
                     }
@@ -6521,7 +6522,8 @@ export const schemas = {
                                         "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"},
-                                        "category": {"$ref": "#/$defs/vanilla_sound_category"}
+                                        "category": {"$ref": "#/$defs/vanilla_sound_category"},
+                                        "stop_previous": {"type": "boolean"},
                                     }
                                 }
                             }
@@ -8257,7 +8259,8 @@ export const schemas = {
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "category": {"$ref": "#/$defs/vanilla_sound_category"},
-                "permission": {"$ref": "#/$defs/action_permission.prop"}
+                "permission": {"$ref": "#/$defs/action_permission.prop"},
+                "stop_previous": {"type": "boolean"},
             }
         },
         "stop_sound": {
