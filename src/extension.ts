@@ -7,12 +7,74 @@ const SCHEMA = "ia-schema";
 let activeEditor : vscode.TextEditor | undefined = undefined;
 let schemaJSON = "";
 let iaDocuments: string[] = [];
-let origWordBasedSuggestions : any = 1337;
 let timeout: NodeJS.Timer | undefined = undefined;
+
+const config = vscode.workspace.getConfiguration('ia-vscode');
+let neverWarnAboutCopilot = config.get('neverWarnAboutCopilot');
+
+let wasWordBasedSuggestionsEnabled : any = null;
+let wasCopilotEnabled : any = null;
+
+
+function getYamlParentPath(document: vscode.TextDocument, position: vscode.Position): string[] {
+	const text = document.getText();
+	const lines = text.split("\n");
+
+	let path: string[] = [];
+	let indentStack: { indent: number; key: string }[] = [];
+	let currentIndent = position.character;
+
+	for (let i = position.line; i >= 0; i--) {
+			const line = lines[i];
+
+			const match = line.match(/^(\s*)([^:]+):/);
+			if (match) {
+					const indent = match[1].length;
+					const key = match[2];
+					// Only add keys that are actual parents based on indentation
+					if (indent < currentIndent) {
+							indentStack.push({ indent, key });
+							currentIndent = indent;
+					}
+			}
+	}
+
+	// Extract only keys from the stack and reverse to get the correct order
+	path = indentStack.reverse().map(item => item.key);
+	return path;
+}
+
+function getYamlSameLevelProperties(document: vscode.TextDocument, position: vscode.Position): string[] {
+	const text = document.getText();
+	const lines = text.split("\n");
+
+	let properties: string[] = [];
+	let currentIndent = position.character;
+
+	for (let i = position.line; i >= 0; i--) {
+		const line = lines[i];
+
+		const match = line.match(/^(\s*)([^:]+):/);
+		if (match) {
+			const indent = match[1].length;
+			const key = match[2];
+			// Only add keys that are on the same indentation level
+			if (indent === currentIndent) {
+				properties.push(key);
+			} else if (indent < currentIndent) {
+				// Stop when a property with a lower indentation level is found
+				break;
+			}
+		}
+	}
+
+	return properties;
+}
 
 export async function activate(context: vscode.ExtensionContext) {
 	activeEditor = vscode.window.activeTextEditor;
-	origWordBasedSuggestions = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
+	wasWordBasedSuggestionsEnabled = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
+	wasCopilotEnabled = getCopilot();
 
 	schemaJSON = JSON.stringify(schemas);
 	const vscodeYaml = vscode.extensions.getExtension("redhat.vscode-yaml");
@@ -22,29 +84,190 @@ export async function activate(context: vscode.ExtensionContext) {
 		yamlExtensionAPI.registerContributor(SCHEMA, onRequestSchemaURI, onRequestSchemaContent);
 	}
 
-	const templateItemDecorationType = vscode.window.createTextEditorDecorationType({
-		gutterIconPath: context.asAbsolutePath('images/template.png'),
+	function addSuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
+		const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
+		item.detail = description;
+		item.insertText = `${name}:\n  `;
+		completionItems.push(item);
+	}
+
+	const provider = vscode.languages.registerCompletionItemProvider(
+		{ language: 'yaml' },
+		{
+				provideCompletionItems(document, position, token, context) {
+					const completionItems: vscode.CompletionItem[] = [];
+					const keyPath = getYamlParentPath(document, position);
+
+					console.log("Current YAML Path:", keyPath);
+
+					// Handle dynamic suggestions of array-like stuff. I don't like YAML array of objects,
+					// so I allow users to add entries by adding a parent with a custom name.
+					// I think this has a cleaner look compared to the array of objects.
+					// This allows adding custom naming to entries without an extra property, useful for debug and error logging.
+					// This is also beginner-friendly, as it's easier to understand and manage.
+					//
+					// Example:
+					// custom_array:
+					//   entry1:
+					//     name: "Entry"
+					//     description: "Description"
+					//   entry2:
+					//     name: "Entry"
+					//     description: "Description"
+					//
+					// Usual YAML array of objects:
+					// custom_array:
+					//   - name: "Entry"
+					//     description: "Description"
+					//   - name: "Entry"
+					//     description: "Description"
+					function addNestedSuggestions(properties: any, parentPath: string[], currentPath: string[]) {
+						// Ensure the full path matches before suggesting anything
+						if (!arraysEqual(parentPath, currentPath)) {
+							return;
+						}
+				
+						Object.keys(properties).forEach((key) => {
+								const newPath = [...currentPath, key];
+				
+								// @ts-ignore
+								const subProperties = properties[key]?.properties;
+								if (subProperties) {
+										addNestedSuggestions(subProperties, parentPath, newPath);
+								} else {
+										if(!key.startsWith("my_")) {
+											return;
+										}
+										let markdownDescription = "New entry.";
+										let newKey = key;
+										// @ts-ignore
+										const ref = properties[key]?.$ref;
+										if (ref) {
+												const refKey = ref.split("/").pop();
+												// @ts-ignore
+												markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
+										}
+
+										// Check if the key was already added to the yaml, in this case append a number to the key.
+										const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+										console.log("Already used keys:", alreadyUsedKeys);
+										let i = 1;
+										while (alreadyUsedKeys.includes(newKey)) {
+											newKey = `${key}_${i}`;
+											i++;
+										}
+
+										addSuggestion(newKey, markdownDescription, completionItems);
+								}
+						});
+					}
+				
+					// Function to compare two paths
+					function arraysEqual(arr1: string[], arr2: string[]): boolean {
+							if (arr1.length !== arr2.length) return false;
+							return arr1.every((value, index) => value === arr2[index]);
+					}
+					
+					// Ensure that properties are suggested only when the full path matches
+					function suggestPropertiesForPath(properties: any, path: string[]) {
+							if (path.length === 0) {
+									addNestedSuggestions(properties, [], []);
+									return;
+							}
+					
+							// TODO also handle item actions that have dynamic properties names,
+							// for example `actions.play_sound`, `actions.play_sound_1`, `actions.play_sound_custom_xxx` etc...
+							// This is currently limited as it can't do suggestions for dynamic parents.
+							// In this case I hack it manually because I am lazy and this is a limitation of the current implementation.
+
+							function addSuggestionAvoidDuplicate(key : string) {
+								let markdownDescription = "New Entry.";
+								let newKey = key;
+								// @ts-ignore
+								const ref = properties[key]?.$ref;
+								if (ref) {
+										const refKey = ref.split("/").pop();
+										// @ts-ignore
+										markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
+								}
+
+								// Check if the key was already added to the yaml, in this case append a number to the key.
+								const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+								console.log("Already used keys:", alreadyUsedKeys);
+								let i = 1;
+								while (alreadyUsedKeys.includes(newKey)) {
+									newKey = `${key}_${i}`;
+									i++;
+								}
+
+								addSuggestion(newKey, markdownDescription, completionItems);
+							}
+
+							if(path.length === 4 && path[0] === "items" && path[2] === "consumable" && path[3] === "effects") {
+								addSuggestionAvoidDuplicate("apply_status_effects");
+								addSuggestionAvoidDuplicate("remove_status_effects");
+								addSuggestionAvoidDuplicate("play_sound");
+							}
+
+							// Todo also add the same for
+							// - "actions" property
+							// - "triggers" property of HUDS
+							const [currentKey, ...remainingPath] = path;
+							// @ts-ignore
+							if (Object.prototype.hasOwnProperty.call(properties, currentKey)) {
+									const subProperties = properties[currentKey]?.properties;
+									if (subProperties) {
+											suggestPropertiesForPath(subProperties, remainingPath);
+									} else {
+											addNestedSuggestions(properties, path, path);
+									}
+							}
+					}
+				
+					suggestPropertiesForPath(schemas.properties, keyPath);
+
+					return completionItems;
+				}
+		},
+		''
+	);
+
+	context.subscriptions.push(provider);
+
+	const templateTextDeco = vscode.window.createTextEditorDecorationType({
+		gutterIconPath: context.asAbsolutePath('images/template.png').replace(/\\/g, "/"),
 		color: 'aqua',
 	});
-	const templateTextDecorationType = vscode.window.createTextEditorDecorationType({
-		color: 'aqua',
-	});
-	const variantItemDecorationType = vscode.window.createTextEditorDecorationType({
-		gutterIconPath: context.asAbsolutePath('images/variant.png'),
+	const variantTextDeco = vscode.window.createTextEditorDecorationType({
+		gutterIconPath: context.asAbsolutePath('images/variant.png').replace(/\\/g, "/"),
 		color: '#B6A102',
 	});
-	const variantTextDecorationType = vscode.window.createTextEditorDecorationType({
+	const resourceTextDeco = vscode.window.createTextEditorDecorationType({
 		color: '#B6A102',
 	});
-	const grayTextDecoType = vscode.window.createTextEditorDecorationType({
+	const actionTextDeco = vscode.window.createTextEditorDecorationType({
+		gutterIconPath: context.asAbsolutePath('images/flash.png').replace(/\\/g, "/"),
+		color: '#B6A102',
+		gutterIconSize: "contain",
+	});
+	const behaviourTextDeco = vscode.window.createTextEditorDecorationType({
+		gutterIconPath: context.asAbsolutePath('images/cog.png').replace(/\\/g, "/"),
+		color: '#B6A102',
+		gutterIconSize: "contain",
+	});
+	const grayTextDeco = vscode.window.createTextEditorDecorationType({
 		color: "#444444"
 	});
-	const greenTextDecoType = vscode.window.createTextEditorDecorationType({
+	const greenTextDeco = vscode.window.createTextEditorDecorationType({
 		color: "#20812d"
 	});
 	const grayAreaDecoType = vscode.window.createTextEditorDecorationType({
-		backgroundColor: "#121212"
+		backgroundColor: "rgba(18, 18, 18, 0.75)"
 	});
+
+	const diagnostics = vscode.languages.createDiagnosticCollection('ia_diagnostics');
+	let diagnosticsArr : vscode.Diagnostic[] = [];
+	
 	let typesDecos : any = {
 		entities : {
 			decos: [],
@@ -55,11 +278,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			data: []
 		}
 	};
-
-	const diagnostics = vscode.languages.createDiagnosticCollection('ia_diagnostics');
-	let diagnosticsArr : vscode.Diagnostic[] = [];
-
-	schemas.$defs.vanilla_entity_types.enum.forEach(element => {
+	schemas.$defs.bukkit_entity_type.enum.forEach(element => {
 		typesDecos.entities.decos[element] = vscode.window.createTextEditorDecorationType({
 			gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/mc-entities-icons/master/icons/${element}.gif`),
 			gutterIconSize: "contain",
@@ -74,10 +293,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
 		typesDecos.entities.data[element] = [];
 	});
-	schemas.$defs.vanilla_materials.enum.forEach(element => {
 
-		let fileName = element.toLowerCase().replace(/_/g, '-')
-
+	schemas.$defs.bukkit_materials.enum.forEach(element => {
+		let fileName = element.toLowerCase().replace(/_/g, '-');
 		typesDecos.materials.decos[element] = vscode.window.createTextEditorDecorationType({
 			gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/crafting-icons/master/32/${fileName}/${fileName}.png`),
 			gutterIconSize: "contain",
@@ -97,42 +315,26 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-		const templateItemsDecorations: vscode.DecorationOptions[] = [];
-		const templateTextsDecorations: vscode.DecorationOptions[] = [];
 	
-		const largeNumbers: vscode.DecorationOptions[] = [];
-	
-		const variantItemsDecorations: vscode.DecorationOptions[] = [];
-		const variantTextsDecorations: vscode.DecorationOptions[] = [];
-	
-		const greenTextsDecorations: vscode.DecorationOptions[] = [];
-		const grayTextsDecorations: vscode.DecorationOptions[] = [];
-	
-		const grayAreasDecorations: vscode.DecorationOptions[] = [];
+		decorateGenericTexts(activeEditor, "Template item", /    template\: true/g, templateTextDeco);
+		decorateGenericTexts(activeEditor, "Variant item", /    variant_of\:/g, variantTextDeco);
 
-		handleText(activeEditor, "Template item", /    template\: true/g, templateItemsDecorations, templateTextsDecorations);
-		activeEditor.setDecorations(templateItemDecorationType, templateItemsDecorations);
-		activeEditor.setDecorations(templateTextDecorationType, templateTextsDecorations);
+		decorateGenericTexts(activeEditor, "The graphical part of the item", /    resource\:/g, resourceTextDeco);
+		decorateGenericTexts(activeEditor, "Events called by the item", /    events\:/g, actionTextDeco);
+		decorateGenericTexts(activeEditor, "Predefined behaviours of the item", /    behaviours\:/g, behaviourTextDeco);
+
+		// NOTE: ACACIA_BOAT causes issues because it's available on both materials and entities.
+		// For this reason it doesn't show at all.
+		decorateEnums(activeEditor, "Vanilla material", schemas.$defs.bukkit_materials.enum, typesDecos.materials);
+		decorateEnums(activeEditor, "Vanilla entity type", schemas.$defs.bukkit_entity_type.enum, typesDecos.entities);
 	
-		handleText(activeEditor, "Variant item", /    variant_of\:/g, variantItemsDecorations, variantTextsDecorations);
-		activeEditor.setDecorations(variantTextDecorationType, variantTextsDecorations);
-		activeEditor.setDecorations(variantItemDecorationType, variantItemsDecorations);
+		decorateGenericTexts(activeEditor, "This property is **enabled**", / true/g, greenTextDeco);
 	
-		handleTextEnum(activeEditor, "Vanilla entity type", schemas.$defs.vanilla_entity_types.enum, typesDecos.entities);
-		handleTextEnum(activeEditor, "Vanilla material", schemas.$defs.vanilla_materials.enum, typesDecos.materials);
+		decorateGenericTexts(activeEditor, "This property is **disabled**", / false/g, grayTextDeco);
 	
-		handleGenericProperty(activeEditor, "TRUE", / true/g, greenTextsDecorations);
-		activeEditor.setDecorations(greenTextDecoType, greenTextsDecorations);
-	
-		handleGenericProperty(activeEditor, "FALSE", / false/g, grayTextsDecorations);
-		activeEditor.setDecorations(grayTextDecoType, grayTextsDecorations);
-	
-		handleGenericArea(activeEditor, "Disabled properties block", /    enabled: false/g, grayAreasDecorations);
-		activeEditor.setDecorations(grayAreaDecoType, grayAreasDecorations);
+		decorateBackgroundTextBlocks(activeEditor, "### This element is disabled.", `enabled: false`, grayAreaDecoType);
 
 		handleForcedDiagnostics(activeEditor, diagnostics, diagnosticsArr);
-	
-		//activeEditor.setDecorations(largeNumberDecorationType, largeNumbers);
 	}
 	
 	function triggerUpdateDecorations(throttle = false) {
@@ -155,22 +357,48 @@ export async function activate(context: vscode.ExtensionContext) {
 		handleDocumentRefresh(document);
 	});
 
+	// High frequency event.
 	vscode.workspace.onDidChangeTextDocument(function(e) {
-		handleDocumentRefresh(e.document);
+		//console.log("Document changed!");
+		//handleDocumentRefresh(e.document);
     });
 
 	vscode.workspace.onDidOpenTextDocument(function(document) {
+		console.log("Document opened!");
 		handleDocumentRefresh(document);
 	});
 
+	async function handleDocumentRefresh(document: vscode.TextDocument) {
+		// Vscode triggered this shit when I edit an editor config. I have no other way to identify that.
+		if(document.fileName.endsWith('settings.json') && document.uri.scheme === 'file' && document.uri.path.includes('Code')) {
+			return;
+		}
+		const uri = decodeURI(document.uri.toString());
+			// Very hacky
+			if(document.lineCount > 0 && document.lineAt(0).text.includes("info:")) {
+				setWordBasedSuggestions(false);
+				await setCopilot(false);
+
+				if(!iaDocuments.includes(uri)) {
+					vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
+					iaDocuments.push(uri);
+				}
+			} else {
+				// Remove from array
+				iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
+			}
+	}
+
 	vscode.window.onDidChangeActiveTextEditor(async editor => {
+		console.log("Active editor changed!");
 		activeEditor = editor;
 		if (editor) {
 			if(isIaFile(editor.document)) {
 				setWordBasedSuggestions(false);
+				setCopilot(false);
 				triggerUpdateDecorations();
 			} else {
-				resetWordBasedSuggestions();
+				restoreOriginalSettings();
 			}
 		}
 	}, null, context.subscriptions);
@@ -185,46 +413,82 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.workspace.onDidCloseTextDocument(async document => {
 		if(isIaFile(document)) {
-			resetWordBasedSuggestions();
+			restoreOriginalSettings();
 		}
 	}, null, context.subscriptions);
 }
 
 export function deactivate() {
-	resetWordBasedSuggestions();
+	restoreOriginalSettings();
 }
 
-/**
- * This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
- * YAML schema entries hard to find in the autocomplete words list.
- * Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
- * 
- * @param val true to hide, false to show.
- * @returns nothing
- */
+async function setCopilot(val : boolean) {
+	// Check if it exists
+	const copilotEnable = vscode.workspace.getConfiguration('github.copilot').get<any>('enable');
+	if(copilotEnable) {
+		copilotEnable["yaml"] = val;
+		vscode.workspace.getConfiguration('github.copilot').update('enable', copilotEnable, true);
+	}
+
+	if(val) {
+		//vscode.window.showInformationMessage('GitHub Copilot re-enabled for YAML!');
+		console.log('GitHub Copilot re-enabled for YAML!');
+	} else {
+		if(!neverWarnAboutCopilot) {
+			const result = await vscode.window.showInformationMessage(
+				'[!] GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct. Please use the CTRL+SPACE shortcut to allow ia-vscode to provide proper autocomplete suggestions.',
+				"OK",
+				"Never Show Again"
+			);
+	
+			if (result === "Never Show Again") {
+				await config.update('neverWarnAboutCopilot', true, vscode.ConfigurationTarget.Global);
+				neverWarnAboutCopilot = true;
+			}
+			return;
+		}
+
+		console.log('GitHub Copilot temporarily disabled for ItemsAdder YAML.');
+	}
+}
+
+function getCopilot() : boolean {
+	// Check if it exists
+	const copilotEnable = vscode.workspace.getConfiguration('github.copilot').get<any>('enable');
+	if(copilotEnable) {
+		if(copilotEnable["yaml"]) {
+			return copilotEnable["yaml"];
+		} else {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 async function setWordBasedSuggestions(val : boolean) {
-	if(origWordBasedSuggestions === 1337) {
-		return;
-	}
-	// Global
-	await vscode.workspace.getConfiguration('editor').update(
-		'wordBasedSuggestions', 
-		val, 
-		true
-	);
-	// If it's in a workspace
-	if(vscode.workspace.name) {
-		// Workspace
-		await vscode.workspace.getConfiguration('editor').update(
-			'wordBasedSuggestions', 
-			val, 
-			false
-		);
+	// This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
+  // YAML schema entries hard to find in the autocomplete words list.
+	// Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
+	if(wasWordBasedSuggestionsEnabled !== null) {
+		// Global
+		await vscode.workspace.getConfiguration('editor').update('wordBasedSuggestions', val, true);
+		// If it's in a workspace
+		if(vscode.workspace.name) {
+			// Workspace
+			await vscode.workspace.getConfiguration('editor').update('wordBasedSuggestions', val, false);
+		}
 	}
 }
 
-async function resetWordBasedSuggestions() {
-	setWordBasedSuggestions(origWordBasedSuggestions);
+async function restoreOriginalSettings() {
+	if(wasWordBasedSuggestionsEnabled !== null) {
+		setWordBasedSuggestions(wasWordBasedSuggestionsEnabled);
+	}
+
+	if(wasCopilotEnabled !== null) {
+		await setCopilot(wasCopilotEnabled);
+	}
 }
 
 /**
@@ -238,20 +502,6 @@ function isIaFile(document: vscode.TextDocument) {
 	}
 	const uri = decodeURI(document.uri.toString());
 	return iaDocuments.includes(uri);
-}
-
-function handleDocumentRefresh(document: vscode.TextDocument) {
-	const uri = decodeURI(document.uri.toString());
-        // Very hacky
-		if(document.lineCount > 0 && document.lineAt(0).text.includes("info:")) {
-			if(!iaDocuments.includes(uri)) {
-				vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
-				iaDocuments.push(uri);
-			}
-		} else {
-			// Remove from array
-			iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
-		}
 }
 
 function onRequestSchemaURI(resource: string): string | undefined {
@@ -327,7 +577,7 @@ function handleForcedDiagnostics(activeEditor : vscode.TextEditor, diagnostics :
 		//#endregion
 	});
 
-	//#region Handle `flow` and allo only one flow rule. 
+	//#region Handle `flow` and allow only one flow rule. 
 	let regEx = new RegExp("(.*)flow:", "g");
 	let allLines = text.split("\n");
 	regexLines(text, regEx, (entry) => {
@@ -367,49 +617,21 @@ function handleForcedDiagnostics(activeEditor : vscode.TextEditor, diagnostics :
 	diagnostics.set(activeEditor.document.uri, diagnosticsArr);
 }
 
-function handleText(activeEditor : vscode.TextEditor, description : string, regEx : RegExp, itemsDeco: vscode.DecorationOptions[], propertyDeco: vscode.DecorationOptions[]) {
+function decorateGenericTexts(activeEditor : vscode.TextEditor, description : string, regEx : RegExp, decorationType : vscode.TextEditorDecorationType) {
+	const appliedDecorations: vscode.DecorationOptions[] = [];
 	const text = activeEditor.document.getText();
 	let match;
 	while ((match = regEx.exec(text))) {
-
 		const startPos = activeEditor.document.positionAt(match.index);
 		const endPos = activeEditor.document.positionAt(match.index + match[0].length);
 		const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-		propertyDeco.push(decoration);
-
-		const regExParent = /  [a-z0-9_]+\:\n/g;
-		let matchParent;
-		let prevText = "";
-		let matchedParent = false;
-		let i = 1;
-		while (!matchedParent)
-		{
-			if(match.index - i < 0) {
-				break;
-			}
-			prevText = activeEditor.document.getText(
-				new vscode.Range(
-					activeEditor.document.positionAt(match.index - i),
-					activeEditor.document.positionAt(match.index)
-				) 
-			);
-			
-			matchParent = regExParent.exec(prevText)
-			matchedParent = matchParent ? true : false;
-			i++;
-		}
-
-		if(matchParent && matchedParent) {
-			const startPos = activeEditor.document.positionAt(2 + match.index - i + 1);
-			const endPos = activeEditor.document.positionAt(match.index - i + matchParent[0].length - 1);
-		
-			const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-			itemsDeco.push(decoration);
-		}
+		appliedDecorations.push(decoration);
 	}
+
+	activeEditor.setDecorations(decorationType, appliedDecorations);
 }
 
-function handleTextEnum(activeEditor : vscode.TextEditor, description : string, enumsSchema: any[], decos : any) {
+function decorateEnums(activeEditor : vscode.TextEditor, description : string, enumsSchema: any[], decos : any) {
 
 	const text = activeEditor.document.getText();
 
@@ -419,12 +641,13 @@ function handleTextEnum(activeEditor : vscode.TextEditor, description : string, 
 
 		// Space is important to match the property after : only and not random texts containing the enum.
 		// For example it will match `property: ZOMBIE` and not `RANDOMSTRINGZOMBIE1234`.
-		var regEx = new RegExp(" " + element + "\n", 'g');
+		// var regEx = new RegExp(" " + element + "\n", 'g');
+		var regEx = new RegExp(`^\\s*\\w+\\s*:\\s*${element}\\b`, 'gm');
 		let match;
 		while ((match = regEx.exec(text))) {
 	
-			const startPos = activeEditor.document.positionAt(match.index);
-			const endPos = activeEditor.document.positionAt(match.index + match[0].length - 1);
+			const startPos = activeEditor.document.positionAt(match.index + 1);
+			const endPos = activeEditor.document.positionAt(match.index + match[0].length);
 			const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
 	
 			decos.data[element].push(decoration);
@@ -434,73 +657,60 @@ function handleTextEnum(activeEditor : vscode.TextEditor, description : string, 
 	});
 }
 
-function handleGenericProperty(activeEditor : vscode.TextEditor, description : string, regEx : RegExp, propertyDeco: vscode.DecorationOptions[]) {
+function decorateBackgroundTextBlocks(activeEditor: vscode.TextEditor, description: string, textToMatch: string, decorationType : vscode.TextEditorDecorationType) {
+	const appliedDecorations: vscode.DecorationOptions[] = [];
 	const text = activeEditor.document.getText();
+	const regEx = new RegExp(textToMatch, 'g');
 	let match;
+
 	while ((match = regEx.exec(text))) {
+			let startPos = activeEditor.document.positionAt(match.index);
+			const lines = text.split('\n');
 
-		const startPos = activeEditor.document.positionAt(match.index);
-		const endPos = activeEditor.document.positionAt(match.index + match[0].length);
-		const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-		propertyDeco.push(decoration);
-	}
-}
-
-function handleGenericArea(activeEditor : vscode.TextEditor, description : string, regEx : RegExp, blockDeco: vscode.DecorationOptions[]) {
-	const text = activeEditor.document.getText();
-	let match;
-	while ((match = regEx.exec(text))) {
-
-		// Find the parent YAML block
-		const regExParent = /  [a-z0-9_]+\:\n/g;
-		let matchParent;
-		let matchedParent = false;
-		let i = 1;
-		while (!matchedParent)
-		{
-			if(match.index - i < 0) {
-				break;
+			// Ensure we have a valid starting line
+			if (startPos.line >= lines.length) {
+				continue;
 			}
-			let prevText = activeEditor.document.getText(
-				new vscode.Range(
-					activeEditor.document.positionAt(match.index - i),
-					activeEditor.document.positionAt(match.index)
-				) 
-			);
-			
-			matchParent = regExParent.exec(prevText);
-			matchedParent = matchParent ? true : false;
-			i++;
-		}
 
-		// Find the next YAML block parent
-		const regExNext = /\n  [a-z0-9_]+\:\n/g;
-		let matchNext;
-		let j = 1;
-		while (!(match.index + j > text.length - 1))
-		{
-			let prevText = activeEditor.document.getText(
-				new vscode.Range(
-					activeEditor.document.positionAt(match.index + j),
-					activeEditor.document.positionAt(match.index)
-				) 
-			);
-			
-			matchNext = regExNext.exec(prevText);
-			if(matchNext) {
-				break;
+			// Get the indentation of the matched line
+			const initialIndentation = lines[startPos.line].match(/^\s*/)?.[0].length ?? 0;
+
+			// Find the parent indentation level and update startPos
+			let parentIndentation = initialIndentation;
+			for (let i = startPos.line - 1; i >= 0; i--) {
+					const lineIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
+					if (lineIndentation < initialIndentation && lines[i].trim() !== '') {
+							parentIndentation = lineIndentation;
+
+							// Debug: print parent and the matched property
+							console.log(lines[i].trim() + " -> " + lines[startPos.line].trim());
+
+							startPos = new vscode.Position(i, 0); // Move startPos to the parent
+							break;
+					}
 			}
-			j++;
-		}
 
-		if(matchNext) {
-			const startPos = activeEditor.document.positionAt(2 + match.index - i + 1);
-			const endPos = activeEditor.document.positionAt(match.index + j - matchNext[0].length - 1);
-		
+			let endPos = activeEditor.document.positionAt(text.length); // Default to end of file
+
+			// Iterate through lines until we find a line with the same indentation as the parent
+			for (let i = startPos.line + 1; i < lines.length; i++) {
+					const currentIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
+
+					// Skip empty lines (they don't count as block delimiters)
+					if (lines[i].trim() === '') continue;
+
+					// If a line has the same indentation as the parent, stop there
+					if (currentIndentation === parentIndentation) {
+							endPos = new vscode.Position(i, 0);
+							break;
+					}
+			}
+
 			const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-			blockDeco.push(decoration);
-		}
+			appliedDecorations.push(decoration);
 	}
+
+	activeEditor.setDecorations(decorationType, appliedDecorations);
 }
 
 function regexLines(str : string, re : RegExp, x: (obj : any) => boolean) {

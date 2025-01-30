@@ -35,15 +35,7 @@ export const schemas = {
                 "$ref": "#/$defs/item"
             },
             "properties": {
-                "custom_item": {
-                    "$ref": "#/$defs/item"
-                },
-                "custom_item_2": {
-                    "$ref": "#/$defs/item"
-                },
-                "custom_item_xxx": {
-                    "$ref": "#/$defs/item"
-                }
+                "my_custom_item": { "$ref": "#/$defs/item" }
             }
         },
         "recipes": {
@@ -59,18 +51,7 @@ export const schemas = {
                         "$ref": "#/$defs/recipe.craft"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.craft"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.craft"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.craft"
-                        }
+                        "my_craft_recipe": { "type": "object", "$ref": "#/$defs/recipe.craft" }
                     }
                 },
                 "cooking": {
@@ -82,18 +63,7 @@ export const schemas = {
                         "$ref": "#/$defs/recipe.cooking"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.cooking"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.cooking"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.cooking"
-                        }
+                        "my_cooking_recipe": { "type": "object", "$ref": "#/$defs/recipe.cooking" }
                     }
                 },
                 "anvil_repair": {
@@ -105,18 +75,7 @@ export const schemas = {
                         "$ref": "#/$defs/recipe.anvil_repair"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.anvil_repair"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.anvil_repair"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.anvil_repair"
-                        }
+                        "my_anvil_repair_recipe": { "type": "object", "$ref": "#/$defs/recipe.anvil_repair" }
                     }
                 },
                 "smithing": {
@@ -128,18 +87,7 @@ export const schemas = {
                         "$ref": "#/$defs/recipe.smithing"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.smithing"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.smithing"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/recipe.smithing"
-                        }
+                        "my_smithing_recipe": { "type": "object", "$ref": "#/$defs/recipe.smithing" }
                     }
                 }
             }
@@ -157,18 +105,7 @@ export const schemas = {
                         "$ref": "#/$defs/loot.block"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.block"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.block"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.block"
-                        }
+                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.block" }
                     }
                 },
                 "mobs": {
@@ -180,18 +117,7 @@ export const schemas = {
                         "$ref": "#/$defs/loot.mobs"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.mobs"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.mobs"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.mobs"
-                        }
+                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.mobs" }
                     }
                 },
                 "fishing": {
@@ -203,31 +129,21 @@ export const schemas = {
                         "$ref": "#/$defs/loot.fishing"
                     },
                     "properties": {
-                        "change_me": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.fishing"
-                        },
-                        "change_me_2": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.fishing"
-                        },
-                        "change_me_xxx": {
-                            "type": "object",
-                            "$ref": "#/$defs/loot.fishing"
-                        }
+                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.fishing" }
                     }
                 }
             }
         },
         "worlds_populators": {
             "type": "object",
-            "markdownDescription": "Legacy feature, use the new `block_populator` instead.",
+            "markdownDescription": "(**OLD NAME**, use the new `blocks_populators` instead.)",
             "kind": 5,
             "detail": "(collection)",
             "additionalProperties": {
                 "type": "object",
                 "$ref": "#/$defs/block_populator"
-            }
+            },
+            "doNotSuggest": true
         },
         "blocks_populators": {
             "type": "object",
@@ -239,18 +155,7 @@ export const schemas = {
                 "$ref": "#/$defs/block_populator"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/block_populator"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/block_populator"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/block_populator"
-                }
+                "my_populator": { "type": "object", "$ref": "#/$defs/block_populator" }
             }
         },
         "trees_populators": {
@@ -263,18 +168,7 @@ export const schemas = {
                 "$ref": "#/$defs/trees_populators"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/trees_populators"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/trees_populators"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/trees_populators"
-                }
+                "my_populator": { "type": "object", "$ref": "#/$defs/trees_populators" }
             }
         },
         "surface_decorators": {
@@ -287,18 +181,7 @@ export const schemas = {
                 "$ref": "#/$defs/surface_decorators"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/surface_decorators"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/surface_decorators"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/surface_decorators"
-                }
+                "my_decorator": { "type": "object", "$ref": "#/$defs/surface_decorators" }
             }
         },
         "cave_decorators": {
@@ -311,18 +194,7 @@ export const schemas = {
                 "$ref": "#/$defs/cave_decorators"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/cave_decorators"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/cave_decorators"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/cave_decorators"
-                }
+                "my_decorator": { "type": "object", "$ref": "#/$defs/cave_decorators" }
             }
         },
         "font_images": {
@@ -330,23 +202,9 @@ export const schemas = {
             "markdownDescription": "Create your own font characters. You can use them as emoji, GUI texture, HUD...\nIt's basically an image shown in texts.",
             "kind": 5,
             "detail": "(collection)",
-            "additionalProperties": {
-                "type": "object",
-                "$ref": "#/$defs/font_image"
-            },
+            "additionalProperties": { "type": "object", "$ref": "#/$defs/font_image" },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/font_image"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/font_image"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/font_image"
-                }
+                "my_image": { "type": "object", "$ref": "#/$defs/font_image" }
             }
         },
         "huds": {
@@ -359,18 +217,7 @@ export const schemas = {
                 "$ref": "#/$defs/hud"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/hud"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/hud"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/hud"
-                }
+                "my_hud": { "type": "object", "$ref": "#/$defs/hud" }
             }
         },
         "categories": {
@@ -383,18 +230,7 @@ export const schemas = {
                 "$ref": "#/$defs/ia_categories"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/ia_categories"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/ia_categories"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/ia_categories"
-                }
+                "my_category": { "type": "object", "$ref": "#/$defs/ia_categories" }
             }
         },
         "liquids": {
@@ -407,18 +243,7 @@ export const schemas = {
                 "$ref": "#/$defs/liquid"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/liquid"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/liquid"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/liquid"
-                }
+                "my_liquid": { "type": "object", "$ref": "#/$defs/liquid" }
             }
         },
         "minecraft_lang_overwrite": {
@@ -431,18 +256,7 @@ export const schemas = {
                 "$ref": "#/$defs/minecraft_lang_overwrite"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/minecraft_lang_overwrite"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/minecraft_lang_overwrite"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/minecraft_lang_overwrite"
-                }
+                "my_lang_overwrite": { "type": "object", "$ref": "#/$defs/minecraft_lang_overwrite" }
             }
         },
         "dictionary": {
@@ -455,25 +269,13 @@ export const schemas = {
                 "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
             },
             "properties": {
-                "display-category-EXAMPLE": {
+                "display-category-example-category-name": {
                     "type": "string",
                     "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
                 },
-                "display-category-EXAMPLE_2": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "display-name-EXAMPLE_ITEM": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "display-lore-EXAMPLE_ITEM": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
-                },
-                "EXAMPLE": {
-                    "type": "string",
-                    "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value."
+                "my_display-name-": {
+                     "type": "string", 
+                     "markdownDescription": "You can then use this property name as any item name or /ia category, it will be replaced with this value." 
                 }
             }
         },
@@ -487,18 +289,7 @@ export const schemas = {
                 "$ref": "#/$defs/entity"
             },
             "properties": {
-                "change_me": {
-                    "type": "object",
-                    "$ref": "#/$defs/entity"
-                },
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/entity"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/entity"
-                }
+                "my_entity": { "type": "object", "$ref": "#/$defs/entity" }
             }
         },
         "emotes": {
@@ -510,15 +301,7 @@ export const schemas = {
                 "$ref": "#/$defs/emote"
             },
             "properties": {
-                "emote": {
-                    "$ref": "#/$defs/emote"
-                },
-                "emote_2": {
-                    "$ref": "#/$defs/emote"
-                },
-                "emote_3": {
-                    "$ref": "#/$defs/emote"
-                }
+                "my_emote": { "type": "object", "$ref": "#/$defs/emote" }
             }
         },
         "armors_rendering": {
@@ -531,15 +314,7 @@ export const schemas = {
                 "$ref": "#/$defs/armors_rendering_entry"
             },
             "properties": {
-                "change_me": {"type": "object", "$ref": "#/$defs/armors_rendering_entry"},
-                "change_me_2": {
-                    "type": "object",
-                    "$ref": "#/$defs/armors_rendering_entry"
-                },
-                "change_me_xxx": {
-                    "type": "object",
-                    "$ref": "#/$defs/armors_rendering_entry"
-                }
+                "my_rendering": { "type": "object", "$ref": "#/$defs/armors_rendering_entry" }
             }
         }
     },
@@ -631,13 +406,13 @@ export const schemas = {
                 'WIND_BURST',
             ]
         },
-        "vanilla_materials_and_customitems": {
-            "$id": "vanilla_materials_and_customitems",
+        "bukkit_materials_and_customitems": {
+            "$id": "bukkit_materials_and_customitems",
             "title": "Vanilla / ItemsAdder custom item",
             "markdownDescription": "Examples: **STONE**, **itemsadder:ruby**, **ruby**",
             "type": "string",
             "anyOf": [
-                {"$ref": "#/$defs/vanilla_materials"},
+                {"$ref": "#/$defs/bukkit_materials"},
                 {"additionalProperties": {"type": "string"}}
             ]
         },
@@ -647,12 +422,12 @@ export const schemas = {
             "markdownDescription": "Examples: **STONE**, **itemsadder:ruby_block**, **crying_obsidian**",
             "type": "string",
             "anyOf": [
-                {"$ref": "#/$defs/vanilla_blocks"},
+                {"$ref": "#/$defs/bukkit_blocks"},
                 {"additionalProperties": {"type": "string"}}
             ]
         },
-        "vanilla_materials": {
-            "$id": "vanilla_materials",
+        "bukkit_materials": {
+            "$id": "bukkit_materials",
             "title": "Vanilla Materials",
             "markdownDescription": "Examples: **STONE**, **DIAMOND**",
             "type": "string",
@@ -2185,8 +1960,8 @@ export const schemas = {
                 'GRASS',
             ]
         },
-        "vanilla_blocks": {
-            "$id": "vanilla_blocks",
+        "bukkit_blocks": {
+            "$id": "bukkit_blocks",
             "title": "Vanilla blocks",
             "markdownDescription": "Examples: **STONE**, **DIAMOND_BLOCK**",
             "type": "string",
@@ -2914,14 +2689,14 @@ export const schemas = {
             "type": "object",
             "description": "Attach a specific potion effect to this potion.",
             "properties": {
-                "type": { "$ref": "#/$defs/vanilla_potion_effects" },
-                "amplifier": { "type": "integer" },
-                "duration": { "type": "integer" },
+                "type": { "$ref": "#/$defs/bukkit_potion_effect_type" },
+                "amplifier": { "$ref": "#/$defs/potion_amplifier" },
+                "duration": { "$ref": "#/$defs/ticks" },
                 "ambient": { "type": "boolean" }
             }
         },
-        "potion_types": {
-            "$id": "potion_types",
+        "vanilla_potion_type": {
+            "$id": "vanilla_potion_type",
             "type": "string",
             "enum": [
                 "minecraft:water",
@@ -2972,63 +2747,61 @@ export const schemas = {
                 "minecraft:infested"
               ]
         },
-        "vanilla_potion_types": {
-            "$id": "vanilla_potion_types",
+        "bukkit_potion_type": {
+            "$id": "bukkit_potion_type",
             "type": "string",
             "markdownDescription": "Vanilla potion types",
             "enum": [
-                "UNCRAFTABLE",
-                "WATER",
-                "MUNDANE",
-                "THICK",
-                "AWKWARD",
-                "NIGHT_VISION",
-                "INVISIBILITY",
-                "JUMP",
-                "FIRE_RESISTANCE",
-                "SPEED",
-                "SLOWNESS",
-                "WATER_BREATHING",
-                "INSTANT_HEAL",
-                "INSTANT_DAMAGE",
-                "POISON",
-                "REGEN",
-                "STRENGTH",
-                "WEAKNESS",
-                "LUCK",
-                "TURTLE_MASTER",
-                "SLOW_FALLING",
-                "ABSORPTION",
-                "BAD_OMEN",
-                "BLINDNESS",
-                "CONDUIT_POWER",
-                "DARKNESS",
-                "DOLPHINS_GRACE",
-                "GLOWING",
-                "HASTE",
-                "HEALTH_BOOST",
-                "HERO_OF_THE_VILLAGE",
-                "HUNGER",
-                "INFESTED",
-                "INSTANT_HEALTH",
-                "JUMP_BOOST",
-                "LEVITATION",
-                "MINING_FATIGUE",
-                "NAUSEA",
-                "OOZING",
-                "RAID_OMEN",
-                "REGENERATION",
-                "RESISTANCE",
-                "SATURATION",
-                "TRIAL_OMEN",
-                "UNLUCK",
-                "WEAVING",
-                "WIND_CHARGED",
-                "WITHER"
+                'AWKWARD',
+                'FIRE_RESISTANCE',
+                'HARMING',
+                'HEALING',
+                'INFESTED',
+                'INVISIBILITY',
+                'LEAPING',
+                'LONG_FIRE_RESISTANCE',
+                'LONG_INVISIBILITY',
+                'LONG_LEAPING',
+                'LONG_NIGHT_VISION',
+                'LONG_POISON',
+                'LONG_REGENERATION',
+                'LONG_SLOW_FALLING',
+                'LONG_SLOWNESS',
+                'LONG_STRENGTH',
+                'LONG_SWIFTNESS',
+                'LONG_TURTLE_MASTER',
+                'LONG_WATER_BREATHING',
+                'LONG_WEAKNESS',
+                'LUCK',
+                'MUNDANE',
+                'NIGHT_VISION',
+                'OOZING',
+                'POISON',
+                'REGENERATION',
+                'SLOW_FALLING',
+                'SLOWNESS',
+                'STRENGTH',
+                'STRONG_HARMING',
+                'STRONG_HEALING',
+                'STRONG_LEAPING',
+                'STRONG_POISON',
+                'STRONG_REGENERATION',
+                'STRONG_SLOWNESS',
+                'STRONG_STRENGTH',
+                'STRONG_SWIFTNESS',
+                'STRONG_TURTLE_MASTER',
+                'SWIFTNESS',
+                'THICK',
+                'TURTLE_MASTER',
+                'WATER',
+                'WATER_BREATHING',
+                'WEAKNESS',
+                'WEAVING',
+                'WIND_CHARGED',
             ]
         },
-        "vanilla_sounds": {
-            "$id": "vanilla_sounds",
+        "vanilla_sound": {
+            "$id": "vanilla_sound",
             "type": "string",
             "markdownDescription": "Vanilla sounds",
             "enum": [
@@ -4646,20 +4419,20 @@ export const schemas = {
                 "weather.rain.above",
             ]
         },
-        "vanilla_sounds_and_custom": {
-            "$id": "vanilla_sounds_and_custom",
+        "vanilla_and_custom_sound": {
+            "$id": "vanilla_and_custom_sound",
             "type": "string",
-            "markdownDescription": "Vanilla sounds",
-            "anyOf": [{"$ref": "#/$defs/vanilla_sounds"}, {"type": "string"}]
+            "markdownDescription": "Vanilla and custom sounds",
+            "anyOf": [{"$ref": "#/$defs/vanilla_sound"}, {"type": "string"}]
         },
-        "vanilla_sound_category": {
-            "$id": "vanilla_sound_category",
+        "bukkit_sound_category": {
+            "$id": "bukkit_sound_category",
             "markdownDescription": "Category of the sound.", 
             "type": "string",
             "enum": ["MASTER", "MUSIC", "RECORDS", "WEATHER", "BLOCKS", "HOSTILE", "NEUTRAL", "PLAYERS", "AMBIENT", "VOICE"]
         },
-        "vanilla_entity_types": {
-            "$id": "vanilla_entity_types",
+        "bukkit_entity_type": {
+            "$id": "bukkit_entity_type",
             "type": "string",
             "markdownDescription": "Vanilla entities",
             "enum": [
@@ -4816,8 +4589,8 @@ export const schemas = {
                 'ZOMBIFIED_PIGLIN',
             ]
         },
-        "vanilla_particles": {
-            "$id": "vanilla_particles",
+        "bukkit_particle": {
+            "$id": "bukkit_particle",
             "type": "string",
             "markdownDescription": "Vanilla particles",
             "enum": [
@@ -4934,10 +4707,10 @@ export const schemas = {
                 'WITCH',
             ]
         },
-        "vanilla_effects": {
-            "$id": "vanilla_effects",
+        "bukkit_effect": {
+            "$id": "bukkit_effect",
             "type": "string",
-            "markdownDescription": "Vanilla effects",
+            "markdownDescription": "Bukkit effect",
             "enum": [
                 'ANVIL_BREAK',
                 'ANVIL_LAND',
@@ -5009,10 +4782,10 @@ export const schemas = {
                 'ZOMBIE_INFECT',
             ]
         },
-        "vanilla_potion_effects": {
-            "$id": "vanilla_potion_effects",
+        "bukkit_potion_effect_type": {
+            "$id": "bukkit_potion_effect_type",
             "type": "string",
-            "markdownDescription": "Vanilla potion effects",
+            "markdownDescription": "Bukkit potion effect type",
             "enum": [
                 'ABSORPTION',
                 'BAD_OMEN',
@@ -5055,10 +4828,10 @@ export const schemas = {
                 'WITHER',
             ]
         },
-        "vanilla_biomes": {
-            "$id": "vanilla_biomes",
+        "bukkit_biome": {
+            "$id": "bukkit_biome",
             "type": "string",
-            "markdownDescription": "Vanilla biomes",
+            "markdownDescription": "Bukkit biome",
             "enum": [
                 'BADLANDS',
                 'BAMBOO_JUNGLE',
@@ -5258,35 +5031,35 @@ export const schemas = {
                             "properties": {
                                 "break": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"}
                                     }
                                 },
                                 "place": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"}
                                     }
                                 },
                                 "hit": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"}
                                     }
                                 },
                                 "step": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"}
                                     }
                                 },
                                 "fall": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"}
                                     }
@@ -5321,7 +5094,7 @@ export const schemas = {
                             "markdownDescription": "Blacklist of tools that cannot break this block",
                             "items": {
                                 "anyOf": [
-                                    {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                     {
                                         "type": "string",
                                         "enum": [
@@ -5348,7 +5121,7 @@ export const schemas = {
                             "markdownDescription": "Whitelist of tools that cannot break this block",
                             "items": {
                                 "anyOf": [
-                                    {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                     {
                                         "type": "string",
                                         "enum": [
@@ -5375,7 +5148,7 @@ export const schemas = {
                             "markdownDescription": "Whitelist of tools that can run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
-                                    {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                     {
                                         "type": "string",
                                         "enum": [
@@ -5402,7 +5175,7 @@ export const schemas = {
                             "markdownDescription": "Blacklist of tools that can't run events on this block (placed_block.interact)",
                             "items": {
                                 "anyOf": [
-                                    {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                     {
                                         "type": "string",
                                         "enum": [
@@ -5531,7 +5304,7 @@ export const schemas = {
                 },
                 "potion": {
                     "properties": {
-                        "type": {"$ref": "#/$defs/vanilla_potion_types"},
+                        "type": {"$ref": "#/$defs/vanilla_potion_type"},
                         "color": {"$ref": "#/$defs/colors"},
                         "effects": {
                             "type": "object",
@@ -5639,14 +5412,19 @@ export const schemas = {
                     "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item.\nHowever custom armors do not require this setting.\nCustom armors default item material will be leather if not specified.",
                     "type": "object",
                     "properties": {
-                        "material": {"$ref": "#/$defs/vanilla_materials"},
+                        "material": {"$ref": "#/$defs/bukkit_materials"},
                         "generate": {
                             "type": "boolean",
                             "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
                         },
+                        "custom_model_data": {
+                            "type": "integer",
+                            "markdownDescription": "Force the usage of a defined `custom_model_data` (CustomModelData).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                        },
                         "model_id": {
                             "type": "integer",
-                            "markdownDescription": "If you want to force the usage of a defined custom_model_data (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                            "markdownDescription": "(**OLD NAME**, use `custom_model_data` instead). If you want to force the usage of a defined `custom_model_data` (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data",
+                            "doNotSuggest": true
                         },
                     },
                     "if": {
@@ -5709,11 +5487,13 @@ export const schemas = {
                     "properties": {
                         "max_custom_durability": {
                             "type": "integer",
-                            "markdownDescription": "(Old name, please use `max_durability`).\nMax durability of the item. If not specified ItemsAdder will use default material max durability"
+                            "markdownDescription": "(**OLD NAME**, please use `max_durability`).\nMax durability of the item. If not specified ItemsAdder will use default material max durability",
+                            "doNotSuggest": true
                         },
                         "custom_durability": {
                             "type": "integer",
-                            "markdownDescription": "(Old name, please use `durability`).\nCurrent durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)"
+                            "markdownDescription": "(**OLD NAME**, please use `durability`).\nCurrent durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)",
+                            "doNotSuggest": true
                         },
                         "max_durability": {
                             "type": "integer",
@@ -5731,6 +5511,10 @@ export const schemas = {
                         "unbreakable": {
                             "type": "boolean",
                             "markdownDescription": "If the item can get damage"
+                        },
+                        "repair_cost": {
+                            "type": "integer",
+                            "markdownDescription": "Initial cost to repair the item in an anvil"
                         },
                         "usages": {
                             "type": "integer",
@@ -5751,6 +5535,80 @@ export const schemas = {
                             "HIDE_UNBREAKABLE"
                         ]
                     }
+                },
+                "max_stack_size": {
+                    "type": "integer",
+                    "markdownDescription": "Max stack size of the item",
+                },
+                "consumable": {
+                    "markdownDescription": "Consumable item. Can be eaten or drank or used in a general way if no food properties are set.",
+                    "properties": {
+                        "nutrition": {
+                            "type": "integer",
+                            "markdownDescription": "Nutrition value of the food item. Not mandatory."
+                        },
+                        "saturation": {
+                            "type": "number",
+                            "markdownDescription": "Saturation value of the food item. Not mandatory."
+                        },
+                        "can_always_eat": {
+                            "type": "boolean",
+                            "markdownDescription": "If the player can eat the food item even if they are not hungry. Not mandatory."
+                        },
+                        "consume_seconds": {
+                            "type": "integer",
+                            "markdownDescription": "How many seconds it takes to consume the food item."
+                        },
+                        "sound": {
+                            "type": "string",
+                            "markdownDescription": "Sound of the food item when eaten. Available on `1.21.2+` clients only!",
+                            "$ref": "#/$defs/vanilla_and_custom_sound"
+                        },
+                        "particles": {
+                            "type": "boolean",
+                            "markdownDescription": "If the particles of the food item should be shown. Available on `1.21.2+` clients only!"
+                        },
+                        "animation": {
+                            "type": "string",
+                            "markdownDescription": "Animation of the food item when eaten. Available on `1.21.2+` clients only!",
+                            "enum": ["none", "eat", "drink", "block", "bow", "spear", "crossbow", "spyglass", "toot_horn", "brush"]
+                        },
+                        "effects": {
+                            "type": "object",
+                            "markdownDescription": "Effects of the consumable item when consumed",
+                            "patternProperties": {
+                                "apply_status_effects.*": { "$ref": "#/$defs/consumable_effect_apply_status_effects" },
+                                "remove_status_effects.*": { "$ref": "#/$defs/consumable_effect_remove_status_effects" },
+                                "play_sound.*": { "$ref": "#/$defs/consumable_effect_play_sound" },
+                                "clear_all_status_effects.*": { "$ref": "#/$defs/consumable_effect_clear_all_status_effects" },
+                                "teleport_randomly.*": { "$ref": "#/$defs/consumable_effect_teleport_randomly" }
+                            },
+                            "properties": {
+                                "apply_status_effects": { "$ref": "#/$defs/consumable_effect_apply_status_effects" },
+                                "remove_status_effects": { "$ref": "#/$defs/consumable_effect_remove_status_effects" },
+                                "play_sound": { "$ref": "#/$defs/consumable_effect_play_sound" },
+                                "clear_all_status_effects": { "$ref": "#/$defs/consumable_effect_clear_all_status_effects" },
+                                "teleport_randomly": { "$ref": "#/$defs/consumable_effect_teleport_randomly" },
+                            }
+                        }
+                    }
+                },
+                "food": {
+                    "type": "object",
+                    "markdownDescription": "OLD NAME, use `consumable` instead!",
+                    "doNotSuggest": true
+                },
+                "fire_resistant": {
+                    "type": "boolean",
+                    "markdownDescription": "If the item is fire resistant, like nethgerite items."
+                },
+                "hide_tooltip": {
+                    "type": "boolean",
+                    "markdownDescription": "If the item tooltip should be hidden."
+                },
+                "glint": {
+                    "type": "boolean",
+                    "markdownDescription": "If the item should have the enchantment glint."
                 },
                 "enchants": {
                     "markdownDescription": "Set default enchants to this item.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html\n\nYou can set also the enchant level, for example: \n- DIG_SPEED:5\n\nYou can also set other plugins enchants (if they provide your the ID), for example:- my_custom_plugin:custom_enchant:6\n- blast_mining:1\n",
@@ -5774,7 +5632,12 @@ export const schemas = {
                     "$ref": "#/$defs/specific_properties"
                 },
                 "nbt": {
-                    "markdownDescription": "Custom NBT properties for this custom item. Read here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
+                    "markdownDescription": "(**OLD NAME**, use `components_nbt_file` instead).\nCustom NBT properties for this custom item. Read here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
+                    "type": "string",
+                    "doNotSuggest": true
+                },
+                "components_nbt_file": {
+                    "markdownDescription": "Path for the custom NBT properties file for this custom item.\nExample: `my_item_nbt.json`.\nRead here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
                     "type": "string"
                 },
                 "drop": {
@@ -5817,7 +5680,8 @@ export const schemas = {
                 "behaviours": {"type": "object", "$ref": "#/$defs/behaviours"},
                 "events_cooldown": {
                     "type": "integer",
-                    "markdownDescription": "**OLD NAME** OF THE property `events_settings.cooldown.ticks`.\n\nUse it instead."
+                    "markdownDescription": "(**OLD NAME** OF THE property `events_settings.cooldown.ticks`.\n\nUse it instead.)",
+                    "doNotSuggest": true
                 },
                 "events_settings": {
                     "type": "object",
@@ -5829,13 +5693,29 @@ export const schemas = {
                             "properties": {
                                 "ticks": {
                                     "type": "integer",
-                                    "markdownDescription": "Cooldown in ticks before user can activate events of this item"
+                                    "markdownDescription": "Cooldown in ticks before user can activate events of this item",
+                                    "defaultSnippets": [
+                                        {"body": "20", "label": "20 (1 second)"},
+                                        {"body": "40", "label": "40 (2 seconds)"},
+                                        {"body": "60", "label": "60 (3 seconds)"},
+                                        {"body": "100", "label": "100 (5 seconds)"},
+                                        {"body": "200", "label": "200 (10 seconds)"},
+                                        {"body": "400", "label": "400 (20 seconds)"},
+                                        {"body": "1200", "label": "1200 (1 minute)"},
+                                        {"body": "6000", "label": "6000 (5 minutes)"},
+                                        {"body": "12000", "label": "12000 (10 minutes)"},
+                                        {"body": "24000", "label": "24000 (20 minutes)"},
+                                        {"body": "36000", "label": "36000 (30 minutes)"},
+                                        {"body": "72000", "label": "72000 (1 hour)"},
+                                        {"body": "2147483647", "label": "2147483647 (forever)"}
+                                    ]
                                 },
                                 "indicator": {
                                     "type": "string",
                                     "markdownDescription": "Type of cooldown indicator, for now there is only HIDDEN and TITLE",
                                     "enum": [
                                         "HIDDEN",
+                                        "VANILLA",
                                         "TITLE",
                                         "BOSSBAR",
                                         "HUD"
@@ -5900,7 +5780,8 @@ export const schemas = {
                 "events": {"type": "object", "$ref": "#/$defs/events"},
                 "permission": {
                     "type": "string",
-                    "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead."
+                    "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead.",
+                    "doNotSuggest": true
                 }
             }
         },
@@ -5935,10 +5816,11 @@ export const schemas = {
                 },
                 "icon": {
                     "markdownDescription": "Icon of this category. Can be a custom item or a vanilla material",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "font_image": {
                     "type": "object",
+                    "markdownDescription": "Font image to be used as background of the category. Usually used for custom categories.",
                     "properties": {
                         "name": {
                             "type": "string",
@@ -5960,12 +5842,12 @@ export const schemas = {
                 },
                 "items": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_materials_and_customitems"}
+                    "items": {"$ref": "#/$defs/bukkit_materials_and_customitems"}
                 },
                 "hide_items": {
                     "type": "array",
                     "markdownDescription": "List of items to be hidden from this category (useful if you're using show_all_items property)",
-                    "items": {"$ref": "#/$defs/vanilla_materials_and_customitems"}
+                    "items": {"$ref": "#/$defs/bukkit_materials_and_customitems"}
                 }
             }
         },
@@ -6138,7 +6020,7 @@ export const schemas = {
             "type": "object",
             "required": ["item", "min_amount", "max_amount", "chance"],
             "properties": {
-                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                 "min_amount": {"type": "integer", "default": 1},
                 "max_amount": {"type": "integer", "default": 1},
                 "chance": {"type": "number", "default": 99.9},
@@ -6150,7 +6032,7 @@ export const schemas = {
             "type": "object",
             "required": ["item", "min_amount", "max_amount", "chance"],
             "properties": {
-                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                 "min_amount": {"type": "integer", "default": 1},
                 "max_amount": {"type": "integer", "default": 1},
                 "chance": {"type": "number", "default": 99.9}
@@ -6182,7 +6064,7 @@ export const schemas = {
                 "result": {
                     "required": ["item"],
                     "properties": {
-                        "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                        "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                         "amount": {"type": "integer", "default": 1}
                     }
                 },
@@ -6194,7 +6076,7 @@ export const schemas = {
                                 "type": "object",
                                 "properties": {
                                     "item": {
-                                        "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                        "$ref": "#/$defs/bukkit_materials_and_customitems"
                                     },
                                     "amount": {"type": "integer", "default": 1}
                                 }
@@ -6206,7 +6088,7 @@ export const schemas = {
                                 "type": "object",
                                 "properties": {
                                     "item": {
-                                        "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                        "$ref": "#/$defs/bukkit_materials_and_customitems"
                                     },
                                     "amount": {"type": "integer", "default": 1}
                                 }
@@ -6216,15 +6098,15 @@ export const schemas = {
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string",
-                                "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                "$ref": "#/$defs/bukkit_materials_and_customitems"
                             }
                         },
                         "play_sound": {
                             "properties": {
-                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"},
-                                "category": {"$ref": "#/$defs/vanilla_sound_category"},
+                                "category": {"$ref": "#/$defs/bukkit_sound_category"},
                                 "stop_previous": {"type": "boolean"},
                             }
                         }
@@ -6262,12 +6144,12 @@ export const schemas = {
         },
         "craft_recipe_ingredient": {
             "type": ["string", "object"],
-            "$ref": "#/$defs/vanilla_materials_and_customitems",
+            "$ref": "#/$defs/bukkit_materials_and_customitems",
             "markdownDescription": "You can specify a vanilla material, custom item or potion.\n\n**Examples:**\n\n A: STONE\n\nB:\n\n  type: POTION\n\n  potion_type: fire_resistance",
             "properties": {
                 "item": {
                     "markdownDescription": "You can specify a vanilla material, custom item or potion.\n\n**Examples:**\n\n A: STONE\n\nB:\n\n  type: POTION\n\n  potion_type: fire_resistance",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
             },
             "if": {
@@ -6277,7 +6159,7 @@ export const schemas = {
                 "required": ["potion_type"],
                 "properties": {
                     "potion_type": {
-                        "$ref": "#/$defs/potion_types"
+                        "$ref": "#/$defs/vanilla_potion_type"
                     }
                 }
             },
@@ -6289,7 +6171,7 @@ export const schemas = {
                     "required": ["potion_type"],
                     "properties": {
                         "potion_type": {
-                            "$ref": "#/$defs/potion_types"
+                            "$ref": "#/$defs/vanilla_potion_type"
                         }
                     }
                 }
@@ -6473,7 +6355,7 @@ export const schemas = {
                     "properties": {
                         "item": {
                             "type": "string",
-                            "$ref": "#/$defs/vanilla_materials_and_customitems"
+                            "$ref": "#/$defs/bukkit_materials_and_customitems"
                         }
                     }
                 },
@@ -6482,7 +6364,7 @@ export const schemas = {
                 "result": {
                     "required": ["item"],
                     "properties": {
-                        "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                        "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                         "amount": {"type": "integer", "default": 1},
                         "return_items": {
                             "properties": {
@@ -6492,7 +6374,7 @@ export const schemas = {
                                         "type": "object",
                                         "properties": {
                                             "item": {
-                                                "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                                "$ref": "#/$defs/bukkit_materials_and_customitems"
                                             },
                                             "amount": {"type": "integer", "default": 1}
                                         }
@@ -6504,7 +6386,7 @@ export const schemas = {
                                         "type": "object",
                                         "properties": {
                                             "item": {
-                                                "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                                "$ref": "#/$defs/bukkit_materials_and_customitems"
                                             },
                                             "amount": {"type": "integer", "default": 1}
                                         }
@@ -6514,15 +6396,15 @@ export const schemas = {
                                     "type": "object",
                                     "additionalProperties": {
                                         "type": "string",
-                                        "$ref": "#/$defs/vanilla_materials_and_customitems"
+                                        "$ref": "#/$defs/bukkit_materials_and_customitems"
                                     }
                                 },
                                 "play_sound": {
                                     "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                         "volume": {"type": "number"},
                                         "pitch": {"type": "number"},
-                                        "category": {"$ref": "#/$defs/vanilla_sound_category"},
+                                        "category": {"$ref": "#/$defs/bukkit_sound_category"},
                                         "stop_previous": {"type": "boolean"},
                                     }
                                 }
@@ -6541,11 +6423,11 @@ export const schemas = {
                 "permission_suffix": {"type": "string"},
                 "ingredient": {
                     "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "item": {
                     "type": "string",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 }
             }
         },
@@ -6559,12 +6441,12 @@ export const schemas = {
                 "base": {
                     "type": "string",
                     "markdownDescription" : "The base item (can be a custom item or vanilla material) on the first slot.",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "addition": {
                     "type": "string",
                     "markdownDescription" : "The mineral item (can be a custom item or vanilla material) on the second slot.",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "result": {
                     "type": "object",
@@ -6573,19 +6455,27 @@ export const schemas = {
                     "properties": {
                         "item": {
                             "markdownDescription" : "The resulting item (can be a custom item or vanilla material) which will be merged into the first slot item.",
-                            "$ref": "#/$defs/vanilla_materials_and_customitems"
+                            "$ref": "#/$defs/bukkit_materials_and_customitems"
                         },
                         "amount": {"type": "integer", "default": 1},
                         "move_attributes": {
                             "type": "object",
                             "markdownDescription" : "The attributes to be moved from the first item to the result item.",
                             "properties": {
-                                "enchants": {"type": "boolean", "default": true},
-                                "durability": {"type": "boolean"},
-                                "custom_model_data": {"type": "boolean"},
-                                "material": {"type": "boolean"},
+                                "name": {"type": "boolean", "markdownDescription" : "Default: `true`"},
+                                "lore": {"type": "boolean", "markdownDescription" : "Default: `true`"},
+                                "enchants": {"type": "boolean", "markdownDescription" : "Default: `true`"},
+                                "durability": {"type": "boolean", "markdownDescription" : "Default: `false`"},
+                                "custom_model_data": {
+                                    "markdownDescription" : "Expert users: Move the `custom_model_data` from the `base` to the `result`. Use this property only if you know what you are doing. Default: `false`",
+                                    "type": "boolean"
+                                },
+                                "material": {
+                                    "markdownDescription" : "Expert users: Move the material from the `base` to the `result`. Use this property only if you know what you are doing. Default: `false`",
+                                    "type": "boolean"
+                                },
                                 "other_nbt": {
-                                    "markdownDescription" : "Move EVERY NBT data from the first item to the last item. Use this property only if you know what you are doing.",
+                                    "markdownDescription" : "Expert users: Move custom NBT data (`minecraft:custom_data`) from the `base` to the `result`. Use this property only if you know what you are doing. Default: `false`",
                                     "type": "boolean"
                                 }
                             }
@@ -6624,7 +6514,7 @@ export const schemas = {
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "worlds": {
                     "type": "array",
@@ -6663,7 +6553,7 @@ export const schemas = {
                 "enabled": {"type": "boolean"},
                 "type": {
                     "markdownDescription": "**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/vanilla_entity_types"
+                    "$ref": "#/$defs/bukkit_entity_type"
                 },
                 "drop_only_first": {
                     "type": "boolean",
@@ -6684,7 +6574,7 @@ export const schemas = {
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "exp": {
                     "markdownDescription": "List of the possible result EXP drops and their chances",
@@ -6759,7 +6649,7 @@ export const schemas = {
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "exp": {
                     "markdownDescription": "List of the possible result EXP drops and their chances",
@@ -6810,11 +6700,11 @@ export const schemas = {
                 "replaceable_blocks": {
                     "markdownDescription": "Blocks that can be replaced when the ore vein is spawned",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_blocks"}
+                    "items": {"$ref": "#/$defs/bukkit_blocks"}
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "chunk_chance": {"type": "number", "default": 70.9},
                 "max_height": {"type": "integer", "default": 45},
@@ -6856,11 +6746,11 @@ export const schemas = {
                 "bottom_blocks": {
                     "markdownDescription": "The custom block will be spawned only if one of these material is available on the surface of the chunk.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_blocks"}
+                    "items": {"$ref": "#/$defs/bukkit_blocks"}
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "chance": {"type": "number", "default": 70.9},
                 "max_height": {"type": "integer", "default": 45},
@@ -6901,11 +6791,11 @@ export const schemas = {
                 "bottom_blocks": {
                     "markdownDescription": "The custom block will be spawned only if one of these material is available in the caves.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_blocks"}
+                    "items": {"$ref": "#/$defs/bukkit_blocks"}
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "chance": {"type": "number", "default": 70.9},
                 "max_height": {"type": "integer", "default": 45},
@@ -6978,11 +6868,11 @@ export const schemas = {
                 "bottom_blocks": {
                     "markdownDescription": "The custom tree will be spawned only if one of these material is available on the surface of the chunk.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_blocks"}
+                    "items": {"$ref": "#/$defs/bukkit_blocks"}
                 },
                 "biomes": {
                     "type": "array",
-                    "items": {"$ref": "#/$defs/vanilla_biomes"}
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
                 },
                 "chance": {"type": "number", "default": 70.9},
                 "max_height": {"type": "integer", "default": 45},
@@ -7061,7 +6951,7 @@ export const schemas = {
                 "enabled": {"type": "boolean"},
                 "projectile": {
                     "markdownDescription": "Which item will be used as projectile for the gun",
-                    "$ref": "#/$defs/vanilla_materials_and_customitems"
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
                 }
             }
         },
@@ -7155,14 +7045,14 @@ export const schemas = {
                     "properties": {
                         "break": {
                             "properties": {
-                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"}
                             }
                         },
                         "place": {
                             "properties": {
-                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"}
                             }
@@ -7350,7 +7240,7 @@ export const schemas = {
                             "type": "object",
                             "required": ["item"],
                             "properties": {
-                                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                 "amount": {"type": "integer", "minimum": 1, "maximum": 64}
                             }
                         },
@@ -7358,7 +7248,7 @@ export const schemas = {
                             "type": "object",
                             "required": ["item"],
                             "properties": {
-                                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                                 "amount": {"type": "integer", "minimum": 1, "maximum": 64}
                             }
                         }
@@ -7369,7 +7259,7 @@ export const schemas = {
                     "markdownDescription": "Resulting item for this recipe",
                     "required": ["item"],
                     "properties": {
-                        "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                        "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                         "amount": {"type": "integer", "minimum": 1, "maximum": 64}
                     }
                 }
@@ -7412,14 +7302,14 @@ export const schemas = {
                     "properties": {
                         "break": {
                             "properties": {
-                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"}
                             }
                         },
                         "place": {
                             "properties": {
-                                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                                 "volume": {"type": "number"},
                                 "pitch": {"type": "number"}
                             }
@@ -7473,17 +7363,18 @@ export const schemas = {
         "behaviour.mob": {
             "$id": "behaviour.mob",
             "type": "object",
-            "markdownDescription": "Tells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
+            "markdownDescription": "(This is an old feature, it probably will be removed in the future.)\nTells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
             "required": ["ai"],
+            "deprecated": true,
             "properties": {
                 "enabled": {"type": "boolean"},
                 "ai": {
                     "markdownDescription": "AI of the mob.\n**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/vanilla_entity_types"
+                    "$ref": "#/$defs/bukkit_entity_type"
                 },
                 "visual": {
                     "markdownDescription": "Appearence of the mob.\nDEFAULT is ZOMBIE because it can holt items on head.\n**Accepts only vanilla mobs**\n\n",
-                    "$ref": "#/$defs/vanilla_entity_types"
+                    "$ref": "#/$defs/bukkit_entity_type"
                 },
                 "animation": {
                     "markdownDescription": "Items models used as animation for the mob",
@@ -7582,10 +7473,10 @@ export const schemas = {
                             "type": "object",
                             "markdownDescription": "Apply potion effect to the mob on spawn",
                             "properties": {
-                                "every_ticks": {"type": "integer"},
-                                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
-                                "amplifier": {"type": "integer"},
-                                "duration": {"type": "integer"},
+                                "every_ticks": {"$ref": "#/$defs/ticks"},
+                                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
+                                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
+                                "duration": {"$ref": "#/$defs/ticks"},
                                 "ambient": {"type": "boolean"}
                             }
                         }
@@ -7595,10 +7486,10 @@ export const schemas = {
                             "type": "object",
                             "markdownDescription": "Apply potion effect to the mob on spawn",
                             "properties": {
-                                "every_ticks": {"type": "integer"},
-                                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
-                                "amplifier": {"type": "integer"},
-                                "duration": {"type": "integer"},
+                                "every_ticks": {"$ref": "#/$defs/ticks"},
+                                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
+                                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
+                                "duration": {"$ref": "#/$defs/ticks"},
                                 "ambient": {"type": "boolean"}
                             }
                         }
@@ -7621,7 +7512,7 @@ export const schemas = {
             "properties": {
                 "type": {
                     "markdownDescription": "**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/vanilla_entity_types"
+                    "$ref": "#/$defs/bukkit_entity_type"
                 },
                 "reason": {
                     "enum": [
@@ -8052,7 +7943,26 @@ export const schemas = {
             "properties": {
                 "command": {
                     "type": "string",
-                    "markdownDescription": "Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:\n\n`{player}` is the player who used this item\n\n`{target-player}` is the player interacted/attacked\n\n`{target-x}` is the x location of player/block interacted/attacked\n\n`{target-y}` is the x location of player/block interacted/attacked\n\n`{target-z}` is the x location of player/block interacted/attacked\n\n`{debug-event-name}` is the current Bukkit event which triggered the action (useful only to devs).\n\n\nExample: `tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}`"
+                    "markdownDescription": "Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:\n\n`{player}` is the player who used this item\n\n`{target-player}` is the player interacted/attacked\n\n`{target-x}` is the x location of player/block interacted/attacked\n\n`{target-y}` is the x location of player/block interacted/attacked\n\n`{target-z}` is the x location of player/block interacted/attacked\n\n`{debug-event-name}` is the current Bukkit event which triggered the action (useful only to devs).\n\n\nExample: `tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}`",
+                    "defaultSnippets": [
+                        {
+                            "body": "minecraft:tell {player} Test", 
+                            "description": "Example tell command"
+                        },
+                        {
+                            "body": "minecraft:give {player} minecraft:diamond 1", 
+                            "description": "Example give command"
+                        },
+                        {
+                            "body": "execute at {player} run minecraft:tp LoneDev ~ ~2 ~", 
+                            "description": "Example teleport +2 on Y axis"
+                        },
+                        {
+                            "body": "minecraft:tp {player} {target-x} 200 {target-z}", 
+                            "description": "Example teleport on same x, z but 200 on Y axis"
+                        }
+
+                    ]
                 },
                 "as_console": {"type": "boolean", "examples": [false]},
                 "flow_success_if_message_contains": {
@@ -8253,12 +8163,12 @@ export const schemas = {
             "markdownDescription": "Play a Vanilla sound or Custom sound",
             "required": ["name", "volume", "pitch"],
             "properties": {
-                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                 "volume": {"type": "number", "minimum": 0},
                 "pitch": {"type": "number", "minimum": 0, "maximum": 2},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
-                "category": {"$ref": "#/$defs/vanilla_sound_category"},
+                "category": {"$ref": "#/$defs/bukkit_sound_category"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"},
                 "stop_previous": {"type": "boolean"},
             }
@@ -8268,7 +8178,7 @@ export const schemas = {
             "markdownDescription": "Stop a Vanilla sound or Custom sound",
             "required": ["name"],
             "properties": {
-                "name": {"$ref": "#/$defs/vanilla_sounds_and_custom"},
+                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8287,7 +8197,9 @@ export const schemas = {
             "properties": {
                 "change_me_1": {"$ref": "#/$defs/command"},
                 "change_me_2": {"$ref": "#/$defs/command"},
-                "change_me_xxx": {"$ref": "#/$defs/command"},
+                "change_me_3": {"$ref": "#/$defs/command"},
+                "change_me_4": {"$ref": "#/$defs/command"},
+                "change_me_xx": {"$ref": "#/$defs/command"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8298,7 +8210,7 @@ export const schemas = {
             "markdownDescription": "Play this particle",
             "required": ["name"],
             "properties": {
-                "name": {"$ref": "#/$defs/vanilla_particles"},
+                "name": {"$ref": "#/$defs/bukkit_particle"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8309,7 +8221,7 @@ export const schemas = {
             "markdownDescription": "Shoot this particle",
             "required": ["name", "distance"],
             "properties": {
-                "name": {"$ref": "#/$defs/vanilla_particles"},
+                "name": {"$ref": "#/$defs/bukkit_particle"},
                 "distance": {"type": "integer", "default": 7},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
@@ -8321,7 +8233,7 @@ export const schemas = {
             "markdownDescription": "Play this effect",
             "required": ["name"],
             "properties": {
-                "name": {"$ref": "#/$defs/vanilla_effects"},
+                "name": {"$ref": "#/$defs/bukkit_effect"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8428,7 +8340,7 @@ export const schemas = {
             "markdownDescription": "Give this player an item",
             "required": ["item"],
             "properties": {
-                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                 "amount": {"type": "integer"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
@@ -8477,7 +8389,7 @@ export const schemas = {
             "markdownDescription": "Glow blocks near interact location (or near the player if this event is not an interact one)",
             "required": ["radius", "material"],
             "properties": {
-                "material": {"$ref": "#/$defs/vanilla_blocks"},
+                "material": {"$ref": "#/$defs/bukkit_blocks"},
                 "radius": {
                     "type": "object",
                     "required": ["x", "y", "z"],
@@ -8538,10 +8450,10 @@ export const schemas = {
             "$id": "potion_effect",
             "markdownDescription": "Apply potion effect to player",
             "properties": {
-                "every_ticks": {"type": "integer"},
-                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
-                "amplifier": {"type": "integer"},
-                "duration": {"type": "integer"},
+                "every_ticks": {"$ref": "#/$defs/ticks"},
+                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
+                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
+                "duration": {"$ref": "#/$defs/ticks"},
                 "ambient": {"type": "boolean"}
             }
         },
@@ -8550,7 +8462,7 @@ export const schemas = {
             "markdownDescription": "Remove potion effect",
             "required": ["type"],
             "properties": {
-                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
+                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8615,9 +8527,9 @@ export const schemas = {
             "markdownDescription": "Apply potion effect to target entity",
             "required": ["type"],
             "properties": {
-                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
-                "amplifier": {"type": "integer"},
-                "duration": {"type": "integer"},
+                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
+                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
+                "duration": {"$ref": "#/$defs/ticks"},
                 "ambient": {"type": "boolean"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
@@ -8630,7 +8542,7 @@ export const schemas = {
             "markdownDescription": "Remove potion effect from target entity",
             "required": ["type"],
             "properties": {
-                "type": {"$ref": "#/$defs/vanilla_potion_effects"},
+                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -8696,7 +8608,7 @@ export const schemas = {
             "markdownDescription": "Drops a vanilla/custom item.",
             "required": ["item"],
             "properties": {
-                "item": {"$ref": "#/$defs/vanilla_materials_and_customitems"},
+                "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                 "min_amount": {"type": "integer", "default": 1},
                 "max_amount": {"type": "integer", "default": 1},
                 "chance": {"type": "number", "default": 99.9},
@@ -8708,6 +8620,7 @@ export const schemas = {
         "font_image": {
             "$id": "font_image",
             "type": "object",
+            "markdownDescription": "A font image, it can be used to create custom emojis, GUIs, HUDs and more.",
             "required": ["path"],
             "properties": {
                 "permission": {
@@ -8749,7 +8662,7 @@ export const schemas = {
             "markdownDescription": "Decrement/increment HUD value over time",
             "properties": {
                 "every_ticks": {
-                    "type": "integer",
+                    "$ref": "#/$defs/ticks",
                     "markdownDescription": "Decrement interval (ticks)"
                 },
                 "amount": {"type": "integer", "markdownDescription": "Decrement amount"},
@@ -8771,9 +8684,9 @@ export const schemas = {
             "$id": "biome_over_time",
             "markdownDescription": "Decrement/increment HUD value over time",
             "properties": {
-                "biome": {"$ref": "#/$defs/vanilla_biomes"},
+                "biome": {"$ref": "#/$defs/bukkit_biome"},
                 "every_ticks": {
-                    "type": "integer",
+                    "$ref": "#/$defs/ticks",
                     "markdownDescription": "Decrement interval (ticks)"
                 },
                 "amount": {"type": "integer", "markdownDescription": "Decrement amount"},
@@ -8813,8 +8726,8 @@ export const schemas = {
             "markdownDescription": "Deal damage to player",
             "properties": {
                 "every_ticks": {
-                    "markdownDescription": "Deal damage to player (interval in ticks)",
-                    "type": "integer"
+                    "$ref": "#/$defs/ticks",
+                    "markdownDescription": "Deal damage to player (interval in ticks)"
                 },
                 "damage": {"markdownDescription": "Deal damage to player", "type": "number"}
             }
@@ -9122,7 +9035,7 @@ export const schemas = {
                 },
                 "type": {
                     "markdownDescription": "The base Vanilla entity type",
-                    "$ref": "#/$defs/vanilla_entity_types"
+                    "$ref": "#/$defs/bukkit_entity_type"
                 },
                 "silent": {
                     "type": "boolean",
@@ -9257,5 +9170,133 @@ export const schemas = {
                 }
             }
         },
+        "ticks": {
+            "$id": "ticks",
+            "type": "integer",
+            "defaultSnippets": [
+                {"body": "20", "label": "20 (1 second)"},
+                {"body": "40", "label": "40 (2 seconds)"},
+                {"body": "60", "label": "60 (3 seconds)"},
+                {"body": "100", "label": "100 (5 seconds)"},
+                {"body": "200", "label": "200 (10 seconds)"},
+                {"body": "400", "label": "400 (20 seconds)"},
+                {"body": "1200", "label": "1200 (1 minute)"},
+                {"body": "6000", "label": "6000 (5 minutes)"},
+                {"body": "12000", "label": "12000 (10 minutes)"},
+                {"body": "24000", "label": "24000 (20 minutes)"},
+                {"body": "36000", "label": "36000 (30 minutes)"},
+                {"body": "72000", "label": "72000 (1 hour)"},
+                {"body": "2147483647", "label": "2147483647 (forever)"}
+            ]
+        },
+        "potion_amplifier": {
+            "$id": "potion_amplifier",
+            "type": "integer",
+                "markdownDescription": "Amplifier level",
+                "defaultSnippets": [
+                    {"body": "0", "label": "0 (I)"},
+                    {"body": "1", "label": "1 (II)"},
+                    {"body": "2", "label": "2 (III)"},
+                    {"body": "3", "label": "3 (IV)"},
+                    {"body": "4", "label": "4 (V)"},
+                ]
+        },
+        "consumable_effect_apply_status_effects": {
+            "$id": "consumable_effect_apply_status_effects",
+            "type": "object",
+            "required": ["effects"],
+            "markdownDescription": "Adds status effects",
+            "additionalProperties": false,
+            "properties": {
+                "effects": {
+                    "markdownDescription": "List of status effects to be applied",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/consumable_status_effect"
+                    },
+                    "properties": { 
+                        "effect_1": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_2": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_3": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_4": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_5": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_6": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_7": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_8": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_9": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_10": { "$ref": "#/$defs/consumable_status_effect" },
+                        "effect_xx": { "$ref": "#/$defs/consumable_status_effect" }
+                    }
+                },
+                "probability": {
+                    "type": "number",
+                    "markdownDescription": "Probability of this effect list to be applied. Default `1`.",
+                    "default": 1.0
+                }
+            }
+        },
+        "consumable_status_effect": {
+            "$id": "consumable_status_effect",
+            "type": "object",
+            "required": ["potion", "duration", "amplifier"],
+            "markdownDescription": "Adds a status effect",
+            "additionalProperties": false,
+            "properties": {
+                "potion": {"$ref": "#/$defs/bukkit_potion_effect_type"},
+                "duration": {"$ref": "#/$defs/ticks"},
+                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
+                "ambient": {
+                    "type": "boolean",
+                    "markdownDescription": "Ambient effect"
+                },
+                "particles": {
+                    "type": "boolean",
+                    "markdownDescription": "If particles should be shown"
+                },
+                "icon": {
+                    "type": "boolean",
+                    "markdownDescription": "If icon should be shown in the inventory"
+                }
+            }
+        },
+        "consumable_effect_remove_status_effects": {
+            "$id": "consumable_effect_remove_status_effects",
+            "type": "object",
+            "markdownDescription": "Removes some status effects",
+            "required": ["effects"],
+            "additionalProperties": false,
+            "properties": {
+                "effects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/bukkit_potion_effect_type"
+                    }
+                }
+            }
+        },
+        "consumable_effect_play_sound": {
+            "$id": "consumable_effect_play_sound",
+            "type": "object",
+            "required": ["sound"],
+            "markdownDescription": "Play a sound when the item is consumed completely",
+            "additionalProperties": false,
+            "properties": {
+                "sound": { "$ref": "#/$defs/vanilla_and_custom_sound" },
+            }
+        },
+        "consumable_effect_teleport_randomly": {
+            "$id": "consumable_effect_teleport_randomly",
+            "type": "object",
+            "required": ["diameter"],
+            "markdownDescription": "Teleport player randomly",
+            "additionalProperties": false,
+            "properties": {
+                "diameter": {
+                    "type": "number",
+                    "default": 5,
+                    "markdownDescription": "Diameter of the teleportation area"
+                }
+            }
+        }
     }
 };

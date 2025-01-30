@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -48,5 +48,17 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "IA VS Code Extension",
+      "properties": {
+        "ia-vscode.neverWarnAboutCopilot": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disables warnings about GitHub Copilot in this extension."
+        }
+      }
+    }
   }
 }
