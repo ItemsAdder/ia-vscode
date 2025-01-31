@@ -1,0 +1,143 @@
+info:
+  namespace: test
+recipes:
+  anvil_repair:
+    my_anvil_repair_recipe:
+      enabled: false
+      ingredient: ACACIA_BOAT
+      item: ACACIA_BOAT
+    my_anvil_repair_recipe_1:
+      ingredient: ACACIA_BOAT
+      item: ACACIA_BOAT
+
+items:
+  test_consumable_food:
+    enabled: true
+    display_name: test_consumable_food
+    resource:
+      generate: false
+      model_path: minecraft:item/emerald
+      material: STONE
+    consumable:
+      animation: eat
+      can_always_eat: true
+      eat_seconds: 3
+      nutrition: 1
+      saturation: 0.5
+      sound: block.anvil.step
+      particles: false
+      effects:
+        play_sound_1:
+          sound: minecraft:block.anvil.place
+        apply_status_effects:
+          effects:
+            effect_1:
+              potion: ABSORPTION
+              duration: 12000
+              amplifier: 0
+        teleport_randomly:
+          diameter: 5
+    events:
+      attack:
+        cancel: true
+    behaviours:
+      fuel:
+        enabled: true
+        burn_ticks: 0
+        machines:
+        - FURNACE
+
+  test_consumable_food2:
+    display_name: test_consumable_food
+    events_cooldown: 0
+    resource:
+      generate: false
+      model_path: minecraft:item/emerald
+      material: STONE
+    consumable:
+      animation: eat
+      can_always_eat: true
+      eat_seconds: 3
+      nutrition: 1
+      saturation: 0.5
+      sound: block.anvil.step
+      particles: false
+      effects:
+        status:
+          effects:
+            effect1:
+              potion: CONDUIT_POWER
+              duration: 60
+              amplifier: 3
+            effect2:
+              potion: DOLPHINS_GRACE
+              duration: 60
+              amplifier: 3
+              ambient: false
+              icon: false
+
+        teleport_randomly:
+          diameter: 1
+        play_sound_1:
+          sound: minecraft:block.anvil.place
+        remove_status_effects:
+          effects:
+          - INFESTED
+          - POISON
+        apply_status_effects:
+          effects:
+            effect_1:
+              potion: ABSORPTION
+              duration: 12000
+              amplifier: 0
+          probability: 1
+        apply_status_effects_1:
+          effects:
+
+
+  test_autocomplete:
+    enabled: true
+    display_name: test_autocomplete
+    resource:
+      generate: false
+      model_path: minecraft:item/emerald
+      material: ACACIA_BOAT
+
+    events:
+      interact_left:
+        damage_entity:
+          damage: 5
+        decrement_amount:
+          amount: 1
+      interact_right:
+        explosion:
+          power: 1
+          fire: true
+          break_blocks: false
+
+font_images:
+  image_1:
+    path: aa
+    scale_ratio: 9
+    y_position: 8
+  my_image:
+    path: font/
+  my_image_1:
+
+
+loots:
+  blocks:
+    my_loot:
+      biomes:
+      - BADLANDS
+    my_loot_1:
+      biomes:
+      - BADLANDS
+emotes:
+  my_emote:
+    id: asdas
+  my_emote_1:
+    id: sdfsedf
+  my_emote_2:
+
+

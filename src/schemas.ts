@@ -9167,6 +9167,20 @@ export const schemas = {
                             "markdownDescription": "Do not start animation when the player is falling, this avoids players from exploiting animations to remove fall damage (if the `can_player_move` is `true`)."
                         }
                     }
+                },
+                "on_stop": {
+                    "type": "object",
+                    "markdownDescription": "Actions to be executed when the emote stops.",
+                    "properties": {
+                        "stop_sounds": {
+                            "type": "boolean",
+                            "markdownDescription": "Stop all sounds. Default `false`."
+                        },
+                        "skip_emote_end": {
+                            "type": "boolean",
+                            "markdownDescription": "Interrupts the emote. Default `false`."
+                        }
+                    }
                 }
             }
         },
@@ -9230,7 +9244,7 @@ export const schemas = {
                 },
                 "probability": {
                     "type": "number",
-                    "markdownDescription": "Probability of this effect list to be applied. Default `1`.",
+                    "markdownDescription": "Probability of this effects list to be applied. Default `1`.",
                     "default": 1.0
                 }
             }

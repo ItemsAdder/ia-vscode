@@ -126,6 +126,11 @@ export async function activate(context: vscode.ExtensionContext) {
 						if (!arraysEqual(parentPath, currentPath)) {
 							return;
 						}
+
+						// Fixes the fact that it suggests the entry on sub-entries, making no sense.
+						if(arraysEqual(parentPath, currentPath) && currentPath.length > 0) {
+							return;
+						}
 				
 						Object.keys(properties).forEach((key) => {
 								const newPath = [...currentPath, key];
