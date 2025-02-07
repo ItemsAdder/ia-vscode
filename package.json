@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -47,7 +47,8 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "yaml": "^2.7.0"
   },
   "contributes": {
     "configuration": {

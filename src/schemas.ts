@@ -324,19 +324,48 @@ export const schemas = {
             "type": "object",
             "markdownDescription": "These are the vanilla attribute modifiers, you can get more info here https://minecraft.gamepedia.com/Attribute#Attributes_available_on_all_living_entities",
             "properties": {
-                "attackDamage": {"$ref": "#/$defs/attribute_modifier"},
-                "attackSpeed": {"$ref": "#/$defs/attribute_modifier"},
-                "maxHealth": {"$ref": "#/$defs/attribute_modifier"},
-                "movementSpeed": {"$ref": "#/$defs/attribute_modifier"},
-                "armor": {"$ref": "#/$defs/attribute_modifier"},
-                "armorToughness": {"$ref": "#/$defs/attribute_modifier"},
-                "attackKnockback": {"$ref": "#/$defs/attribute_modifier"},
-                "luck": {"$ref": "#/$defs/attribute_modifier"}
+                "attackDamage": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "attackSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "maxHealth": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "movementSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "armor": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "armorToughness": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "attackKnockback": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "max_health": {"$ref": "#/$defs/attribute_modifier"},
+                "follow_range": {"$ref": "#/$defs/attribute_modifier"},
+                "knockback_resistance": {"$ref": "#/$defs/attribute_modifier"},
+                "luck": {"$ref": "#/$defs/attribute_modifier"},
+                "flying_speed": {"$ref": "#/$defs/attribute_modifier"},
+                "fall_damage_multiplier": {"$ref": "#/$defs/attribute_modifier"},
+                "max_absorption": {"$ref": "#/$defs/attribute_modifier"},
+                "safe_fall_distance": {"$ref": "#/$defs/attribute_modifier"},
+                "scale": {"$ref": "#/$defs/attribute_modifier"},
+                "step_height": {"$ref": "#/$defs/attribute_modifier"},
+                "gravity": {"$ref": "#/$defs/attribute_modifier"},
+                "jump_strength": {"$ref": "#/$defs/attribute_modifier"},
+                "block_interaction_range": {"$ref": "#/$defs/attribute_modifier"},
+                "entity_interaction_range": {"$ref": "#/$defs/attribute_modifier"},
+                "block_break_speed": {"$ref": "#/$defs/attribute_modifier"},
+                "spawn_reinforcements": {"$ref": "#/$defs/attribute_modifier"}
             }
         },
         "attribute_modifier": {
             "$id": "attribute_modifier",
-            "markdownDescription": "You can directly set a value or press ENTER and specify value and operation.",
+            "markdownDescription": `You can directly set a value or set \`value\` and \`operation\`.\n## Examples:
+\`\`\`
+attribute_modifiers:
+  mainhand:
+    attackDamage: 2
+\`\`\`
+Or:
+\`\`\`
+attribute_modifiers:
+  mainhand:
+    attackDamage:
+      value: 2
+      operation: add
+\`\`\`
+`,
             "anyOf": [
                 {
                     "type": "object",
@@ -352,7 +381,21 @@ export const schemas = {
                     }
                 },
                 {
-                    "markdownDescription": "You can directly set a value or press ENTER and specify value and operation.",
+                    "markdownDescription": `You can directly set a value or set \`value\` and \`operation\`.\n## Examples:
+\`\`\`
+attribute_modifiers:
+  mainhand:
+    attackDamage: 2
+\`\`\`
+Or:
+\`\`\`
+attribute_modifiers:
+  mainhand:
+    attackDamage:
+      value: 2
+      operation: add
+\`\`\`
+`,
                     "type": "number"
                 }
             ]
@@ -5434,25 +5477,25 @@ export const schemas = {
                     "then": {
                         "properties": {
                             "textures": {
-                                "items": {"type": "string"},
+                            "items": {"type": "string"},
+                            "title": "Set `generate: true` to use this!",
+                            "markdownDescription": "Specifies the textures layers to be used to generate the model. You usually will need only 1 layer.\nIf you are creating a block you can set a texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
+                            "defaultSnippets": [
+                                {"body": "item/$0.png"},
+                                {"body": "block/$0.png"}
+                            ],
+                            "default": [""]
+                            },
+                            "texture": {
+                                "type": "string",
                                 "title": "Set `generate: true` to use this!",
-                                "markdownDescription": "Specifies the textures layers to be used to generate the model. You usually will need only 1 texture.\nIf you are creating a block you can set 1 texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
+                                "markdownDescription": "Specifies the texture layer to be used to generate the model.\nIf you are creating a block you can set a texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
                                 "defaultSnippets": [
                                     {"body": "item/$0.png"},
                                     {"body": "block/$0.png"}
-                                ],
-                                "default": [""]
-                            },
-                            "parent": {
-                                "type": "string",
-                                "markdownDescription": "The `parent` value to be set in the automatically generated JSON model." ,
-                                "defaultSnippets": [
-                                    {"body": "builtin/generated"},
-                                ],
-                                "default": [""]
+                                ]
                             }
-                        },
-                        "required": ["textures"]
+                        }
                     },
                     "else" : {
                         "properties": {
@@ -5541,7 +5584,7 @@ export const schemas = {
                     "markdownDescription": "Max stack size of the item",
                 },
                 "consumable": {
-                    "markdownDescription": "Consumable item. Can be eaten or drank or used in a general way if no food properties are set.",
+                    "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nConsumable item. Can be eaten or drank or used in a general way if no food properties are set.",
                     "properties": {
                         "nutrition": {
                             "type": "integer",
@@ -5598,6 +5641,67 @@ export const schemas = {
                     "markdownDescription": "OLD NAME, use `consumable` instead!",
                     "doNotSuggest": true
                 },
+                "equipment": {
+                    "type": "object",
+                    "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nIf present, this item can be equipped by players in the selected slot.",
+                    "required": ["id"],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "markdownDescription": "Equipment ID. Must be a valid ID of an equipment created under the `equipments` section."
+                        },
+                        "slot": {
+                            "type": "string",
+                            "markdownDescription": "Slot in which this item can be equipped. This is automatically set if the item is a vanilla armor piece.\nExample: `material: IRON_HELMET` will automatically set `slot: HEAD`.",
+                            "enum": [
+                                "HEAD",
+                                "CHEST",
+                                "LEGS",
+                                "FEET"
+                            ],
+                        },
+                        "camera_overlay_id": {
+                            "type": "string",
+                            "markdownDescription": "(optional): namespaced ID of the overlay texture to use when equipped. Example: `minecraft:misc/pumpkinblur` (which addresses `assets/minecraft/textures/misc/pumpkinblur.png`)."
+                        },
+                        "sound": {
+                            "type": "string",
+                            "markdownDescription": "(optional): sound to play when equipped. Example: `minecraft:item.armor.equip_iron`."
+                        },
+                        "dispensable": {
+                            "type": "boolean",
+                            "markdownDescription": "(default: `true`), whether the item can be equipped by using a Dispenser."
+                        },
+                        "swappable": {
+                            "type": "boolean",
+                            "markdownDescription": "boolean (default: `true`), whether the item can be equipped into the relevant slot by right-clicking."
+                        },
+                        "allowed_entities": {
+                            "type": "array",
+                            "markdownDescription": "(optional): Entity ID, Entity Tag, or list of Entity IDs to limit which entities can equip this item\nIf not specified, any entity (that can wear this kind of equipment) is allowed to equip this item",
+                            "items": {
+                                "markdownDescription": "**Accepts only vanilla mobs**",
+                                "$ref": "#/$defs/bukkit_entity_type"
+                            }
+                        },
+                        "damage_on_hurt": {
+                            "type": "boolean",
+                            "markdownDescription": "(default: `true`), whether this item will be damaged when the wearing entity is damaged."
+                        },
+                        "slot_attribute_modifiers": {
+                            "markdownDescription": "(optional) Attribute modifiers to be applied when equipped on the previously specified `slot`.",
+                            "$ref": "#/$defs/attribute_modifiers"
+                        },
+                        "glider": {
+                            "type": "boolean",
+                            "markdownDescription": "(default: `false`), whether this item can be used to glide (without the ELytra)."
+                        }
+                    }
+                },
+                "tooltip_style": {
+                    "type": "string",
+                    "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nNamespaced ID for a tooltip style. If present, this item can use custom sprites for its tooltip background and frame.\n`<namespace>:tooltip/<path>_background` and `<namespace>:tooltip/<path>_frame`. Example: `my_items:special_sword`"
+                },
                 "fire_resistant": {
                     "type": "boolean",
                     "markdownDescription": "If the item is fire resistant, like nethgerite items."
@@ -5608,7 +5712,12 @@ export const schemas = {
                 },
                 "glint": {
                     "type": "boolean",
-                    "markdownDescription": "If the item should have the enchantment glint."
+                    "markdownDescription": "Overrides the enchantment glint effect on an item.\nIf `true`, an item without an enchantment glint will display a glint.\nIf `false`, an item with a glint will not display this glint (either from enchantments or intrinsic properties of the item)."
+                },
+                "enchantment_glint_override": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "markdownDescription": "Overrides the enchantment glint effect on an item.\nIf `true`, an item without an enchantment glint will display a glint.\nIf `false`, an item with a glint will not display this glint (either from enchantments or intrinsic properties of the item)."
                 },
                 "enchants": {
                     "markdownDescription": "Set default enchants to this item.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html\n\nYou can set also the enchant level, for example: \n- DIG_SPEED:5\n\nYou can also set other plugins enchants (if they provide your the ID), for example:- my_custom_plugin:custom_enchant:6\n- blast_mining:1\n",

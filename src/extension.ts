@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 import {schemas} from "./schemas";
 const yaml = require('js-yaml');
+import * as YAML from 'yaml';
 
 const SCHEMA = "ia-schema";
 let activeEditor : vscode.TextEditor | undefined = undefined;
@@ -14,7 +15,6 @@ let neverWarnAboutCopilot = config.get('neverWarnAboutCopilot');
 
 let wasWordBasedSuggestionsEnabled : any = null;
 let wasCopilotEnabled : any = null;
-
 
 function getYamlParentPath(document: vscode.TextDocument, position: vscode.Position): string[] {
 	const text = document.getText();
@@ -267,7 +267,9 @@ export async function activate(context: vscode.ExtensionContext) {
 		color: "#20812d"
 	});
 	const grayAreaDecoType = vscode.window.createTextEditorDecorationType({
-		backgroundColor: "rgba(18, 18, 18, 0.75)"
+		backgroundColor: "rgba(0, 0, 0, 0.3)",
+		opacity: "0.7",
+		isWholeLine: true,
 	});
 
 	const diagnostics = vscode.languages.createDiagnosticCollection('ia_diagnostics');
@@ -320,7 +322,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-	
+
+		
+		const text = activeEditor.document.getText();
+		const doc = YAML.parseDocument(text);
+
 		decorateGenericTexts(activeEditor, "Template item", /    template\: true/g, templateTextDeco);
 		decorateGenericTexts(activeEditor, "Variant item", /    variant_of\:/g, variantTextDeco);
 
@@ -330,16 +336,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		// NOTE: ACACIA_BOAT causes issues because it's available on both materials and entities.
 		// For this reason it doesn't show at all.
-		decorateEnums(activeEditor, "Vanilla material", schemas.$defs.bukkit_materials.enum, typesDecos.materials);
-		decorateEnums(activeEditor, "Vanilla entity type", schemas.$defs.bukkit_entity_type.enum, typesDecos.entities);
+		decorateEnums(doc, text, activeEditor, "Vanilla material", schemas.$defs.bukkit_materials.enum, typesDecos.materials);
+		decorateEnums(doc, text, activeEditor, "Vanilla entity type", schemas.$defs.bukkit_entity_type.enum, typesDecos.entities);
 	
 		decorateGenericTexts(activeEditor, "This property is **enabled**", / true/g, greenTextDeco);
 	
 		decorateGenericTexts(activeEditor, "This property is **disabled**", / false/g, grayTextDeco);
 	
 		decorateBackgroundTextBlocks(activeEditor, "### This element is disabled.", `enabled: false`, grayAreaDecoType);
+		decorateBackgroundItemsAlternated(activeEditor);
 
-		handleForcedDiagnostics(activeEditor, diagnostics, diagnosticsArr);
+		handleForcedDiagnostics(doc, text, activeEditor, diagnostics, diagnosticsArr);
 	}
 	
 	function triggerUpdateDecorations(throttle = false) {
@@ -362,10 +369,10 @@ export async function activate(context: vscode.ExtensionContext) {
 		handleDocumentRefresh(document);
 	});
 
-	// High frequency event.
+	// High frequency event!
 	vscode.workspace.onDidChangeTextDocument(function(e) {
-		//console.log("Document changed!");
-		//handleDocumentRefresh(e.document);
+		console.log("Document changed!");
+		handleDocumentRefresh(e.document);
     });
 
 	vscode.workspace.onDidOpenTextDocument(function(document) {
@@ -536,75 +543,98 @@ function onRequestSchemaContent(schemaUri: string): string | undefined {
  * @param diagnostics the diagnostics object
  * @param diagnosticsArr the diagnostics array
  */
-function handleForcedDiagnostics(activeEditor : vscode.TextEditor, diagnostics : vscode.DiagnosticCollection, diagnosticsArr : vscode.Diagnostic[]) {
+function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: string, activeEditor: vscode.TextEditor, diagnostics: vscode.DiagnosticCollection, diagnosticsArr: vscode.Diagnostic[]) {
 	diagnostics.clear();
 	diagnosticsArr = [];
 
-	const text = activeEditor.document.getText();
-	let yy : any = null;
-	try
-	{
-		yy = yaml.load(text);
-		if(!yy?.items) {
-			return;
-		}
-	}
-	catch(ex : any)
-	{
-		//console.log(ex);
-		//vscode.window.showErrorMessage('Error parsing ItemsAdder yml configuration!', ex.message);
-		return;
-	}
+	const node = doc.get('items', true);
 
-	Object.keys(yy.items).forEach((key : any) => {
-		let value = yy.items[key];
+	if (node && YAML.isCollection(node)) {
+		node.items.forEach((pair: any) => {
+			if (!YAML.isPair(pair) || !YAML.isMap(pair.value)) {
+				return;
+			}
 
-		//#region Handle `material` property in `resource`.
-		// Must underline the resources to warn about the missing material property and are not custom armors
-		if(!value?.resource?.material && !value?.specific_properties?.armor) {
-			// Search for the specified item key. 
-			// Warning: this might find the wrong thing if there is something else with the same key name before the items list. //TODO: FIX THIS
-			let matchItem;
-			let regexItem = new RegExp("  " + key + ":", "g");
-			while ((matchItem = regexItem.exec(text))) {
-				// Search for the nearest "resource" property to underline it. No need to loop it, stop at the first found one.
-				let match2;
-				let regEx2 = new RegExp("    resource:", "g");
-				if ((match2 = regEx2.exec(text.substring(matchItem.index)))) {
-					const startPos = activeEditor.document.positionAt(4 + matchItem.index + match2.index); // 4spaces in front of "resource:"
-					const endPos = activeEditor.document.positionAt(matchItem.index + match2.index + match2[0].length);
-					
-					const diagnostic = new vscode.Diagnostic(new vscode.Range(startPos, endPos), "Missing `material` property for `resource`", vscode.DiagnosticSeverity.Error);
+			const item = pair.value; // Prendi il valore effettivo del Pair (l'oggetto)
+
+			const resourceNode = item.get('resource'); // Non serve il secondo argomento
+			if (!resourceNode || !YAML.isMap(resourceNode)) {
+				return;
+			}
+
+			const specificPropertiesNode = item.get('specific_properties');
+
+			const hasTexture = resourceNode.has('texture');
+			const hasTextures = resourceNode.has('textures');
+			const hasModelPath = resourceNode.has('model_path');
+
+			if (hasTexture && hasTextures) {
+				if (resourceNode.range) {
+					const startPos = activeEditor.document.positionAt(resourceNode.range[0]);
+					const endPos = activeEditor.document.positionAt(resourceNode.range[1]);
+					const diagnostic = new vscode.Diagnostic(
+						new vscode.Range(startPos, endPos),
+						"Use either `texture` or `textures` property, not both.",
+						vscode.DiagnosticSeverity.Error
+					);
 					diagnosticsArr.push(diagnostic);
 				}
 			}
-		}
-		//#endregion
-	});
+
+			if (hasModelPath && (hasTexture || hasTextures)) {
+				if (resourceNode.range) {
+					const startPos = activeEditor.document.positionAt(resourceNode.range[0]);
+					const endPos = activeEditor.document.positionAt(resourceNode.range[1]);
+					const diagnostic = new vscode.Diagnostic(
+						new vscode.Range(startPos, endPos),
+						"Do not use `texture` or `textures` property when `model_path` is specified.",
+						vscode.DiagnosticSeverity.Error
+					);
+					diagnosticsArr.push(diagnostic);
+				}
+			}
+
+			const armorNode = YAML.isMap(specificPropertiesNode) ? specificPropertiesNode.get('armor', true) : null;
+
+			// `material` property is mandatory. Only if the item is a legacy armor piece, the `material` property is not mandatory.
+			if (!resourceNode.has("material") && !armorNode) {
+				if (resourceNode.range) {
+					const startPos = activeEditor.document.positionAt(resourceNode.range[0]);
+					const endPos = activeEditor.document.positionAt(resourceNode.range[1]);
+					const diagnostic = new vscode.Diagnostic(
+						new vscode.Range(startPos, endPos),
+						"Missing `material` property!",
+						vscode.DiagnosticSeverity.Error
+					);
+					diagnosticsArr.push(diagnostic);
+				}
+			}
+		});
+	}
 
 	//#region Handle `flow` and allow only one flow rule. 
 	let regEx = new RegExp("(.*)flow:", "g");
 	let allLines = text.split("\n");
 	regexLines(text, regEx, (entry) => {
-		if(!entry) {
+		if (!entry) {
 			return false;
 		}
 
 		let lines = allLines.slice(entry.line);
 		let count = 0;
-		for(let i = 1; i < lines.length; i++) {
+		for (let i = 1; i < lines.length; i++) {
 			let line = lines[i];
-			if(new RegExp("(.*)(skip|stop)_if(.*)(_success|_fail):", "g").test(line)) {
+			if (new RegExp("(.*)(skip|stop)_if(.*)(_success|_fail):", "g").test(line)) {
 				count++;
 			} else {
 				// To detect if reached the end of the current action.
-				if(count > 0) {
+				if (count > 0) {
 					break;
 				}
 			}
 		}
 
-		if(count > 1) {
+		if (count > 1) {
 			const range = activeEditor.document.lineAt(entry.line).range;
 			const diagnostic = new vscode.Diagnostic(
 				new vscode.Range(range.start.translate(0, entry.text.search(/\S/)), range.end),
@@ -636,14 +666,10 @@ function decorateGenericTexts(activeEditor : vscode.TextEditor, description : st
 	activeEditor.setDecorations(decorationType, appliedDecorations);
 }
 
-function decorateEnums(activeEditor : vscode.TextEditor, description : string, enumsSchema: any[], decos : any) {
-
-	const text = activeEditor.document.getText();
-
+function decorateEnums(doc: YAML.Document.Parsed<any, true>, text: string, activeEditor : vscode.TextEditor, description : string, enumsSchema: any[], decos : any) {
+	// This is dirty and has false positives but it is the fastest way to avoid iterating through the whole entries of the YAML structure.
 	enumsSchema.forEach(element => {
-
 		decos.data[element] = [];
-
 		// Space is important to match the property after : only and not random texts containing the enum.
 		// For example it will match `property: ZOMBIE` and not `RANDOMSTRINGZOMBIE1234`.
 		// var regEx = new RegExp(" " + element + "\n", 'g');
@@ -702,11 +728,13 @@ function decorateBackgroundTextBlocks(activeEditor: vscode.TextEditor, descripti
 					const currentIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
 
 					// Skip empty lines (they don't count as block delimiters)
-					if (lines[i].trim() === '') continue;
+					if (lines[i].trim() === '') {
+						continue;
+					}
 
 					// If a line has the same indentation as the parent, stop there
 					if (currentIndentation === parentIndentation) {
-							endPos = new vscode.Position(i, 0);
+							endPos = new vscode.Position(i - 1, 0);
 							break;
 					}
 			}
@@ -716,6 +744,85 @@ function decorateBackgroundTextBlocks(activeEditor: vscode.TextEditor, descripti
 	}
 
 	activeEditor.setDecorations(decorationType, appliedDecorations);
+} 
+
+const prevDecorationsAlternated: vscode.TextEditorDecorationType[] = [];
+
+function decorateBackgroundItemsAlternated(activeEditor: vscode.TextEditor) {
+	if (!activeEditor) {
+			return;
+	}
+
+	// Dispose of the previous decorations
+	prevDecorationsAlternated.forEach(decoration => decoration.dispose());
+
+	const text = activeEditor.document.getText();
+	const lines = text.split('\n');
+
+	// Find the line where "items:" is declared
+	const itemsLine = lines.findIndex(line => line.trim() === 'items:');
+	if (itemsLine === -1) {
+			return;
+	}
+
+	// Find all the lines with the indentation level of "  ". Save them in an array with start and end.
+	const itemsRanges: { start: number, end: number }[] = [];
+	let currentIndentation = 0;
+	let currentItemStart = -1;
+
+	for (let i = itemsLine + 1; i < lines.length; i++) {
+		const line = lines[i];
+		const lineIndentation = line.match(/^(\s*)/)?.[0].length ?? 0;
+
+		if (lineIndentation === 2 && currentItemStart !== -1) {
+			itemsRanges.push({ start: currentItemStart, end: i });
+			currentItemStart = i;
+		} else if (lineIndentation === 2) {
+			currentItemStart = i;
+		} else if (lineIndentation < 2 && currentItemStart !== -1) {
+			itemsRanges.push({ start: currentItemStart, end: i });
+			currentItemStart = -1;
+		}
+	}
+
+	// If there's an open item at the end of the document, close it
+	if (currentItemStart !== -1) {
+		itemsRanges.push({ start: currentItemStart, end: lines.length });
+	}
+
+	const decorationsA: vscode.DecorationOptions[] = [];
+	const decorationsB: vscode.DecorationOptions[] = [];
+
+	const isLightTheme = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Light;
+	const decorationTypeA = vscode.window.createTextEditorDecorationType({
+		backgroundColor: isLightTheme ? "rgba(255, 0, 170, 0.2)" : "rgba(255, 0, 170, 0.03)",
+		isWholeLine: true,
+	});
+	const decorationTypeB = vscode.window.createTextEditorDecorationType({
+		backgroundColor: isLightTheme ? "rgba(132, 0, 255, 0.2)" : "rgba(0, 238, 255, 0.03)",
+		isWholeLine: true,
+	});
+
+	prevDecorationsAlternated.push(decorationTypeA, decorationTypeB);
+
+	// Apply decorations to every other item with alternating colors
+	itemsRanges.forEach((entry, index) => {
+		for (let i = entry.start; i < entry.end; i++) {
+			const lineText = lines[i];
+			const firstNonWhitespaceIndex = lineText.search(/\S/);
+			const startPos = new vscode.Position(i, firstNonWhitespaceIndex !== -1 ? firstNonWhitespaceIndex : 0);
+			const endPos = new vscode.Position(i, lineText.length);
+			const decoration = { range: new vscode.Range(startPos, endPos) };
+			if(index % 2 === 0) {
+				decorationsA.push(decoration);
+			} else {
+				decorationsB.push(decoration);
+			}
+		}
+
+		activeEditor.setDecorations(decorationTypeA, decorationsA);
+		activeEditor.setDecorations(decorationTypeB, decorationsB);
+	});
 }
 
 function regexLines(str : string, re : RegExp, x: (obj : any) => boolean) {
