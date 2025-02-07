@@ -316,6 +316,17 @@ export const schemas = {
             "properties": {
                 "my_rendering": { "type": "object", "$ref": "#/$defs/armors_rendering_entry" }
             }
+        },
+        "equipments": {
+            "type": "object",
+            "markdownDescription": "Create custom equipments.",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/equipments_entry"
+            },
+            "properties": {
+                "my_equipment": { "type": "object", "$ref": "#/$defs/equipments_entry" }
+            }
         }
     },
     "$defs": {
@@ -9126,6 +9137,29 @@ attribute_modifiers:
                         }
                     }
                 }
+            }
+        },
+        "equipments_entry": {
+            "$id": "equipments_entry",
+            "markdownDescription": "Custom equipment rendering",
+            "type": "object",
+            "kind": 2,
+            "detail": "(object)",
+            "required": ["layer_1", "layer_2"],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "markdownDescription": "Available types: `armor`. More will be implemented in the future.",
+                    "enum": ["armor"]
+                },
+                "layer_1": {
+                    "type": "string",
+                    "markdownDescription": "The path to the texture for the first layer of this equipment"
+                },
+                "layer_2": {
+                    "type": "string",
+                    "markdownDescription": "The path to the texture for the second layer of this equipment"
+                },
             }
         },
         "entity": {
