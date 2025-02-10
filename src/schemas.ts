@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 export const schemas = {
-    "$id": "ia-schema",
-    "$schema": "file://ia-schema/schema.json",
+    "$id": "itemsadder://schema/itemsadder-resource",
+    "title": "ItemsAdder Resource",
     "type": "object",
     "required": [
         "info"
@@ -5711,7 +5711,7 @@ attribute_modifiers:
                 },
                 "tooltip_style": {
                     "type": "string",
-                    "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nNamespaced ID for a tooltip style. If present, this item can use custom sprites for its tooltip background and frame.\n`<namespace>:tooltip/<path>_background` and `<namespace>:tooltip/<path>_frame`. Example: `my_items:special_sword`"
+                    "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nNamespaced ID for a tooltip style. If present, this item can use custom sprites for its tooltip background and frame.\n`<namespace>:tooltip/<path>_background` and `<namespace>:tooltip/<path>_frame`.\n## Example:\n`my_items:tooltip/red` requires `my_items/textures/tooltip/red_frame.png` and `my_items/textures/tooltip/red_background.png`."
                 },
                 "fire_resistant": {
                     "type": "boolean",

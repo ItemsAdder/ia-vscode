@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 import {schemas} from "./schemas";
-const yaml = require('js-yaml');
 import * as YAML from 'yaml';
 
-const SCHEMA = "ia-schema";
+const SCHEME = "itemsadder";
+const JSON_SCHEMA = JSON.stringify(schemas);
+
 let activeEditor : vscode.TextEditor | undefined = undefined;
-let schemaJSON = "";
-let iaDocuments: string[] = [];
+
+let cachedIsIaFile: string[] = [];
 let timeout: NodeJS.Timer | undefined = undefined;
 
 const config = vscode.workspace.getConfiguration('ia-vscode');
@@ -76,12 +77,30 @@ export async function activate(context: vscode.ExtensionContext) {
 	wasWordBasedSuggestionsEnabled = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
 	wasCopilotEnabled = getCopilot();
 
-	schemaJSON = JSON.stringify(schemas);
 	const vscodeYaml = vscode.extensions.getExtension("redhat.vscode-yaml");
 	if(vscodeYaml)
 	{
 		const yamlExtensionAPI = await vscodeYaml.activate();
-		yamlExtensionAPI.registerContributor(SCHEMA, onRequestSchemaURI, onRequestSchemaContent);
+		yamlExtensionAPI.registerContributor(SCHEME, (resource : string) => {
+			if(!resource.endsWith('.yml')) {
+				return undefined;
+			}
+			if(!cachedIsIaFile.includes(decodeURI(resource))) {
+				return undefined;
+			}
+			return `${SCHEME}://schema/itemsadder-resource`;
+		}, (schemaUri : string) => {
+			const parsedUri = Uri.parse(schemaUri);
+			if (parsedUri.scheme !== SCHEME) {
+				return undefined;
+			}
+			if (!parsedUri.path || !parsedUri.path.startsWith('/')) {
+				return undefined;
+			}
+			return Promise.resolve(JSON_SCHEMA);
+		}, "ItemsAdder Resource");
+
+		console.log("Registered YAML schema for ItemsAdder Resources.");
 	}
 
 	function addSuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
@@ -322,7 +341,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (!activeEditor) {
 			return;
 		}
-
 		
 		const text = activeEditor.document.getText();
 		const doc = YAML.parseDocument(text);
@@ -391,13 +409,13 @@ export async function activate(context: vscode.ExtensionContext) {
 				setWordBasedSuggestions(false);
 				await setCopilot(false);
 
-				if(!iaDocuments.includes(uri)) {
+				if(!cachedIsIaFile.includes(uri)) {
 					vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
-					iaDocuments.push(uri);
+					cachedIsIaFile.push(uri);
 				}
 			} else {
 				// Remove from array
-				iaDocuments = iaDocuments.filter(function(a){return a !== uri;});
+				cachedIsIaFile = cachedIsIaFile.filter(function(a){return a !== uri;});
 			}
 	}
 
@@ -509,32 +527,11 @@ async function restoreOriginalSettings() {
  * @returns 
  */
 function isIaFile(document: vscode.TextDocument) {
-	if(iaDocuments.length === 0) {
+	if(cachedIsIaFile.length === 0) {
 		return false;
 	}
 	const uri = decodeURI(document.uri.toString());
-	return iaDocuments.includes(uri);
-}
-
-function onRequestSchemaURI(resource: string): string | undefined {
-	if(!resource.endsWith('.yml')) {
-		return undefined;
-	}
-	if(!iaDocuments.includes(decodeURI(resource))) {
-		return undefined;
-	}
-	return `${SCHEMA}://schema/ItemsAdder`;
-}
-
-function onRequestSchemaContent(schemaUri: string): string | undefined {
-	const parsedUri = Uri.parse(schemaUri);
-	if (parsedUri.scheme !== SCHEMA) {
-		return undefined;
-	}
-	if (!parsedUri.path || !parsedUri.path.startsWith('/')) {
-		return undefined;
-	}
-	return schemaJSON;
+	return cachedIsIaFile.includes(uri);
 }
 
 /**

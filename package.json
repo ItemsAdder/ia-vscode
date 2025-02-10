@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -17,12 +17,6 @@
   },
   "categories": [
     "Other"
-  ],
-  "activationEvents": [
-    "onLanguage:yaml"
-  ],
-  "extensionDependencies": [
-    "redhat.vscode-yaml"
   ],
   "main": "./out/extension.js",
   "scripts": {
@@ -47,10 +41,23 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0",
     "yaml": "^2.7.0"
   },
+  "activationEvents": [
+    "onLanguage:yaml"
+  ],
+  "extensionDependencies": [
+    "redhat.vscode-yaml"
+  ],
   "contributes": {
+    "languages": [
+      {
+        "id": "yaml",
+        "aliases": ["ItemsAdder Resource"],
+        "extensions": [".yml"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
     "configuration": {
       "title": "IA VS Code Extension",
       "properties": {
