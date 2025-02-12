@@ -307,6 +307,23 @@ export const schemas = {
         },
         "armors_rendering": {
             "$id": "armors_rendering",
+            "markdownDescription": "(**OLD NAME**, use the new `legacy_armor_renderings` instead) Create legacy custom armors rendering which use shaders to show custom textures.",
+            "type": "object",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/armors_rendering_entry"
+            },
+            "properties": {
+                "my_rendering": { "type": "object", "$ref": "#/$defs/armors_rendering_entry" }
+            },
+            "deprecated": true, 
+            "doNotSuggest": true
+        },
+        "legacy_armor_renderings": {
+            "$id": "armors_rendering",
+            "markdownDescription": "Create legacy custom armors rendering which use shaders to show custom textures.",
             "type": "object",
             "kind": 5,
             "detail": "(collection)",
@@ -5671,6 +5688,10 @@ attribute_modifiers:
                             "type": "string",
                             "markdownDescription": "Equipment ID. Must be a valid ID of an equipment created under the `equipments` section."
                         },
+                        "legacy_armor_rendering_id": {
+                            "type": "string",
+                            "markdownDescription": "Legacy armor rendering ID. Must be a valid ID of a legacy armor rendering created under the `legacy_armor_renderings` section."
+                        },
                         "slot": {
                             "type": "string",
                             "markdownDescription": "Slot in which this item can be equipped. This is automatically set if the item is a vanilla armor piece.\nExample: `material: IRON_HELMET` will automatically set `slot: HEAD`.",
@@ -9132,6 +9153,7 @@ attribute_modifiers:
                 },
                 "color": {
                     "kind": 19,
+                    "markdownDescription": "The color to be used by the shader to identify the texture. This is used as an ID.",
                     "default": "ff0000",
                     "anyOf": [
                         {
