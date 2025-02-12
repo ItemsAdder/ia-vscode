@@ -5434,8 +5434,11 @@ attribute_modifiers:
             "$id": "item",
             "markdownDescription": "Custom item",
             "type": "object",
-            "required": ["resource", "name"],
             "additionalProperties": true,
+            "anyOf": [
+                { "required": ["resource", "name"] },
+                { "required": ["resource", "display_name"] }
+            ],
             "properties": {
                 "enabled": {
                     "markdownDescription": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
