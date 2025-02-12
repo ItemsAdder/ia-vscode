@@ -5666,7 +5666,6 @@ attribute_modifiers:
                 "equipment": {
                     "type": "object",
                     "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nIf present, this item can be equipped by players in the selected slot.",
-                    "required": ["id"],
                     "properties": {
                         "id": {
                             "type": "string",
