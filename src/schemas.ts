@@ -143,7 +143,8 @@ export const schemas = {
                 "type": "object",
                 "$ref": "#/$defs/block_populator"
             },
-            "doNotSuggest": true
+            "doNotSuggest": true,
+            "deprecated": true
         },
         "blocks_populators": {
             "type": "object",
@@ -335,13 +336,13 @@ export const schemas = {
             "type": "object",
             "markdownDescription": "These are the vanilla attribute modifiers, you can get more info here https://minecraft.gamepedia.com/Attribute#Attributes_available_on_all_living_entities",
             "properties": {
-                "attackDamage": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "attackSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "maxHealth": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "movementSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "armor": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "armorToughness": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
-                "attackKnockback": {"$ref": "#/$defs/attribute_modifier", "deprecated": true},
+                "attackDamage": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "attackSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "maxHealth": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "movementSpeed": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "armor": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "armorToughness": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "attackKnockback": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
                 "max_health": {"$ref": "#/$defs/attribute_modifier"},
                 "follow_range": {"$ref": "#/$defs/attribute_modifier"},
                 "knockback_resistance": {"$ref": "#/$defs/attribute_modifier"},
@@ -5308,10 +5309,11 @@ attribute_modifiers:
                     }
                 },
                 "armor": {
+                    "markdownDescription": "Old way of creating custom armors. For Minecraft 1.21.1 and lower.\n\nIf your server accepts 1.21.2 and higher, use the `custom_armor` property instead.",
                     "properties": {
                         "custom_armor": {
                             "type": "string",
-                            "markdownDescription": "Minecraft 1.17+ only!\n\nThis property makes the plugin use the specified 'armors_rendering' textures for this armor piece.\nNote: you must create an 'armors_rendering' setting in order to reference it here. Read more: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-armors/\n\nIf you decide to specify 'custom_armor' you can avoid setting the 'color' property here."
+                            "markdownDescription": "Specify a name from previously created 'armors_rendering' textures for this armor piece.\nRead more: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-armors/\n\nIf you decide to specify 'custom_armor' you can avoid setting the 'color' property here."
                         },
                         "slot": {
                             "type": "string",
@@ -5415,7 +5417,7 @@ attribute_modifiers:
             "$id": "item",
             "markdownDescription": "Custom item",
             "type": "object",
-            "required": ["resource", "display_name"],
+            "required": ["resource", "name"],
             "additionalProperties": true,
             "properties": {
                 "enabled": {
@@ -5435,9 +5437,14 @@ attribute_modifiers:
                     "markdownDescription": "Name of the template you want to use.\nVariants are items that will appear ingame and will inherit properties of template items.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
                 },
                 "display_name": {
-                    "markdownDescription": "Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "markdownDescription": "(**OLD NAME**, use `name` instead). Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
                     "type": "string",
-                    "default": "display-name-",
+                    "doNotSuggest": true,
+                    "deprecated": true
+                },
+                "name": {
+                    "markdownDescription": "Item name.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "type": "string",
                     "kind": 18
                 },
                 "permission_suffix": {
@@ -5473,12 +5480,13 @@ attribute_modifiers:
                         },
                         "custom_model_data": {
                             "type": "integer",
-                            "markdownDescription": "Force the usage of a defined `custom_model_data` (CustomModelData).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                            "markdownDescription": "Force the usage of a defined `custom_model_data` (`CustomModelData`).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
                         },
                         "model_id": {
                             "type": "integer",
                             "markdownDescription": "(**OLD NAME**, use `custom_model_data` instead). If you want to force the usage of a defined `custom_model_data` (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data",
-                            "doNotSuggest": true
+                            "doNotSuggest": true,
+                            "deprecated": true
                         },
                     },
                     "if": {
@@ -5542,12 +5550,14 @@ attribute_modifiers:
                         "max_custom_durability": {
                             "type": "integer",
                             "markdownDescription": "(**OLD NAME**, please use `max_durability`).\nMax durability of the item. If not specified ItemsAdder will use default material max durability",
-                            "doNotSuggest": true
+                            "doNotSuggest": true,
+                            "deprecated": true
                         },
                         "custom_durability": {
                             "type": "integer",
                             "markdownDescription": "(**OLD NAME**, please use `durability`).\nCurrent durability of the item (when crafted or obtained with command).\nIf not specified ItemsAdder will use material max durability (undamaged)",
-                            "doNotSuggest": true
+                            "doNotSuggest": true,
+                            "deprecated": true
                         },
                         "max_durability": {
                             "type": "integer",
@@ -5650,7 +5660,8 @@ attribute_modifiers:
                 "food": {
                     "type": "object",
                     "markdownDescription": "OLD NAME, use `consumable` instead!",
-                    "doNotSuggest": true
+                    "doNotSuggest": true,
+                    "deprecated": true
                 },
                 "equipment": {
                     "type": "object",
@@ -5727,8 +5738,9 @@ attribute_modifiers:
                 },
                 "enchantment_glint_override": {
                     "type": "boolean",
+                    "doNotSuggest": true,
                     "deprecated": true,
-                    "markdownDescription": "Overrides the enchantment glint effect on an item.\nIf `true`, an item without an enchantment glint will display a glint.\nIf `false`, an item with a glint will not display this glint (either from enchantments or intrinsic properties of the item)."
+                    "markdownDescription": "(**OLD NAME**, use `glint` instead). Overrides the enchantment glint effect on an item.\nIf `true`, an item without an enchantment glint will display a glint.\nIf `false`, an item with a glint will not display this glint (either from enchantments or intrinsic properties of the item)."
                 },
                 "enchants": {
                     "markdownDescription": "Set default enchants to this item.\nhttps://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html\n\nYou can set also the enchant level, for example: \n- DIG_SPEED:5\n\nYou can also set other plugins enchants (if they provide your the ID), for example:- my_custom_plugin:custom_enchant:6\n- blast_mining:1\n",
@@ -5754,7 +5766,8 @@ attribute_modifiers:
                 "nbt": {
                     "markdownDescription": "(**OLD NAME**, use `components_nbt_file` instead).\nCustom NBT properties for this custom item. Read here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
                     "type": "string",
-                    "doNotSuggest": true
+                    "doNotSuggest": true,
+                    "deprecated": true
                 },
                 "components_nbt_file": {
                     "markdownDescription": "Path for the custom NBT properties file for this custom item.\nExample: `my_item_nbt.json`.\nRead here for more information: https://itemsadder.devs.beer/plugin-usage/adding-content/advanced/custom-nbt",
@@ -5801,7 +5814,8 @@ attribute_modifiers:
                 "events_cooldown": {
                     "type": "integer",
                     "markdownDescription": "(**OLD NAME** OF THE property `events_settings.cooldown.ticks`.\n\nUse it instead.)",
-                    "doNotSuggest": true
+                    "doNotSuggest": true,
+                    "deprecated": true
                 },
                 "events_settings": {
                     "type": "object",
@@ -5901,7 +5915,8 @@ attribute_modifiers:
                 "permission": {
                     "type": "string",
                     "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead.",
-                    "doNotSuggest": true
+                    "doNotSuggest": true,
+                    "deprecated": true
                 }
             }
         },
@@ -7190,7 +7205,27 @@ attribute_modifiers:
                 },
                 "cancel_drop": {
                     "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players."
+                    "markdownDescription": "(**OLD NAME**, use the new `drop_when_mined` instead.). This option allows you to avoid furniture from being dropped when broken by players.",
+                    "deprecated": true,
+                    "doNotSuggest": true
+                },
+                "drop_when_mined": {
+                    "type": "boolean",
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players.",
+                    "deprecated": true,
+                    "doNotSuggest": true
+                },
+                "drop_on_silk_touch": {
+                    "type": "boolean",
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using silk touch enchantment.",
+                    "deprecated": true,
+                    "doNotSuggest": true
+                },
+                "drop_on_shears": {
+                    "type": "boolean",
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using shears.",
+                    "deprecated": true,
+                    "doNotSuggest": true
                 },
                 "display_transformation": {
                     "type": "object",
@@ -7485,6 +7520,7 @@ attribute_modifiers:
             "type": "object",
             "markdownDescription": "(This is an old feature, it probably will be removed in the future.)\nTells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
             "required": ["ai"],
+            "doNotSuggest": true,
             "deprecated": true,
             "properties": {
                 "enabled": {"type": "boolean"},

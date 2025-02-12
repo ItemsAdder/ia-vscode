@@ -103,10 +103,17 @@ export async function activate(context: vscode.ExtensionContext) {
 		console.log("Registered YAML schema for ItemsAdder Resources.");
 	}
 
-	function addSuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
+	function addEntrySuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
 		const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
 		item.detail = description;
 		item.insertText = `${name}:\n  `;
+		completionItems.push(item);
+	}
+
+	function addTextSuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
+		const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Text);
+		item.detail = description;
+		item.insertText = `${name}`;
 		completionItems.push(item);
 	}
 
@@ -181,7 +188,7 @@ export async function activate(context: vscode.ExtensionContext) {
 											i++;
 										}
 
-										addSuggestion(newKey, markdownDescription, completionItems);
+										addEntrySuggestion(newKey, markdownDescription, completionItems);
 								}
 						});
 					}
@@ -224,7 +231,13 @@ export async function activate(context: vscode.ExtensionContext) {
 									i++;
 								}
 
-								addSuggestion(newKey, markdownDescription, completionItems);
+								addEntrySuggestion(newKey, markdownDescription, completionItems);
+							}
+
+							function isKeyAlreadyUsed(key : string) {
+								// Check if the key was already added to the yaml, in this case append a number to the key.
+								const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+								return alreadyUsedKeys.includes(key);
 							}
 
 							if(path.length === 4 && path[0] === "items" && path[2] === "consumable" && path[3] === "effects") {
@@ -233,6 +246,25 @@ export async function activate(context: vscode.ExtensionContext) {
 								addSuggestionAvoidDuplicate("play_sound");
 							}
 
+							// Suggest example strings for the item name.
+							if(path.length === 3 && path[0] === "items" && path[2] === "name") {
+								const entryId = path[1];
+								// Normalize the entry id to be used as a name. Capitalize each word.
+								const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+								addTextSuggestion(name, "Name shown in the inventory tooltip.", completionItems);
+								addTextSuggestion("item-" + entryId, "Name shown in the inventory tooltip. Uses a dictionary entry, for easier multi-language compatibility.", completionItems);
+								addTextSuggestion("Item", "Name shown in the inventory tooltip.", completionItems);
+							}
+
+							if(path.length === 2 && path[0] === "items") {
+								if(!isKeyAlreadyUsed("name")) {
+									// Normalize the entry id to be used as a name. Capitalize each word.
+									const entryId = path[1];
+									const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+									addTextSuggestion("name: " + name, "Name shown in the inventory tooltip.", completionItems);
+								}
+							}
+							
 							// Todo also add the same for
 							// - "actions" property
 							// - "triggers" property of HUDS
