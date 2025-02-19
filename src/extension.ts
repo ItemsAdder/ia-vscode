@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 import {schemas} from "./schemas";
+import {items as vscodeItemsSuggestions} from "./vscodeSuggestions";
 import * as YAML from 'yaml';
 
 const SCHEME = "itemsadder";
@@ -170,7 +171,7 @@ export async function activate(context: vscode.ExtensionContext) {
 											return;
 										}
 										let markdownDescription = "New entry.";
-										let newKey = key;
+										let newKey = key + "_1";
 										// @ts-ignore
 										const ref = properties[key]?.$ref;
 										if (ref) {
@@ -263,6 +264,19 @@ export async function activate(context: vscode.ExtensionContext) {
 									const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
 									addTextSuggestion("name: " + name, "Name shown in the inventory tooltip.", completionItems);
 								}
+							}
+
+							if(path.length === 1 && path[0] === "items") {
+								vscodeItemsSuggestions.forEach((element : any) => {
+									if(element.devMode && !config.get('devMode')) {
+										return;
+									}
+									const item = new vscode.CompletionItem(element.label, vscode.CompletionItemKind.Class);
+									item.sortText = "~" + element.label;
+									item.detail = element.detail ? element.detail : element.label;
+									item.insertText = YAML.stringify(element.object);
+									completionItems.push(item);
+								});
 							}
 							
 							// Todo also add the same for

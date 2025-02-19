@@ -360,6 +360,11 @@ export const schemas = {
                 "armor": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
                 "armorToughness": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
                 "attackKnockback": {"$ref": "#/$defs/attribute_modifier", "deprecated": true, "doNotSuggest": true,},
+                "attack_damage": {"$ref": "#/$defs/attribute_modifier"},
+                "attack_speed": {"$ref": "#/$defs/attribute_modifier"},
+                "movement_speed": {"$ref": "#/$defs/attribute_modifier"},
+                "armor_toughness": {"$ref": "#/$defs/attribute_modifier"},
+                "attack_knockback": {"$ref": "#/$defs/attribute_modifier"},
                 "max_health": {"$ref": "#/$defs/attribute_modifier"},
                 "follow_range": {"$ref": "#/$defs/attribute_modifier"},
                 "knockback_resistance": {"$ref": "#/$defs/attribute_modifier"},
@@ -5493,7 +5498,7 @@ attribute_modifiers:
                     "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item.\nHowever custom armors do not require this setting.\nCustom armors default item material will be leather if not specified.",
                     "type": "object",
                     "properties": {
-                        "material": {"$ref": "#/$defs/bukkit_materials"},
+                        "material": {"$ref": "#/$defs/bukkit_materials", "default": "PAPER"},
                         "generate": {
                             "type": "boolean",
                             "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
@@ -5711,7 +5716,8 @@ attribute_modifiers:
                         },
                         "sound": {
                             "type": "string",
-                            "markdownDescription": "(optional): sound to play when equipped. Example: `minecraft:item.armor.equip_iron`."
+                            "markdownDescription": "(optional): sound to play when equipped. Example: `minecraft:item.armor.equip_iron`.",
+                            "$ref": "#/$defs/vanilla_and_custom_sound"
                         },
                         "dispensable": {
                             "type": "boolean",
@@ -5805,10 +5811,12 @@ attribute_modifiers:
                         },
                         "glow": {
                             "markdownDescription": "You can make an item glowing when dropped on the ground.\nVery useful for rare items.",
+                            "required": ["enabled"],
                             "properties": {
-                                "enabled": {"type": "boolean"},
+                                "enabled": {"type": "boolean", "default": true},
                                 "color": {
                                     "type": "string",
+                                    "default": "AQUA",
                                     "enum": [
                                         "BLACK",
                                         "DARK_BLUE",
@@ -7234,21 +7242,15 @@ attribute_modifiers:
                 },
                 "drop_when_mined": {
                     "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players.",
-                    "deprecated": true,
-                    "doNotSuggest": true
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players."
                 },
                 "drop_on_silk_touch": {
                     "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using silk touch enchantment.",
-                    "deprecated": true,
-                    "doNotSuggest": true
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using silk touch enchantment."
                 },
                 "drop_on_shears": {
                     "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using shears.",
-                    "deprecated": true,
-                    "doNotSuggest": true
+                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using shears."
                 },
                 "display_transformation": {
                     "type": "object",
