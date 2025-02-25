@@ -5145,8 +5145,22 @@ attribute_modifiers:
                         },
                         "cancel_drop": {
                             "type": "boolean",
-                            "default": false,
-                            "markdownDescription": "Default is `false`. If `true` the custom block won't be dropped when a player mines it"
+                            "markdownDescription": "(**OLD NAME**, use the new `drop_when_mined` instead.). This option allows you to avoid the block from being dropped when broken by players.",
+                            "deprecated": true,
+                            "doNotSuggest": true
+                        },
+                        "drop_when_mined": {
+                            "type": "boolean",
+                            "markdownDescription": "Set if the block should drop when mined by a player.",
+                            "default": true
+                        },
+                        "drop_on_silk_touch": {
+                            "type": "boolean",
+                            "markdownDescription": "Set if the block should drop when mined by a player with silk touch enchanted tool.",
+                        },
+                        "drop_on_shears": {
+                            "type": "boolean",
+                            "markdownDescription": "Set if the block should drop when mined by a player with shears.",
                         },
                         "light_level": {
                             "type": "integer",
@@ -7064,6 +7078,8 @@ attribute_modifiers:
                 "gun": {"$ref": "#/$defs/behaviour.gun"},
                 "furniture_sit": {"$ref": "#/$defs/behaviour.furniture_sit"},
                 "furniture": {"$ref": "#/$defs/behaviour.furniture"},
+                "complex_furniture": {"$ref": "#/$defs/behaviour.complex_furniture"},
+                "entity_summoner": {"$ref": "#/$defs/behaviour.entity_summoner"},
                 "block_trade_machine": {"$ref": "#/$defs/behaviour.trade_machine"},
                 "furniture_trade_machine": {"$ref": "#/$defs/behaviour.trade_machine"},
                 "vehicle": {"$ref": "#/$defs/behaviour.vehicle"},
@@ -7244,14 +7260,6 @@ attribute_modifiers:
                     "type": "boolean",
                     "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players."
                 },
-                "drop_on_silk_touch": {
-                    "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using silk touch enchantment."
-                },
-                "drop_on_shears": {
-                    "type": "boolean",
-                    "markdownDescription": "This option allows you to avoid furniture from being dropped when broken by players using shears."
-                },
                 "display_transformation": {
                     "type": "object",
                     "markdownDescription": "`item_display` property that allows to resize, move or rotate the model freely.",
@@ -7309,6 +7317,106 @@ attribute_modifiers:
                             }
                         }
                     }
+                },
+            }
+        },
+        "behaviour.complex_furniture": {
+            "$id": "behaviour.complex_furniture",
+            "type": "object",
+            "markdownDescription": "Creates a complex furniture using a custom entity. They can be animated and have more rotations steps (not limited to 22.5 degrees).",
+            "properties": {
+                "enabled": {"type": "boolean"},
+                "entity": {
+                    "type": "string",
+                    "markdownDescription": "Custom entity ID",
+                },
+                "static": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) if the model is static, it will not be animated."
+                },
+                "light_level": {
+                    "type": "integer",
+                    "markdownDescription": "Set this to make the furniture emit light.",
+                    "minimum": 1,
+                    "maximum": 15
+                },
+                "solid": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) Solid furniture. Uses BARRIER block to simulate collisions."
+                },
+                "permission_suffix": {
+                    "type": "string",
+                    "markdownDescription": "Partial permission used to allow a player to place/break the complex furniture.\n\nFor example `example.ceiling_fan` is a suffix permission for `ia.user.complex_furniture.break.example.ceiling_fan`."
+                },
+                "sound": {
+                    "properties": {
+                        "break": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        },
+                        "place": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        }
+                    }
+                },
+                "drop_when_mined": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `true`) This option allows you to avoid furniture from being dropped when broken by players."
+                },
+                "max_per_chunk": {
+                    "type": "integer",
+                    "markdownDescription": "Maximum number of complex furniture that can be placed in a chunk. Overrides the `config.yml` setting `max_per_chunk`."
+                },
+                "placement_offset": {
+                    "type": "object",
+                    "markdownDescription": "Offset the placement of the complex furniture.",
+                    "properties": {
+                        "ceiling": {
+                            "type": "number",
+                            "markdownDescription": "Offset the placement of the complex furniture on the ceiling. Can be positive or negative."
+                        },
+                        "floor": {
+                            "type": "number",
+                            "markdownDescription": "Offset the placement of the complex furniture on the floor. Can be positive or negative."
+                        },
+                        "wall": {
+                            "type": "number",
+                            "markdownDescription": "Offset the placement of the complex furniture on the wall. Can be positive or negative."
+                        }
+                    }
+                }
+            }
+        },
+        "behaviour.entity_summoner": {
+            "$id": "behaviour.entity_summoner",
+            "type": "object",
+            "markdownDescription": "Spawn a specific vanilla entity or custom entity on interaction. Similar to the vanilla spawn egg",
+            "properties": {
+                "enabled": {"type": "boolean"},
+                "entity": {
+                    "anyOf": [
+                        {"$ref": "#/$defs/bukkit_entity_type"},
+                        {"type": "string"}
+                    ]
+                },
+                "max_per_chunk": {
+                    "type": "integer",
+                    "markdownDescription": "Maximum number of entities that can be spawned in a chunk."
+                },
+                "decrement_durability": {
+                    "type": "boolean",
+                    "markdownDescription": "Decrement the item durability when the entity is spawned."
+                },
+                "decrement_amount": {
+                    "type": "integer",
+                    "markdownDescription": "(default `1`) amount of durability to decrement when the entity is spawned."
                 },
             }
         },
