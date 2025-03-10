@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.1.17",
+  "version": "0.2.0",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -53,8 +53,12 @@
     "languages": [
       {
         "id": "yaml",
-        "aliases": ["ItemsAdder Resource"],
-        "extensions": [".yml"],
+        "aliases": [
+          "ItemsAdder Resource"
+        ],
+        "extensions": [
+          ".yml"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -72,6 +76,13 @@
           "description": "Enables dev mode for the extension."
         }
       }
-    }
+    },
+    "keybindings": [
+      {
+        "key": "enter",
+        "command": "extension.newLineWithDashAfterArrayEntry",
+        "when": "editorTextFocus && editorLangId == yaml"
+      }
+    ]
   }
 }

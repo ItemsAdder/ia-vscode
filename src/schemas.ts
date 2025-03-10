@@ -5476,13 +5476,13 @@ attribute_modifiers:
                     "markdownDescription": "Name of the template you want to use.\nVariants are items that will appear ingame and will inherit properties of template items.\n\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/advanced/item-properties/basic/templates-and-variants\n\nThis is useful to create items with the same logic but different texture/model, name, lore (for example I use it to create a furniture with different woods without having to copy and paste the \"furniture\" behaviour everytime)."
                 },
                 "display_name": {
-                    "markdownDescription": "(**OLD NAME**, use `name` instead). Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "markdownDescription": "(**OLD NAME**, use `name` instead). Display name of the item.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about translations here: https://itemsadder.devs.beer/plugin-usage/languages",
                     "type": "string",
                     "doNotSuggest": true,
                     "deprecated": true
                 },
                 "name": {
-                    "markdownDescription": "Item name.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about dictionaries here: https://itemsadder.devs.beer/plugin-usage/adding-content/translation",
+                    "markdownDescription": "Item name.\nYou can set a **text** or an identifier from a **dictionary** file.\n\nGet more info about translations here: https://itemsadder.devs.beer/plugin-usage/languages",
                     "type": "string",
                     "kind": 18
                 },
@@ -6249,9 +6249,10 @@ attribute_modifiers:
                     }
                 },
                 "return_items": {
+                    "markdownDescription": "Items to be replaced in the grid after crafting.",
                     "properties": {
                         "decrement_durability": {
-                            "type": "object",
+                            "markdownDescription": "Decrement the durability of a particular item in the grid after crafting.",
                             "additionalProperties": {
                                 "type": "object",
                                 "properties": {
@@ -6263,7 +6264,7 @@ attribute_modifiers:
                             }
                         },
                         "increment_durability": {
-                            "type": "object",
+                            "markdownDescription": "Increment the durability of a particular item in the grid after crafting.",
                             "additionalProperties": {
                                 "type": "object",
                                 "properties": {
@@ -6275,7 +6276,20 @@ attribute_modifiers:
                             }
                         },
                         "replace": {
-                            "type": "object",
+                            "markdownDescription": `Replace a particular item in the grid with another item after crafting..\n## Examples:
+                            \`\`\`
+                            return_items:
+                              replace:
+                                my_item: another_item
+                                
+                            return_items:
+                              replace:
+                                LAVE_BUCKET: BUCKET
+                            \`\`\`
+                            `,
+                            "properties": {
+                                
+                            },
                             "additionalProperties": {
                                 "type": "string",
                                 "$ref": "#/$defs/bukkit_materials_and_customitems"
@@ -6546,50 +6560,6 @@ attribute_modifiers:
                     "properties": {
                         "item": {"$ref": "#/$defs/bukkit_materials_and_customitems"},
                         "amount": {"type": "integer", "default": 1},
-                        "return_items": {
-                            "properties": {
-                                "decrement_durability": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "object",
-                                        "properties": {
-                                            "item": {
-                                                "$ref": "#/$defs/bukkit_materials_and_customitems"
-                                            },
-                                            "amount": {"type": "integer", "default": 1}
-                                        }
-                                    }
-                                },
-                                "increment_durability": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "object",
-                                        "properties": {
-                                            "item": {
-                                                "$ref": "#/$defs/bukkit_materials_and_customitems"
-                                            },
-                                            "amount": {"type": "integer", "default": 1}
-                                        }
-                                    }
-                                },
-                                "replace": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "string",
-                                        "$ref": "#/$defs/bukkit_materials_and_customitems"
-                                    }
-                                },
-                                "play_sound": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"},
-                                        "category": {"$ref": "#/$defs/bukkit_sound_category"},
-                                        "stop_previous": {"type": "boolean"},
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

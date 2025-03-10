@@ -4,10 +4,20 @@ import {schemas} from "./schemas";
 import {items as vscodeItemsSuggestions} from "./vscodeSuggestions";
 import * as YAML from 'yaml';
 
+import * as fs from 'fs';
+import * as path from 'path';
+import * as https from 'https';
+
+const DEBUG = false;
+
 const SCHEME = "itemsadder";
 const JSON_SCHEMA = JSON.stringify(schemas);
 
-let activeEditor : vscode.TextEditor | undefined = undefined;
+const VANILLA_TEXTURES_API_ROOT = 'https://assets.mcasset.cloud/1.21.4/assets/minecraft/textures';
+const DOWNLOAD_VANILLA_TEXTURES_LIST = false; // Set it true when you want to update the list.
+
+let activeEditor : vscode.TextEditor;
+let extContext : vscode.ExtensionContext;
 
 let cachedIsIaFile: string[] = [];
 let timeout: NodeJS.Timer | undefined = undefined;
@@ -18,6 +28,10 @@ let neverWarnAboutCopilot = config.get('neverWarnAboutCopilot');
 let wasWordBasedSuggestionsEnabled : any = null;
 let wasCopilotEnabled : any = null;
 
+let activeDecorationsTextures: vscode.TextEditorDecorationType[] = [];
+
+const VANILLA_TEXTURES_PATHS : any = [];
+
 function getYamlParentPath(document: vscode.TextDocument, position: vscode.Position): string[] {
 	const text = document.getText();
 	const lines = text.split("\n");
@@ -27,22 +41,49 @@ function getYamlParentPath(document: vscode.TextDocument, position: vscode.Posit
 	let currentIndent = position.character;
 
 	for (let i = position.line; i >= 0; i--) {
-			const line = lines[i];
+		const line = lines[i];
 
-			const match = line.match(/^(\s*)([^:]+):/);
-			if (match) {
-					const indent = match[1].length;
-					const key = match[2];
-					// Only add keys that are actual parents based on indentation
-					if (indent < currentIndent) {
-							indentStack.push({ indent, key });
-							currentIndent = indent;
-					}
+		// Handle list elements
+		const arrayMatch = line.match(/^(\s*)-\s+/);
+		if (arrayMatch) {
+			const indent = arrayMatch[1].length;
+			if (indent < currentIndent) {
+				currentIndent = indent;
 			}
+			continue;
+		}
+
+		// Handle `key: value` elements
+		const keyMatch = line.match(/^(\s*)([^:]+):/);
+		if (keyMatch) {
+			const indent = keyMatch[1].length;
+			const key = keyMatch[2];
+
+			if (indent < currentIndent) {
+				indentStack.push({ indent, key });
+				currentIndent = indent;
+			}
+		}
 	}
 
-	// Extract only keys from the stack and reverse to get the correct order
 	path = indentStack.reverse().map(item => item.key);
+
+	// Add the current key if the cursor is on a value line or inside an array
+	const currentLine = lines[position.line];
+	const valueMatch = currentLine.match(/^(\s*)([^:]+):\s*(.*)/);
+	if (valueMatch && valueMatch[3].trim() === '') {
+		path.push(valueMatch[2]);
+	} else if (currentLine.trim().startsWith('-')) {
+		// Find the main key of the array
+		for (let j = position.line - 1; j >= 0; j--) {
+			const lastKeyMatch = lines[j].match(/^(\s*)([^:]+):/);
+			if (lastKeyMatch && !lines[j].trim().startsWith('-')) {
+				path.push(lastKeyMatch[2]);
+				break;
+			}
+		}
+	}
+
 	return path;
 }
 
@@ -74,7 +115,8 @@ function getYamlSameLevelProperties(document: vscode.TextDocument, position: vsc
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-	activeEditor = vscode.window.activeTextEditor;
+	activeEditor = vscode.window.activeTextEditor as vscode.TextEditor;
+	extContext = context;
 	wasWordBasedSuggestionsEnabled = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
 	wasCopilotEnabled = getCopilot();
 
@@ -104,10 +146,97 @@ export async function activate(context: vscode.ExtensionContext) {
 		console.log("Registered YAML schema for ItemsAdder Resources.");
 	}
 
-	function addEntrySuggestion(name: string, description: string, completionItems: vscode.CompletionItem[]) {
-		const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Property);
+	// Insert `-` automatically when pressing ENTER after an array entry, to continue adding entries.
+  context.subscriptions.push(vscode.commands.registerCommand('extension.newLineWithDashAfterArrayEntry', () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+			return;
+		}
+
+    const position = editor.selection.active;
+    const lineText = editor.document.lineAt(position.line).text;
+
+		const indent = lineText.match(/^\s*/)![0];
+		const previousLineText = position.line > 0 ? editor.document.lineAt(position.line - 1).text : '';
+		const insertText = !previousLineText.trim().startsWith('-') ? `\n${indent}` : `\n${indent}- `;
+		editor.edit(editBuilder => {
+			editBuilder.insert(position, insertText);
+		});
+  }));
+
+	try {
+		const vanillaTexturesListJsonPath = context.asAbsolutePath('images/vanilla_textures.json').replace(/\\/g, "/");
+		if (fs.existsSync(vanillaTexturesListJsonPath)) {
+			console.log('Vanilla textures paths already downloaded.');
+			const textures = JSON.parse(fs.readFileSync(vanillaTexturesListJsonPath).toString());
+			textures.forEach((texture: string) => {
+				if (texture.endsWith('.png')) {
+					VANILLA_TEXTURES_PATHS.push(texture);
+				}
+			});
+			console.log('Vanilla textures paths loaded from:', vanillaTexturesListJsonPath);
+		} else {
+			if (!DOWNLOAD_VANILLA_TEXTURES_LIST) {
+				vscode.window.showErrorMessage('Wtf? did you forget to ship the textures list?');
+			}
+		}
+
+		if (DOWNLOAD_VANILLA_TEXTURES_LIST) {
+			vscode.window.showInformationMessage('Downloading vanilla 1.21.4 textures list...');
+
+			const texturesRoots = await fetchJson(`${VANILLA_TEXTURES_API_ROOT}/_list.json`);
+			console.log('JSON scaricato:', texturesRoots);
+
+			async function fetchTexturesRecursively(baseUrl: string, directories: string[]) {
+				for (const dir of directories) {
+					// Include only item, block, entity, gui. I think the other ones are useless.
+					if (!['item', 'block', 'entity', 'gui'].includes(dir)) {
+						continue;
+					}
+
+					const url = `${baseUrl}/${dir}/_list.json`;
+					const textures = await fetchJson(url);
+					console.log(`Textures for ${dir}:`, textures);
+
+					textures.files.forEach((texture: string) => {
+						let fullPath = texture.includes("/") ? texture : `${dir}/${texture}`;
+						// Extract previous directories from baseUrl, after "textures/"
+						const previousDirectories = baseUrl.split('textures/')[1];
+						// Add the previous directories to the texture path
+						fullPath = previousDirectories ? `${previousDirectories}/${fullPath}` : fullPath;
+						console.log('Texture:', fullPath);
+
+						if (fullPath.endsWith('.png')) {
+							VANILLA_TEXTURES_PATHS.push(fullPath);
+						}
+					});
+
+					if (textures.directories && textures.directories.length > 0) {
+						await fetchTexturesRecursively(`${baseUrl}/${dir}`, textures.directories);
+					}
+				}
+			}
+
+			await fetchTexturesRecursively(VANILLA_TEXTURES_API_ROOT, texturesRoots.directories);
+
+			// Save it to the vscode temp folder
+			fs.writeFileSync(vanillaTexturesListJsonPath, JSON.stringify(VANILLA_TEXTURES_PATHS));
+			console.log('Vanilla Textures paths saved to:', vanillaTexturesListJsonPath);
+			vscode.window.showInformationMessage('Vanilla Textures paths saved to:', vanillaTexturesListJsonPath);
+		}
+	} catch (error) {
+		vscode.window.showErrorMessage(`Errore: ${error}`);
+	}
+
+	function addEntrySuggestion(name: string, description: string, completionItems: vscode.CompletionItem[], addNewLine = true, kind = vscode.CompletionItemKind.Property) {
+		const item = new vscode.CompletionItem(name, kind);
 		item.detail = description;
-		item.insertText = `${name}:\n  `;
+		if(addNewLine) {
+			item.insertText = `${name}:\n  `;
+		}
+		else {
+			item.insertText = `${name}: `;
+		}
 		completionItems.push(item);
 	}
 
@@ -195,109 +324,287 @@ export async function activate(context: vscode.ExtensionContext) {
 					}
 				
 					// Function to compare two paths
-					function arraysEqual(arr1: string[], arr2: string[]): boolean {
-							if (arr1.length !== arr2.length) return false;
-							return arr1.every((value, index) => value === arr2[index]);
+				function arraysEqual(arr1: string[], arr2: string[]): boolean {
+					if (arr1.length !== arr2.length) {
+						return false;
 					}
-					
-					// Ensure that properties are suggested only when the full path matches
-					function suggestPropertiesForPath(properties: any, path: string[]) {
-							if (path.length === 0) {
-									addNestedSuggestions(properties, [], []);
-									return;
+					return arr1.every((value, index) => value === arr2[index]);
+				}
+
+				// Ensure that properties are suggested only when the full path matches
+				function suggestPropertiesForPath(properties: any, yamlPath: string[]) {
+					if (yamlPath.length === 0) {
+						addNestedSuggestions(properties, [], []);
+						return;
+					}
+
+					// TODO also handle item actions that have dynamic properties names,
+					// for example `actions.play_sound`, `actions.play_sound_1`, `actions.play_sound_custom_xxx` etc...
+					// This is currently limited as it can't do suggestions for dynamic parents.
+					// In this case I hack it manually because I am lazy and this is a limitation of the current implementation.
+
+					function addSuggestionAvoidDuplicate(key: string) {
+						let markdownDescription = "New Entry.";
+						let newKey = key;
+						// @ts-ignore
+						const ref = properties[key]?.$ref;
+						if (ref) {
+							const refKey = ref.split("/").pop();
+							// @ts-ignore
+							markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
+						}
+
+						// Check if the key was already added to the yaml, in this case append a number to the key.
+						const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+						console.log("Already used keys:", alreadyUsedKeys);
+						let i = 1;
+						while (alreadyUsedKeys.includes(newKey)) {
+							newKey = `${key}_${i}`;
+							i++;
+						}
+
+						addEntrySuggestion(newKey, markdownDescription, completionItems);
+					}
+
+					function isKeyAlreadyUsed(key: string) {
+						// Check if the key was already added to the yaml, in this case append a number to the key.
+						const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+						return alreadyUsedKeys.includes(key);
+					}
+
+					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "consumable" && yamlPath[3] === "effects") {
+						addSuggestionAvoidDuplicate("apply_status_effects");
+						addSuggestionAvoidDuplicate("remove_status_effects");
+						addSuggestionAvoidDuplicate("play_sound");
+					}
+
+					// Suggest example strings for the item name.
+					if (yamlPath.length === 3 && yamlPath[0] === "items" && yamlPath[2] === "name") {
+						const entryId = yamlPath[1];
+						// Normalize the entry id to be used as a name. Capitalize each word.
+						const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+						addTextSuggestion(name, "Name shown in the inventory tooltip.", completionItems);
+						addTextSuggestion("item-" + entryId, "Name shown in the inventory tooltip. Uses a dictionary entry, for easier multi-language compatibility.", completionItems);
+						addTextSuggestion("Item", "Name shown in the inventory tooltip.", completionItems);
+					}
+
+					if (yamlPath.length === 2 && yamlPath[0] === "items") {
+						if (!isKeyAlreadyUsed("name")) {
+							// Normalize the entry id to be used as a name. Capitalize each word.
+							const entryId = yamlPath[1];
+							const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+							addTextSuggestion("name: " + name, "Name shown in the inventory tooltip.", completionItems);
+						}
+					}
+
+					if (yamlPath.length === 1 && yamlPath[0] === "items") {
+						vscodeItemsSuggestions.forEach((element: any) => {
+							if (element.devMode && !config.get('devMode')) {
+								return;
 							}
-					
-							// TODO also handle item actions that have dynamic properties names,
-							// for example `actions.play_sound`, `actions.play_sound_1`, `actions.play_sound_custom_xxx` etc...
-							// This is currently limited as it can't do suggestions for dynamic parents.
-							// In this case I hack it manually because I am lazy and this is a limitation of the current implementation.
+							const item = new vscode.CompletionItem(element.label, vscode.CompletionItemKind.Class);
+							item.sortText = "~" + element.label;
+							item.detail = element.detail ? element.detail : element.label;
+							item.insertText = YAML.stringify(element.object);
+							completionItems.push(item);
+						});
+					}
 
-							function addSuggestionAvoidDuplicate(key : string) {
-								let markdownDescription = "New Entry.";
-								let newKey = key;
-								// @ts-ignore
-								const ref = properties[key]?.$ref;
-								if (ref) {
-										const refKey = ref.split("/").pop();
-										// @ts-ignore
-										markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
-								}
-
-								// Check if the key was already added to the yaml, in this case append a number to the key.
-								const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
-								console.log("Already used keys:", alreadyUsedKeys);
-								let i = 1;
-								while (alreadyUsedKeys.includes(newKey)) {
-									newKey = `${key}_${i}`;
-									i++;
-								}
-
-								addEntrySuggestion(newKey, markdownDescription, completionItems);
+					// Suggest textures
+					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && yamlPath[3] === "texture" || yamlPath[3] === "textures") {
+						// Check if the current line value stars by minecraft:, to avoid pollution of the suggestions.
+						VANILLA_TEXTURES_PATHS.forEach((element: any) => {
+							const elementNoExt = `minecraft:${element}`;
+							const suggestion = new vscode.CompletionItem(element, vscode.CompletionItemKind.File);
+							suggestion.detail = "Vanilla texture";
+							suggestion.label = elementNoExt;
+							suggestion.insertText = elementNoExt;
+							// Check if previous line is an array entry, then add the - in front of the suggestion
+							if (position.line > 0 && !document.lineAt(position.line).text.trim().includes("-") && document.lineAt(position.line - 1).text.trim().startsWith("-")) {
+								suggestion.insertText = "- " + suggestion.insertText;
 							}
 
-							function isKeyAlreadyUsed(key : string) {
-								// Check if the key was already added to the yaml, in this case append a number to the key.
-								const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
-								return alreadyUsedKeys.includes(key);
-							}
+							const fullPath = VANILLA_TEXTURES_API_ROOT + "/" + element;
+							suggestion.documentation = new vscode.MarkdownString(`\`assets/minecraft/textures/${element}\`\n\n![Texture Preview](${vscode.Uri.parse(fullPath)}|width=100)`);
+							completionItems.push(suggestion);
+						});
 
-							if(path.length === 4 && path[0] === "items" && path[2] === "consumable" && path[3] === "effects") {
-								addSuggestionAvoidDuplicate("apply_status_effects");
-								addSuggestionAvoidDuplicate("remove_status_effects");
-								addSuggestionAvoidDuplicate("play_sound");
-							}
+						if(!isProjectFile()) {
+							return;
+						}
+						
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (!workspaceFolders) {
+							console.warn('No workspace open.');
+							return;
+						}
 
-							// Suggest example strings for the item name.
-							if(path.length === 3 && path[0] === "items" && path[2] === "name") {
-								const entryId = path[1];
-								// Normalize the entry id to be used as a name. Capitalize each word.
-								const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-								addTextSuggestion(name, "Name shown in the inventory tooltip.", completionItems);
-								addTextSuggestion("item-" + entryId, "Name shown in the inventory tooltip. Uses a dictionary entry, for easier multi-language compatibility.", completionItems);
-								addTextSuggestion("Item", "Name shown in the inventory tooltip.", completionItems);
-							}
+						const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
+						const currentFilePath = document.uri.fsPath;
 
-							if(path.length === 2 && path[0] === "items") {
-								if(!isKeyAlreadyUsed("name")) {
-									// Normalize the entry id to be used as a name. Capitalize each word.
-									const entryId = path[1];
-									const name = entryId.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
-									addTextSuggestion("name: " + name, "Name shown in the inventory tooltip.", completionItems);
-								}
-							}
+						// Get the namespace of the file
+						const namespace = currentFilePath.split("contents\\")[1].split("\\")[0];
+						if (!namespace) {
+							return;
+						}
 
-							if(path.length === 1 && path[0] === "items") {
-								vscodeItemsSuggestions.forEach((element : any) => {
-									if(element.devMode && !config.get('devMode')) {
-										return;
+						// Find all textures in the current project
+						const possiblePaths = [
+							path.join(workspacePath, namespace, 'textures'),
+							path.join(workspacePath, namespace, `assets`, namespace, 'textures'),
+							path.join(workspacePath, namespace, `assets`, 'textures'),
+
+							path.join(workspacePath, namespace, `resourcepack`, `assets`, namespace, 'textures'),
+							path.join(workspacePath, namespace, `resourcepack`, namespace, 'textures'),
+							path.join(workspacePath, namespace, `resourcepack`, 'textures'),
+
+							path.join(workspacePath, namespace, `resource_pack`, `assets`, namespace, 'textures'),
+							path.join(workspacePath, namespace, `resource_pack`, namespace, 'textures'),
+							path.join(workspacePath, namespace, `resource_pack`, 'textures'),
+						];
+
+						if(DEBUG) {
+							console.log("Possible paths:", possiblePaths);
+						}
+
+						function addTexturesFromDirectory(directory: string) {
+							if (fs.existsSync(directory)) {
+								const files = fs.readdirSync(directory);
+								files.forEach((file: any) => {
+									const fullPath = path.join(directory, file);
+									if (fs.statSync(fullPath).isDirectory()) {
+										addTexturesFromDirectory(fullPath);
+									} else if (file.endsWith('.png')) {
+										const suggestion = new vscode.CompletionItem(file, vscode.CompletionItemKind.File);
+										const suggestionText = fullPath.replace(/\\/g, "/").split("textures/")[1];
+										suggestion.label = "- " + suggestionText;
+										suggestion.insertText = suggestionText;
+										// Check if previous line is an array entry, then add the - in front of the suggestion
+										if (position.line > 0 && !document.lineAt(position.line).text.trim().includes("-") && document.lineAt(position.line - 1).text.trim().startsWith("-")) {
+											suggestion.insertText = "- " + suggestion.insertText;
+										}
+
+										const relativePath = path.relative(workspacePath, fullPath);
+										suggestion.documentation = new vscode.MarkdownString(`\`${relativePath}\`\n\n![Texture Preview](${vscode.Uri.file(fullPath)}|width=100)`);
+
+										completionItems.push(suggestion);
 									}
-									const item = new vscode.CompletionItem(element.label, vscode.CompletionItemKind.Class);
-									item.sortText = "~" + element.label;
-									item.detail = element.detail ? element.detail : element.label;
-									item.insertText = YAML.stringify(element.object);
-									completionItems.push(item);
 								});
 							}
-							
-							// Todo also add the same for
-							// - "actions" property
-							// - "triggers" property of HUDS
-							const [currentKey, ...remainingPath] = path;
-							// @ts-ignore
-							if (Object.prototype.hasOwnProperty.call(properties, currentKey)) {
-									const subProperties = properties[currentKey]?.properties;
-									if (subProperties) {
-											suggestPropertiesForPath(subProperties, remainingPath);
-									} else {
-											addNestedSuggestions(properties, path, path);
-									}
-							}
-					}
-				
-					suggestPropertiesForPath(schemas.properties, keyPath);
+						}
 
-					return completionItems;
+						possiblePaths.forEach((element: any) => {
+							addTexturesFromDirectory(element);
+						});
+					}
+
+					// Suggest models
+					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && yamlPath[3] === "model_path") {
+
+						// Todo: suggest vanilla models. Might be useless.
+
+						if(!isProjectFile()) {
+							return;
+						}
+						
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (!workspaceFolders) {
+							console.warn('No workspace open.');
+							return;
+						}
+
+						const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
+						const currentFilePath = document.uri.fsPath;
+
+						// Get the namespace of the file
+						const namespace = currentFilePath.split("contents\\")[1].split("\\")[0];
+						if (!namespace) {
+							return;
+						}
+
+						// Find all textures in the current project
+						const possiblePaths = [
+							path.join(workspacePath, namespace, 'models'),
+							path.join(workspacePath, namespace, `assets`, namespace, 'models'),
+							path.join(workspacePath, namespace, `assets`, 'models'),
+
+							path.join(workspacePath, namespace, `resourcepack`, `assets`, namespace, 'models'),
+							path.join(workspacePath, namespace, `resourcepack`, namespace, 'models'),
+							path.join(workspacePath, namespace, `resourcepack`, 'models'),
+
+							path.join(workspacePath, namespace, `resource_pack`, `assets`, namespace, 'models'),
+							path.join(workspacePath, namespace, `resource_pack`, namespace, 'models'),
+							path.join(workspacePath, namespace, `resource_pack`, 'models'),
+						];
+
+						if(DEBUG) {
+							console.log("Possible paths:", possiblePaths);
+						}
+
+						function addModelsFromDirectory(directory: string) {
+							if (fs.existsSync(directory)) {
+								const files = fs.readdirSync(directory);
+								files.forEach((file: any) => {
+									const fullPath = path.join(directory, file);
+									if (fs.statSync(fullPath).isDirectory()) {
+										addModelsFromDirectory(fullPath);
+									} else if (file.endsWith('.json')) {
+										const suggestion = new vscode.CompletionItem(file, vscode.CompletionItemKind.File);
+										const suggestionText = fullPath.replace(/\\/g, "/").split("models/")[1].replace(".json", "");
+										suggestion.label = suggestionText;
+										suggestion.insertText = suggestionText;
+										// Check if previous line is an array entry, then add the - in front of the suggestion
+										if (position.line > 0 && !document.lineAt(position.line).text.trim().includes("-") && document.lineAt(position.line - 1).text.trim().startsWith("-")) {
+											suggestion.insertText = "- " + suggestion.insertText;
+										}
+
+										const relativePath = path.relative(workspacePath, fullPath);
+										suggestion.documentation = new vscode.MarkdownString(`\`${relativePath}\``);
+
+										completionItems.push(suggestion);
+									}
+								});
+							}
+						}
+
+						possiblePaths.forEach((element: any) => {
+							addModelsFromDirectory(element);
+						});
+					}
+
+					// If under return_items.replace, suggest the keys of the item to replace
+					if (yamlPath.length >= 5 && yamlPath[0] === "recipes" && yamlPath[1] === "crafting_table" && yamlPath[3] === "return_items" && yamlPath[4] === "replace") {
+						// Check if current line is not a key, for example STONE: xxxx
+						const currentLine = document.lineAt(position.line).text;
+						if(currentLine.includes(": ") || currentLine.endsWith(":")) {
+							return;
+						}
+						
+						schemas.$defs.bukkit_materials.enum.forEach((element: any) => {
+							addEntrySuggestion(element, "Material to replace.", completionItems, false, vscode.CompletionItemKind.EnumMember);
+						});
+						// TODO Also suggest custom items.
+					}
+
+					// Todo also add the same for
+					// - "actions" property
+					// - "triggers" property of HUDS
+					const [currentKey, ...remainingPath] = yamlPath;
+					// @ts-ignore
+					if (Object.prototype.hasOwnProperty.call(properties, currentKey)) {
+						const subProperties = properties[currentKey]?.properties;
+						if (subProperties) {
+							suggestPropertiesForPath(subProperties, remainingPath);
+						} else {
+							addNestedSuggestions(properties, yamlPath, yamlPath);
+						}
+					}
 				}
+
+				suggestPropertiesForPath(schemas.properties, keyPath);
+
+				return completionItems;
+			}
 		},
 		''
 	);
@@ -435,12 +742,16 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// High frequency event!
 	vscode.workspace.onDidChangeTextDocument(function(e) {
-		console.log("Document changed!");
+		if(DEBUG) {
+			console.log("Document changed!");
+		}
 		handleDocumentRefresh(e.document);
     });
 
 	vscode.workspace.onDidOpenTextDocument(function(document) {
-		console.log("Document opened!");
+		if(DEBUG) {
+			console.log("Document opened!");
+		}
 		handleDocumentRefresh(document);
 	});
 
@@ -467,7 +778,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.window.onDidChangeActiveTextEditor(async editor => {
 		console.log("Active editor changed!");
-		activeEditor = editor;
+		activeEditor = editor as vscode.TextEditor;
 		if (editor) {
 			if(isIaFile(editor.document)) {
 				setWordBasedSuggestions(false);
@@ -567,6 +878,31 @@ async function restoreOriginalSettings() {
 	}
 }
 
+function isProjectFile() {
+	// Check if the current file is part of a vscode directory project or not
+	if (!vscode.workspace.name) {
+		return false;
+	}
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+	if (!workspaceFolders) {
+		console.warn('No workspace open.');
+		return false;
+	}
+
+	// Check if the currently opened file is part of the project/workspace, because I might also have opened some files that are not in the current project.
+	const currentFilePath = activeEditor.document.uri.fsPath;
+	let isFileInWorkspace = false;
+	for (const folder of workspaceFolders) {
+		const relative = path.relative(folder.uri.fsPath, currentFilePath);
+		if (!relative.startsWith('..') && !path.isAbsolute(relative)) {
+			isFileInWorkspace = true;
+			break;
+		}
+	}
+
+	return isFileInWorkspace;
+}
+
 /**
  * Check if the file is registered
  * @param document
@@ -589,6 +925,16 @@ function isIaFile(document: vscode.TextDocument) {
 function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: string, activeEditor: vscode.TextEditor, diagnostics: vscode.DiagnosticCollection, diagnosticsArr: vscode.Diagnostic[]) {
 	diagnostics.clear();
 	diagnosticsArr = [];
+
+	const fileNamespace = (doc.get('info') as any)?.get("namespace");
+	if(!fileNamespace) {
+		return;
+	}
+
+	activeDecorationsTextures.forEach(decoration => decoration.dispose());
+	activeDecorationsTextures = [];
+
+	const decorations: vscode.DecorationOptions[] = [];
 
 	const node = doc.get('items', true);
 
@@ -652,7 +998,218 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 					diagnosticsArr.push(diagnostic);
 				}
 			}
+
+			checkTextureExistence(resourceNode, fileNamespace, diagnosticsArr);
+			checkModelExistence(resourceNode, fileNamespace, diagnosticsArr);
 		});
+	}
+
+	function checkTextureExistence(resourceNode: any, fileNamespace: string, diagnosticsArr: vscode.Diagnostic[]){
+		
+		if(!isProjectFile()) {
+			return;
+		}
+
+		const workspaceFolders = vscode.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			console.warn('No workspace open.');
+			return;
+		}
+
+		const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
+
+		const textureNode = resourceNode.get('texture', true);
+		const texturesNode = resourceNode.get('textures', true);
+
+		const checkPath = (texturePath: string) => {
+			if(!texturePath || texturePath === "") {
+				return undefined;
+			}
+			if (!texturePath.endsWith('.png')) {
+				texturePath += '.png';
+			}
+			const textureNamespace = texturePath.includes(":") ? texturePath.split(":")[0] : fileNamespace;
+			let texturePathWithoutNamespace = texturePath.includes(":") ? texturePath.split(":")[1] : texturePath;
+
+			if(textureNamespace === "minecraft") {
+				// Check if the texture actually exists, if it returns 404 I will show the missing texture icon.
+				if(VANILLA_TEXTURES_PATHS.includes(texturePathWithoutNamespace)) {
+					return vscode.Uri.parse(`https://assets.mcasset.cloud/1.21.4/assets/minecraft/textures/${texturePathWithoutNamespace}`);
+				}
+				return undefined;
+			}
+
+			const possiblePaths = [
+				path.join(workspacePath, fileNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, fileNamespace, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, fileNamespace, `resourcepack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, fileNamespace, `resourcepack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, fileNamespace, `resource_pack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, fileNamespace, `resource_pack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`)
+			];
+
+			if(DEBUG) {
+				console.log("Possible paths:", possiblePaths);
+				console.log("workspacePath:", workspacePath);
+			}
+
+			for (const filePath of possiblePaths) {
+				if (fs.existsSync(filePath)) {
+					console.log("Texture found:", filePath);
+					return vscode.Uri.file(filePath);
+				}
+			}
+
+			return undefined;
+		};
+
+		const isFileSaved = !activeEditor.document.isDirty;
+
+		if (textureNode) {
+			const texturePath = textureNode.value as string;
+			const foundUri = checkPath(texturePath);
+			const startPos = activeEditor.document.positionAt(textureNode.range[0]);
+			const endPos = activeEditor.document.positionAt(textureNode.range[1]);
+			let decoration;
+			if (!foundUri) {
+				diagnosticsArr.push(new vscode.Diagnostic(
+					new vscode.Range(startPos, endPos),
+					"Texture not found!",
+					isFileSaved ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
+				));
+				decoration = vscode.window.createTextEditorDecorationType({
+					gutterIconPath: extContext.asAbsolutePath('images/missing.png').replace(/\\/g, "/"),
+					gutterIconSize: 'contain'
+				});
+			} else {
+				decoration = vscode.window.createTextEditorDecorationType({
+					gutterIconPath: foundUri,
+					gutterIconSize: 'contain'
+				});
+			}
+
+			decorations.push({ range: new vscode.Range(startPos, endPos) });
+			activeEditor.setDecorations(decoration, decorations);
+			activeDecorationsTextures.push(decoration);
+		} else {
+			if (texturesNode && YAML.isSeq(texturesNode) && texturesNode.range) {
+				texturesNode.items.forEach((item: any) => {
+					const texturePath = item.value as string;
+					const foundUri = checkPath(texturePath);
+					const startPos = activeEditor.document.positionAt(item.range[0]);
+					const endPos = activeEditor.document.positionAt(item.range[1]);
+					let decoration;
+					if (!foundUri) {
+						diagnosticsArr.push(new vscode.Diagnostic(
+							new vscode.Range(startPos, endPos),
+							"Texture not found!",
+							isFileSaved ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
+						));
+						decoration = vscode.window.createTextEditorDecorationType({
+							gutterIconPath: extContext.asAbsolutePath('images/missing.png').replace(/\\/g, "/"),
+							gutterIconSize: 'contain'
+						});
+					} else {
+						decoration = vscode.window.createTextEditorDecorationType({
+							gutterIconPath: foundUri,
+							gutterIconSize: 'contain'
+						});
+					}
+
+					decorations.push({ range: new vscode.Range(startPos, endPos) });
+					activeEditor.setDecorations(decoration, decorations);
+					activeDecorationsTextures.push(decoration);
+				});
+			}
+		}
+		return;
+	}
+
+	function checkModelExistence(resourceNode: any, fileNamespace: string, diagnosticsArr: vscode.Diagnostic[]){
+		
+		if(!isProjectFile()) {
+			return;
+		}
+
+		const workspaceFolders = vscode.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			console.warn('No workspace open.');
+			return;
+		}
+
+		const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
+
+		const modelNode = resourceNode.get('model_path', true);
+
+		const checkPath = (filePath: string) => {
+			if(!filePath || filePath === "") {
+				return undefined;
+			}
+			if (!filePath.endsWith('.json')) {
+				filePath += '.json';
+			}
+			const namespace = filePath.includes(":") ? filePath.split(":")[0] : fileNamespace;
+			let fileNoNamespace = filePath.includes(":") ? filePath.split(":")[1] : filePath;
+
+			if(namespace === "minecraft") {
+				return "minecraft"; // Shit
+			}
+
+			const possiblePaths = [
+				path.join(workspacePath, fileNamespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, fileNamespace, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, fileNamespace, `resourcepack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, fileNamespace, `resourcepack`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, fileNamespace, `resource_pack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, fileNamespace, `resource_pack`, namespace, `models`, `${fileNoNamespace}`)
+			];
+
+			console.log("Possible paths:", possiblePaths);
+			console.log("workspacePath:", workspacePath);
+
+			for (const filePath of possiblePaths) {
+				if (fs.existsSync(filePath)) {
+					console.log("Asset found:", filePath);
+					return vscode.Uri.file(filePath);
+				}
+			}
+
+			return undefined;
+		};
+
+		const isFileSaved = !activeEditor.document.isDirty;
+
+		if (modelNode) {
+			const modelPathProperty = modelNode.value as string;
+			const foundUri = checkPath(modelPathProperty);
+			const startPos = activeEditor.document.positionAt(modelNode.range[0]);
+			const endPos = activeEditor.document.positionAt(modelNode.range[1]);
+			let decoration;
+			if (!foundUri) {
+				diagnosticsArr.push(new vscode.Diagnostic(
+					new vscode.Range(startPos, endPos),
+					"Model not found!",
+					isFileSaved ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
+				));
+				decoration = vscode.window.createTextEditorDecorationType({
+					gutterIconPath: extContext.asAbsolutePath('images/missing.png').replace(/\\/g, "/"),
+					gutterIconSize: 'contain'
+				});
+			} else {
+				if(foundUri === "minecraft") {
+					return;
+				}
+				decoration = vscode.window.createTextEditorDecorationType({
+					gutterIconPath: foundUri,
+					gutterIconSize: 'contain'
+				});
+			}
+
+			decorations.push({ range: new vscode.Range(startPos, endPos) });
+			activeEditor.setDecorations(decoration, decorations);
+			activeDecorationsTextures.push(decoration);
+		}
+		return;
 	}
 
 	//#region Handle `flow` and allow only one flow rule. 
@@ -886,3 +1443,24 @@ function regexLines(str : string, re : RegExp, x: (obj : any) => boolean) {
 		}
 	});
 };
+
+async function fetchJson(url: string): Promise<any> {
+	return new Promise((resolve, reject) => {
+		https.get(url, (response) => {
+			if (response.statusCode !== 200) {
+				return reject(new Error(`Errore nel download: ${response.statusCode}`));
+			}
+
+			let data = '';
+			response.on('data', (chunk) => (data += chunk));
+			response.on('end', () => {
+				try {
+					const jsonData = JSON.parse(data);
+					resolve(jsonData);
+				} catch (error) {
+					reject(new Error('Errore nel parsing JSON'));
+				}
+			});
+		}).on('error', reject);
+	});
+}
