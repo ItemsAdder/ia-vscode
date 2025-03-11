@@ -6553,7 +6553,7 @@ attribute_modifiers:
                         }
                     }
                 },
-                "exp": {"type": "integer"},
+                "exp": {"type": "number"},
                 "cook_time": {"type": "integer"},
                 "result": {
                     "required": ["item"],
