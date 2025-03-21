@@ -5957,6 +5957,10 @@ attribute_modifiers:
                     "markdownDescription": "Permission needed to execute any of the actions of each event.\nIf you want to set a different permission to eachaction you can add the 'permission' attribute on each action instead."
                 },
                 "events": {"type": "object", "$ref": "#/$defs/events"},
+                "click_in_ia_gui": {
+                    "type": "boolean",
+                    "markdownDescription": "If the item can be clicked in the ItemsAdder `/ia` GUI or if it does nothing on click."
+                },
                 "permission": {
                     "type": "string",
                     "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead.",
