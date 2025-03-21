@@ -8882,9 +8882,15 @@ attribute_modifiers:
             "markdownDescription": "A font image, it can be used to create custom emojis, GUIs, HUDs and more.",
             "required": ["path"],
             "properties": {
+                "permission_suffix": {
+                    "type": "string",
+                    "markdownDescription": "Partial permission used to allow a player to use the font image (in signs, books, chat, etc...).\n\nFor example `my_emojis.smile` is a suffix permission for `ia.user.image.use.my_emojis.smile`."
+                },
                 "permission": {
                     "type": "string",
-                    "markdownDescription": "Usage permission for this emoji. States if a player can use the shorthand to write the emoji on signs, books, chat..."
+                    "markdownDescription": "**OLD NAME** OF THE property `permission_suffix`.\n\nUse `permission_suffix` instead.",
+                    "doNotSuggest": true,
+                    "deprecated": true
                 },
                 "show_in_gui": {
                     "type": "boolean",
