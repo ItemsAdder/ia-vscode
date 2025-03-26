@@ -19,14 +19,13 @@ const DOWNLOAD_VANILLA_TEXTURES_LIST = false; // Set it true when you want to up
 let activeEditor : vscode.TextEditor;
 let extContext : vscode.ExtensionContext;
 
-let cachedIsIaFile: string[] = [];
 let timeout: NodeJS.Timer | undefined = undefined;
 
 const config = vscode.workspace.getConfiguration('ia-vscode');
 let neverWarnAboutCopilot = config.get('neverWarnAboutCopilot');
 
-let wasWordBasedSuggestionsEnabled : any = null;
-let wasCopilotEnabled : any = null;
+let originalWordBasedSuggestionsEnabled : any = null;
+let originalCopilotEnabled : any = null;
 
 let activeDecorationsTextures: vscode.TextEditorDecorationType[] = [];
 
@@ -117,8 +116,16 @@ function getYamlSameLevelProperties(document: vscode.TextDocument, position: vsc
 export async function activate(context: vscode.ExtensionContext) {
 	activeEditor = vscode.window.activeTextEditor as vscode.TextEditor;
 	extContext = context;
-	wasWordBasedSuggestionsEnabled = vscode.workspace.getConfiguration('editor').get('wordBasedSuggestions');
-	wasCopilotEnabled = getCopilot();
+	{
+		const settings = vscode.workspace.getConfiguration("[yaml]");
+		const wordBasedSuggestions = settings.inspect("editor.wordBasedSuggestions");
+		originalWordBasedSuggestionsEnabled = wordBasedSuggestions?.globalValue
+			?? wordBasedSuggestions?.workspaceValue
+			?? wordBasedSuggestions?.workspaceFolderValue
+			?? wordBasedSuggestions?.defaultValue;
+	}
+
+	originalCopilotEnabled = getCopilotYaml();
 
 	const vscodeYaml = vscode.extensions.getExtension("redhat.vscode-yaml");
 	if(vscodeYaml)
@@ -128,7 +135,8 @@ export async function activate(context: vscode.ExtensionContext) {
 			if(!resource.endsWith('.yml')) {
 				return undefined;
 			}
-			if(!cachedIsIaFile.includes(decodeURI(resource))) {
+			const document = vscode.workspace.textDocuments.find(doc => doc.uri.toString() === resource);
+			if (document && !isItemsAdderResourceConfig(document)) {
 				return undefined;
 			}
 			return `${SCHEME}://schema/itemsadder-resource`;
@@ -738,31 +746,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	});
 
 	async function handleDocumentRefresh(document: vscode.TextDocument) {
-		// Vscode triggered this shit when I edit an editor config. I have no other way to identify that.
-		if(document.fileName.endsWith('settings.json') && document.uri.scheme === 'file' && document.uri.path.includes('Code')) {
-			return;
+		if(isItemsAdderResourceConfig(document)) {
+			await setWordBasedSuggestions(false);
+			await setCopilot(false);
 		}
-		const uri = decodeURI(document.uri.toString());
-			// Very hacky
-			if(document.lineCount > 0 && document.lineAt(0).text.includes("info:")) {
-				setWordBasedSuggestions(false);
-				await setCopilot(false);
-
-				if(!cachedIsIaFile.includes(uri)) {
-					vscode.window.showInformationMessage('Detected ItemsAdder yml configuration!');
-					cachedIsIaFile.push(uri);
-				}
-			} else {
-				// Remove from array
-				cachedIsIaFile = cachedIsIaFile.filter(function(a){return a !== uri;});
-			}
 	}
 
 	vscode.window.onDidChangeActiveTextEditor(async editor => {
 		console.log("Active editor changed!");
 		activeEditor = editor as vscode.TextEditor;
 		if (editor) {
-			if(isIaFile(editor.document)) {
+			if(isItemsAdderResourceConfig(editor.document)) {
 				setWordBasedSuggestions(false);
 				setCopilot(false);
 				triggerUpdateDecorations();
@@ -774,14 +768,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	vscode.workspace.onDidChangeTextDocument(event => {
 		if (activeEditor && event.document === activeEditor.document) {
-			if(isIaFile(event.document)) {
+			if(isItemsAdderResourceConfig(event.document)) {
 				triggerUpdateDecorations(true);
 			}
 		}
 	}, null, context.subscriptions);
 
 	vscode.workspace.onDidCloseTextDocument(async document => {
-		if(isIaFile(document)) {
+		if(isItemsAdderResourceConfig(document)) {
 			restoreOriginalSettings();
 		}
 	}, null, context.subscriptions);
@@ -791,73 +785,101 @@ export function deactivate() {
 	restoreOriginalSettings();
 }
 
-async function setCopilot(val : boolean) {
-	// Check if it exists
-	const copilotEnable = vscode.workspace.getConfiguration('github.copilot').get<any>('enable');
-	if(copilotEnable) {
-		copilotEnable["yaml"] = val;
-		vscode.workspace.getConfiguration('github.copilot').update('enable', copilotEnable, true);
-	}
+async function setCopilot(val: boolean) {
+	const config = vscode.workspace.getConfiguration();
+	const inspect = config.inspect<any>('github.copilot.enable');
 
-	if(val) {
-		//vscode.window.showInformationMessage('GitHub Copilot re-enabled for YAML!');
-		console.log('GitHub Copilot re-enabled for YAML!');
-	} else {
-		if(!neverWarnAboutCopilot) {
+	const current = inspect?.globalValue
+		?? inspect?.workspaceValue
+		?? inspect?.workspaceFolderValue
+		?? inspect?.defaultValue
+		?? {};
+
+	const newValue = { ...current, yaml: val };
+	await config.update('github.copilot.enable', newValue, vscode.ConfigurationTarget.Global);
+
+	if (!val) {
+		if (!neverWarnAboutCopilot) {
 			const result = await vscode.window.showInformationMessage(
 				'[!] GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct. Please use the CTRL+SPACE shortcut to allow ia-vscode to provide proper autocomplete suggestions.',
-				"OK",
-				"Never Show Again"
+				'OK',
+				'Never Show Again'
 			);
-	
-			if (result === "Never Show Again") {
+
+			if (result === 'Never Show Again') {
 				await config.update('neverWarnAboutCopilot', true, vscode.ConfigurationTarget.Global);
 				neverWarnAboutCopilot = true;
 			}
-			return;
+		} else {
+			console.log('GitHub Copilot temporarily disabled for ItemsAdder YAML.');
 		}
-
-		console.log('GitHub Copilot temporarily disabled for ItemsAdder YAML.');
 	}
 }
 
-function getCopilot() : boolean {
-	// Check if it exists
-	const copilotEnable = vscode.workspace.getConfiguration('github.copilot').get<any>('enable');
-	if(copilotEnable) {
-		if(copilotEnable["yaml"]) {
-			return copilotEnable["yaml"];
-		} else {
-			return true;
+function getCopilotYaml() : boolean | undefined {
+	const inspect = vscode.workspace.getConfiguration('github.copilot').inspect<any>('enable');
+	if(inspect) {
+		if(!inspect?.globalValue?.yaml) {
+			return undefined;
 		}
+		return inspect.globalValue.yaml;
 	}
-	
-	return false;
+	return undefined;
 }
 
 async function setWordBasedSuggestions(val : boolean) {
 	// This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
   // YAML schema entries hard to find in the autocomplete words list.
 	// Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
-	if(wasWordBasedSuggestionsEnabled !== null) {
-		// Global
-		await vscode.workspace.getConfiguration('editor').update('wordBasedSuggestions', val, true);
-		// If it's in a workspace
-		if(vscode.workspace.name) {
-			// Workspace
-			await vscode.workspace.getConfiguration('editor').update('wordBasedSuggestions', val, false);
+	const config = vscode.workspace.getConfiguration();
+	const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
+	if(!val) {
+		yamlSettings["editor.wordBasedSuggestions"] = "off";
+	} else {
+		if(originalWordBasedSuggestionsEnabled !== null) {
+			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
+		} else {
+			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
 		}
 	}
+	await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
 }
 
 async function restoreOriginalSettings() {
-	if(wasWordBasedSuggestionsEnabled !== null) {
-		setWordBasedSuggestions(wasWordBasedSuggestionsEnabled);
+	{
+		const config = vscode.workspace.getConfiguration();
+		const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
+		if(originalWordBasedSuggestionsEnabled !== null) {
+			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
+		} else {
+			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
+		}
+		await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
 	}
 
-	if(wasCopilotEnabled !== null) {
-		await setCopilot(wasCopilotEnabled);
+	{
+		const config = vscode.workspace.getConfiguration();
+		const inspect = config.inspect<any>('github.copilot.enable');
+		if(inspect) {
+			if(originalCopilotEnabled !== undefined && originalCopilotEnabled !== null) {
+				await config.update('github.copilot.enable', {
+					...inspect.globalValue,
+					yaml: originalCopilotEnabled
+				}, vscode.ConfigurationTarget.Global);
+			} else {
+				// If properties are equal to the default ones, I remove the whole property to fallback to the default value.
+				const updatedValue = { ...inspect.globalValue };
+				delete updatedValue.yaml;
+				if (JSON.stringify(updatedValue) === JSON.stringify(inspect.defaultValue)) {
+					await config.update('github.copilot.enable', undefined, vscode.ConfigurationTarget.Global);
+				} else {
+					delete updatedValue.yaml;
+					await config.update('github.copilot.enable', updatedValue, vscode.ConfigurationTarget.Global);
+				}
+			}
+		}
 	}
+	console.log('Restored original settings for YAML!');
 }
 
 function isProjectFile() {
@@ -886,16 +908,22 @@ function isProjectFile() {
 }
 
 /**
- * Check if the file is registered
+ * Check if the file is a ItemsAdder resource configuration.
  * @param document
  * @returns 
  */
-function isIaFile(document: vscode.TextDocument) {
-	if(cachedIsIaFile.length === 0) {
+function isItemsAdderResourceConfig(document: vscode.TextDocument) : boolean {
+	// Vscode triggered this shit when I edit an editor config. I have no other way to identify that.
+	if (document.fileName.endsWith('settings.json') && document.uri.scheme === 'file' && document.uri.path.includes('Code')) {
 		return false;
 	}
+
 	const uri = decodeURI(document.uri.toString());
-	return cachedIsIaFile.includes(uri);
+	// TODO: Might be outdated info. In case I remove the info line during editing the file would be still considered an ItemsAdder config.
+	if (uri.startsWith(`${SCHEME}://`)) {
+		return true;
+	}
+	return (document.lineCount > 0 && document.lineAt(0).text.includes("info:"));
 }
 
 /**

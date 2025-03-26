@@ -50,18 +50,6 @@
     "redhat.vscode-yaml"
   ],
   "contributes": {
-    "languages": [
-      {
-        "id": "yaml",
-        "aliases": [
-          "ItemsAdder Resource"
-        ],
-        "extensions": [
-          ".yml"
-        ],
-        "configuration": "./language-configuration.json"
-      }
-    ],
     "configuration": {
       "title": "IA VS Code Extension",
       "properties": {
