@@ -785,103 +785,6 @@ export function deactivate() {
 	restoreOriginalSettings();
 }
 
-async function setCopilot(val: boolean) {
-	const config = vscode.workspace.getConfiguration();
-	const inspect = config.inspect<any>('github.copilot.enable');
-
-	const current = inspect?.globalValue
-		?? inspect?.workspaceValue
-		?? inspect?.workspaceFolderValue
-		?? inspect?.defaultValue
-		?? {};
-
-	const newValue = { ...current, yaml: val };
-	await config.update('github.copilot.enable', newValue, vscode.ConfigurationTarget.Global);
-
-	if (!val) {
-		if (!neverWarnAboutCopilot) {
-			const result = await vscode.window.showInformationMessage(
-				'[!] GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct. Please use the CTRL+SPACE shortcut to allow ia-vscode to provide proper autocomplete suggestions.',
-				'OK',
-				'Never Show Again'
-			);
-
-			if (result === 'Never Show Again') {
-				await config.update('neverWarnAboutCopilot', true, vscode.ConfigurationTarget.Global);
-				neverWarnAboutCopilot = true;
-			}
-		} else {
-			console.log('GitHub Copilot temporarily disabled for ItemsAdder YAML.');
-		}
-	}
-}
-
-function getCopilotYaml() : boolean | undefined {
-	const inspect = vscode.workspace.getConfiguration('github.copilot').inspect<any>('enable');
-	if(inspect) {
-		if(!inspect?.globalValue?.yaml) {
-			return undefined;
-		}
-		return inspect.globalValue.yaml;
-	}
-	return undefined;
-}
-
-async function setWordBasedSuggestions(val : boolean) {
-	// This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
-  // YAML schema entries hard to find in the autocomplete words list.
-	// Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
-	const config = vscode.workspace.getConfiguration();
-	const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
-	if(!val) {
-		yamlSettings["editor.wordBasedSuggestions"] = "off";
-	} else {
-		if(originalWordBasedSuggestionsEnabled !== null) {
-			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
-		} else {
-			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
-		}
-	}
-	await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
-}
-
-async function restoreOriginalSettings() {
-	{
-		const config = vscode.workspace.getConfiguration();
-		const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
-		if(originalWordBasedSuggestionsEnabled !== null) {
-			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
-		} else {
-			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
-		}
-		await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
-	}
-
-	{
-		const config = vscode.workspace.getConfiguration();
-		const inspect = config.inspect<any>('github.copilot.enable');
-		if(inspect) {
-			if(originalCopilotEnabled !== undefined && originalCopilotEnabled !== null) {
-				await config.update('github.copilot.enable', {
-					...inspect.globalValue,
-					yaml: originalCopilotEnabled
-				}, vscode.ConfigurationTarget.Global);
-			} else {
-				// If properties are equal to the default ones, I remove the whole property to fallback to the default value.
-				const updatedValue = { ...inspect.globalValue };
-				delete updatedValue.yaml;
-				if (JSON.stringify(updatedValue) === JSON.stringify(inspect.defaultValue)) {
-					await config.update('github.copilot.enable', undefined, vscode.ConfigurationTarget.Global);
-				} else {
-					delete updatedValue.yaml;
-					await config.update('github.copilot.enable', updatedValue, vscode.ConfigurationTarget.Global);
-				}
-			}
-		}
-	}
-	console.log('Restored original settings for YAML!');
-}
-
 function isProjectFile() {
 	// Check if the current file is part of a vscode directory project or not
 	if (!vscode.workspace.name) {
@@ -1473,4 +1376,101 @@ async function fetchJson(url: string): Promise<any> {
 			});
 		}).on('error', reject);
 	});
+}
+
+async function setCopilot(val: boolean) {
+	const config = vscode.workspace.getConfiguration();
+	const inspect = config.inspect<any>('github.copilot.enable');
+
+	const current = inspect?.globalValue
+		?? inspect?.workspaceValue
+		?? inspect?.workspaceFolderValue
+		?? inspect?.defaultValue
+		?? {};
+
+	const newValue = { ...current, yaml: val };
+	await config.update('github.copilot.enable', newValue, vscode.ConfigurationTarget.Global);
+
+	if (!val) {
+		if (!neverWarnAboutCopilot) {
+			const result = await vscode.window.showInformationMessage(
+				'[!] GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct. Please use the CTRL+SPACE shortcut to allow ia-vscode to provide proper autocomplete suggestions.',
+				'OK',
+				'Never Show Again'
+			);
+
+			if (result === 'Never Show Again') {
+				await config.update('ia-vscode.neverWarnAboutCopilot', true, vscode.ConfigurationTarget.Global);
+				neverWarnAboutCopilot = true;
+			}
+		} else {
+			console.log('GitHub Copilot temporarily disabled for ItemsAdder YAML.');
+		}
+	}
+}
+
+function getCopilotYaml() : boolean | undefined {
+	const inspect = vscode.workspace.getConfiguration('github.copilot').inspect<any>('enable');
+	if(inspect) {
+		if(!inspect?.globalValue?.yaml) {
+			return undefined;
+		}
+		return inspect.globalValue.yaml;
+	}
+	return undefined;
+}
+
+async function setWordBasedSuggestions(val : boolean) {
+	// This is an hack to avoid the editor to fill the autocomplete list with words from the document which make
+  // YAML schema entries hard to find in the autocomplete words list.
+	// Disable this function and try to edit a file to understand what I mean (edit the "resource" YAML section of an item and press CTRL+SPACE).
+	const config = vscode.workspace.getConfiguration();
+	const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
+	if(!val) {
+		yamlSettings["editor.wordBasedSuggestions"] = "off";
+	} else {
+		if(originalWordBasedSuggestionsEnabled !== null) {
+			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
+		} else {
+			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
+		}
+	}
+	await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
+}
+
+async function restoreOriginalSettings() {
+	{
+		const config = vscode.workspace.getConfiguration();
+		const yamlSettings = config.get<{ [key: string]: any }>("[yaml]") ?? {};
+		if(originalWordBasedSuggestionsEnabled !== null) {
+			yamlSettings["editor.wordBasedSuggestions"] = originalWordBasedSuggestionsEnabled;
+		} else {
+			delete yamlSettings["editor.wordBasedSuggestions"]; // To fallback to default value
+		}
+		await config.update("[yaml]", yamlSettings, vscode.ConfigurationTarget.Global);
+	}
+
+	{
+		const config = vscode.workspace.getConfiguration();
+		const inspect = config.inspect<any>('github.copilot.enable');
+		if(inspect) {
+			if(originalCopilotEnabled !== undefined && originalCopilotEnabled !== null) {
+				await config.update('github.copilot.enable', {
+					...inspect.globalValue,
+					yaml: originalCopilotEnabled
+				}, vscode.ConfigurationTarget.Global);
+			} else {
+				// If properties are equal to the default ones, I remove the whole property to fallback to the default value.
+				const updatedValue = { ...inspect.globalValue };
+				delete updatedValue.yaml;
+				if (JSON.stringify(updatedValue) === JSON.stringify(inspect.defaultValue)) {
+					await config.update('github.copilot.enable', undefined, vscode.ConfigurationTarget.Global);
+				} else {
+					delete updatedValue.yaml;
+					await config.update('github.copilot.enable', updatedValue, vscode.ConfigurationTarget.Global);
+				}
+			}
+		}
+	}
+	console.log('Restored original settings for YAML!');
 }
