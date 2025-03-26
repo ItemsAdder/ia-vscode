@@ -146,24 +146,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		console.log("Registered YAML schema for ItemsAdder Resources.");
 	}
 
-	// Insert `-` automatically when pressing ENTER after an array entry, to continue adding entries.
-  context.subscriptions.push(vscode.commands.registerCommand('extension.newLineWithDashAfterArrayEntry', () => {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-			return;
-		}
-
-    const position = editor.selection.active;
-    const lineText = editor.document.lineAt(position.line).text;
-
-		const indent = lineText.match(/^\s*/)![0];
-		const previousLineText = position.line > 0 ? editor.document.lineAt(position.line - 1).text : '';
-		const insertText = !previousLineText.trim().startsWith('-') ? `\n${indent}` : `\n${indent}- `;
-		editor.edit(editBuilder => {
-			editBuilder.insert(position, insertText);
-		});
-  }));
-
 	try {
 		const vanillaTexturesListJsonPath = context.asAbsolutePath('images/vanilla_textures.json').replace(/\\/g, "/");
 		if (fs.existsSync(vanillaTexturesListJsonPath)) {
@@ -250,80 +232,80 @@ export async function activate(context: vscode.ExtensionContext) {
 	const provider = vscode.languages.registerCompletionItemProvider(
 		{ language: 'yaml' },
 		{
-				provideCompletionItems(document, position, token, context) {
-					const completionItems: vscode.CompletionItem[] = [];
-					const keyPath = getYamlParentPath(document, position);
+			provideCompletionItems(document, position, token, context) {
+				const completionItems: vscode.CompletionItem[] = [];
+				const keyPath = getYamlParentPath(document, position);
 
-					console.log("Current YAML Path:", keyPath);
+				console.log("Current YAML Path:", keyPath);
 
-					// Handle dynamic suggestions of array-like stuff. I don't like YAML array of objects,
-					// so I allow users to add entries by adding a parent with a custom name.
-					// I think this has a cleaner look compared to the array of objects.
-					// This allows adding custom naming to entries without an extra property, useful for debug and error logging.
-					// This is also beginner-friendly, as it's easier to understand and manage.
-					//
-					// Example:
-					// custom_array:
-					//   entry1:
-					//     name: "Entry"
-					//     description: "Description"
-					//   entry2:
-					//     name: "Entry"
-					//     description: "Description"
-					//
-					// Usual YAML array of objects:
-					// custom_array:
-					//   - name: "Entry"
-					//     description: "Description"
-					//   - name: "Entry"
-					//     description: "Description"
-					function addNestedSuggestions(properties: any, parentPath: string[], currentPath: string[]) {
-						// Ensure the full path matches before suggesting anything
-						if (!arraysEqual(parentPath, currentPath)) {
-							return;
-						}
-
-						// Fixes the fact that it suggests the entry on sub-entries, making no sense.
-						if(arraysEqual(parentPath, currentPath) && currentPath.length > 0) {
-							return;
-						}
-				
-						Object.keys(properties).forEach((key) => {
-								const newPath = [...currentPath, key];
-				
-								// @ts-ignore
-								const subProperties = properties[key]?.properties;
-								if (subProperties) {
-										addNestedSuggestions(subProperties, parentPath, newPath);
-								} else {
-										if(!key.startsWith("my_")) {
-											return;
-										}
-										let markdownDescription = "New entry.";
-										let newKey = key + "_1";
-										// @ts-ignore
-										const ref = properties[key]?.$ref;
-										if (ref) {
-												const refKey = ref.split("/").pop();
-												// @ts-ignore
-												markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
-										}
-
-										// Check if the key was already added to the yaml, in this case append a number to the key.
-										const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
-										console.log("Already used keys:", alreadyUsedKeys);
-										let i = 1;
-										while (alreadyUsedKeys.includes(newKey)) {
-											newKey = `${key}_${i}`;
-											i++;
-										}
-
-										addEntrySuggestion(newKey, markdownDescription, completionItems);
-								}
-						});
+				// Handle dynamic suggestions of array-like stuff. I don't like YAML array of objects,
+				// so I allow users to add entries by adding a parent with a custom name.
+				// I think this has a cleaner look compared to the array of objects.
+				// This allows adding custom naming to entries without an extra property, useful for debug and error logging.
+				// This is also beginner-friendly, as it's easier to understand and manage.
+				//
+				// Example:
+				// custom_array:
+				//   entry1:
+				//     name: "Entry"
+				//     description: "Description"
+				//   entry2:
+				//     name: "Entry"
+				//     description: "Description"
+				//
+				// Usual YAML array of objects:
+				// custom_array:
+				//   - name: "Entry"
+				//     description: "Description"
+				//   - name: "Entry"
+				//     description: "Description"
+				function addNestedSuggestions(properties: any, parentPath: string[], currentPath: string[]) {
+					// Ensure the full path matches before suggesting anything
+					if (!arraysEqual(parentPath, currentPath)) {
+						return;
 					}
-				
-					// Function to compare two paths
+
+					// Fixes the fact that it suggests the entry on sub-entries, making no sense.
+					if (arraysEqual(parentPath, currentPath) && currentPath.length > 0) {
+						return;
+					}
+
+					Object.keys(properties).forEach((key) => {
+						const newPath = [...currentPath, key];
+
+						// @ts-ignore
+						const subProperties = properties[key]?.properties;
+						if (subProperties) {
+							addNestedSuggestions(subProperties, parentPath, newPath);
+						} else {
+							if (!key.startsWith("my_")) {
+								return;
+							}
+							let markdownDescription = "New entry.";
+							let newKey = key + "_1";
+							// @ts-ignore
+							const ref = properties[key]?.$ref;
+							if (ref) {
+								const refKey = ref.split("/").pop();
+								// @ts-ignore
+								markdownDescription = schemas.$defs[refKey]?.markdownDescription ? schemas.$defs[refKey].markdownDescription : markdownDescription;
+							}
+
+							// Check if the key was already added to the yaml, in this case append a number to the key.
+							const alreadyUsedKeys = getYamlSameLevelProperties(document, position);
+							console.log("Already used keys:", alreadyUsedKeys);
+							let i = 1;
+							while (alreadyUsedKeys.includes(newKey)) {
+								newKey = `${key}_${i}`;
+								i++;
+							}
+
+							addEntrySuggestion(newKey, markdownDescription, completionItems);
+						}
+					});
+				}
+
+				// Function to compare two paths
 				function arraysEqual(arr1: string[], arr2: string[]): boolean {
 					if (arr1.length !== arr2.length) {
 						return false;
@@ -429,10 +411,10 @@ export async function activate(context: vscode.ExtensionContext) {
 							completionItems.push(suggestion);
 						});
 
-						if(!isProjectFile()) {
+						if (!isProjectFile()) {
 							return;
 						}
-						
+
 						const workspaceFolders = vscode.workspace.workspaceFolders;
 						if (!workspaceFolders) {
 							console.warn('No workspace open.');
@@ -463,7 +445,7 @@ export async function activate(context: vscode.ExtensionContext) {
 							path.join(workspacePath, namespace, `resource_pack`, 'textures'),
 						];
 
-						if(DEBUG) {
+						if (DEBUG) {
 							console.log("Possible paths:", possiblePaths);
 						}
 
@@ -503,10 +485,10 @@ export async function activate(context: vscode.ExtensionContext) {
 
 						// Todo: suggest vanilla models. Might be useless.
 
-						if(!isProjectFile()) {
+						if (!isProjectFile()) {
 							return;
 						}
-						
+
 						const workspaceFolders = vscode.workspace.workspaceFolders;
 						if (!workspaceFolders) {
 							console.warn('No workspace open.');
@@ -537,7 +519,7 @@ export async function activate(context: vscode.ExtensionContext) {
 							path.join(workspacePath, namespace, `resource_pack`, 'models'),
 						];
 
-						if(DEBUG) {
+						if (DEBUG) {
 							console.log("Possible paths:", possiblePaths);
 						}
 
@@ -576,10 +558,10 @@ export async function activate(context: vscode.ExtensionContext) {
 					if (yamlPath.length >= 5 && yamlPath[0] === "recipes" && yamlPath[1] === "crafting_table" && yamlPath[3] === "return_items" && yamlPath[4] === "replace") {
 						// Check if current line is not a key, for example STONE: xxxx
 						const currentLine = document.lineAt(position.line).text;
-						if(currentLine.includes(": ") || currentLine.endsWith(":")) {
+						if (currentLine.includes(": ") || currentLine.endsWith(":")) {
 							return;
 						}
-						
+
 						schemas.$defs.bukkit_materials.enum.forEach((element: any) => {
 							addEntrySuggestion(element, "Material to replace.", completionItems, false, vscode.CompletionItemKind.EnumMember);
 						});

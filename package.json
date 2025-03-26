@@ -76,13 +76,6 @@
           "description": "Enables dev mode for the extension."
         }
       }
-    },
-    "keybindings": [
-      {
-        "key": "enter",
-        "command": "extension.newLineWithDashAfterArrayEntry",
-        "when": "editorTextFocus && editorLangId == yaml"
-      }
-    ]
+    }
   }
 }
