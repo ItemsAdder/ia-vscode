@@ -1393,8 +1393,8 @@ async function setCopilot(val: boolean) {
 
 	if (!val) {
 		if (!neverWarnAboutCopilot) {
-			const result = await vscode.window.showInformationMessage(
-				'[!] GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct. Please use the CTRL+SPACE shortcut to allow ia-vscode to provide proper autocomplete suggestions.',
+			const result = await vscode.window.showWarningMessage(
+				'GitHub Copilot temporarily disabled for ItemsAdder YAML.\nCopilot causes only issues and suggestions are not correct.\nUse CTRL+SPACE to get proper autocomplete suggestions by the ItemsAdder extension.\nYou can still use Copilot chat if you really need that.',
 				'OK',
 				'Never Show Again'
 			);
