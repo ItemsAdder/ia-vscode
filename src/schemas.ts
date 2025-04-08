@@ -6592,14 +6592,19 @@ attribute_modifiers:
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
                 "permission_suffix": {"type": "string"},
+                "template": {
+                    "type": "string",
+                    "markdownDescription" : "The template item (can be a custom item or vanilla material) on the first slot.",
+                    "$ref": "#/$defs/bukkit_materials_and_customitems"
+                },
                 "base": {
                     "type": "string",
-                    "markdownDescription" : "The base item (can be a custom item or vanilla material) on the first slot.",
+                    "markdownDescription" : "The base item (can be a custom item or vanilla material) on the second slot.",
                     "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "addition": {
                     "type": "string",
-                    "markdownDescription" : "The mineral item (can be a custom item or vanilla material) on the second slot.",
+                    "markdownDescription" : "The mineral item (can be a custom item or vanilla material) on the third slot.",
                     "$ref": "#/$defs/bukkit_materials_and_customitems"
                 },
                 "result": {
