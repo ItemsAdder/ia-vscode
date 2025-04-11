@@ -5512,20 +5512,9 @@ attribute_modifiers:
                     "markdownDescription": "Resource pack model generator settings.\n`material` property is required for every item.\nHowever custom armors do not require this setting.\nCustom armors default item material will be leather if not specified.",
                     "type": "object",
                     "properties": {
-                        "material": {"$ref": "#/$defs/bukkit_materials", "default": "PAPER"},
                         "generate": {
                             "type": "boolean",
                             "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
-                        },
-                        "custom_model_data": {
-                            "type": "integer",
-                            "markdownDescription": "Force the usage of a defined `custom_model_data` (`CustomModelData`).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
-                        },
-                        "model_id": {
-                            "type": "integer",
-                            "markdownDescription": "(**OLD NAME**, use `custom_model_data` instead). If you want to force the usage of a defined `custom_model_data` (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data",
-                            "doNotSuggest": true,
-                            "deprecated": true
                         },
                     },
                     "if": {
@@ -5533,30 +5522,66 @@ attribute_modifiers:
                         "required": ["generate"]
                     },
                     "then": {
+                        "additionalProperties": false,
                         "properties": {
+                            "generate": {
+                                "type": "boolean",
+                                "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
+                            },
+                            "material": {"$ref": "#/$defs/bukkit_materials", "default": "PAPER"},
+                            "custom_model_data": {
+                                "type": "integer",
+                                "markdownDescription": "(optional) Force the usage of a defined `custom_model_data` (`CustomModelData`).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                            },
+                            "model_id": {
+                                "type": "integer",
+                                "markdownDescription": "(**OLD NAME**, use `custom_model_data` instead). If you want to force the usage of a defined `custom_model_data` (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data",
+                                "doNotSuggest": true,
+                                "deprecated": true
+                            },
                             "textures": {
-                            "items": {"type": "string"},
-                            "title": "Set `generate: true` to use this!",
-                            "markdownDescription": "Specifies the textures layers to be used to generate the model. You usually will need only 1 layer.\nIf you are creating a block you can set a texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
-                            "defaultSnippets": [
-                                {"body": "item/$0.png"},
-                                {"body": "block/$0.png"}
-                            ],
-                            "default": [""]
+                                "items": { "type": "string" },
+                                "title": "Set `generate: true` to use this!",
+                                "markdownDescription": "Specifies the textures layers to be used to generate the model. You usually will need only 1 layer.\nIf you are creating a block you can set a texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
+                                "defaultSnippets": [
+                                    { "body": "item/$0.png" },
+                                    { "body": "block/$0.png" }
+                                ],
+                                "default": [""]
                             },
                             "texture": {
                                 "type": "string",
                                 "title": "Set `generate: true` to use this!",
                                 "markdownDescription": "Specifies the texture layer to be used to generate the model.\nIf you are creating a block you can set a texture for each face of the block in this order:\n- block/block_down.png\n- block/block_east.png\n- block/block_north.png\n- block/block_south.png\n- block/block_up.png\n- block/block_west.png",
                                 "defaultSnippets": [
-                                    {"body": "item/$0.png"},
-                                    {"body": "block/$0.png"}
+                                    { "body": "item/$0.png" },
+                                    { "body": "block/$0.png" }
                                 ]
-                            }
+                            },
+                            "parent": {
+                                "type": "string",
+                                "markdownDescription": "(optional) Parent model of the item.\n\nThis is useful to create items that are based on other items.\nThis option is generally used by advanced resourcepacks artists."
+                            },
                         }
                     },
-                    "else" : {
+                    "else": {
+                        "additionalProperties": false,
                         "properties": {
+                            "generate": {
+                                "type": "boolean",
+                                "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
+                            },
+                            "material": {"$ref": "#/$defs/bukkit_materials", "default": "PAPER"},
+                            "custom_model_data": {
+                                "type": "integer",
+                                "markdownDescription": "(optional) Force the usage of a defined `custom_model_data` (`CustomModelData`).\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data"
+                            },
+                            "model_id": {
+                                "type": "integer",
+                                "markdownDescription": "(**OLD NAME**, use `custom_model_data` instead). If you want to force the usage of a defined `custom_model_data` (CustomModelData) you can set this value.\nhttps://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/resource#manually-specify-custom_model_data",
+                                "doNotSuggest": true,
+                                "deprecated": true
+                            },
                             "model_path": {
                                 "type": "string",
                                 "title": "Set `generate: false` to use this!",
