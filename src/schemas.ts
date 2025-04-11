@@ -6837,6 +6837,7 @@ attribute_modifiers:
                 "vein_blocks",
                 "chunk_veins"
             ],
+            "additionalProperties": false,
             "properties": {
                 "block": {
                     "type": "string",
@@ -6883,6 +6884,7 @@ attribute_modifiers:
                 "min_height",
                 "amount"
             ],
+            "additionalProperties": false,
             "properties": {
                 "block": {
                     "type": "string",
@@ -6928,6 +6930,7 @@ attribute_modifiers:
                 "min_height",
                 "amount"
             ],
+            "additionalProperties": false,
             "properties": {
                 "block": {
                     "type": "string",
@@ -6976,6 +6979,7 @@ attribute_modifiers:
                 "log",
                 "leaves"
             ],
+            "additionalProperties": false,
             "properties": {
                 "log": {
                     "type": "string",
