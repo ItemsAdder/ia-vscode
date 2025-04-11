@@ -6016,7 +6016,13 @@ attribute_modifiers:
                     "type": "string"
                 },
                 "permission": {
-                    "markdownDescription": "Permission of the category",
+                    "markdownDescription": "(**OLD NAME**, use the new `permission_suffix` instead, and do not include the complete permission.). Complete permission of the category. For example: `ia.menu.seecategory.special_items.group_1`.",
+                    "type": "string",
+                    "deprecated": true,
+                    "doNotSuggest": true
+                },
+                "permission_suffix": {
+                    "markdownDescription": "Partial permission used to allow a player to see the category.\n\nFor example `special_items.group_1` is a suffix permission for `ia.menu.seecategory.special_items.group_1`.",
                     "type": "string"
                 },
                 "skip_if_already": {
