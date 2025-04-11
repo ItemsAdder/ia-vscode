@@ -1208,52 +1208,52 @@ function decorateBackgroundTextBlocks(activeEditor: vscode.TextEditor, descripti
 	let match;
 
 	while ((match = regEx.exec(text))) {
-			let startPos = activeEditor.document.positionAt(match.index);
-			const lines = text.split('\n');
+		let startPos = activeEditor.document.positionAt(match.index);
+		const lines = text.split('\n');
 
-			// Ensure we have a valid starting line
-			if (startPos.line >= lines.length) {
+		// Ensure we have a valid starting line
+		if (startPos.line >= lines.length) {
+			continue;
+		}
+
+		// Get the indentation of the matched line
+		const initialIndentation = lines[startPos.line].match(/^\s*/)?.[0].length ?? 0;
+
+		// Find the parent indentation level and update startPos
+		let parentIndentation = initialIndentation;
+		for (let i = startPos.line - 1; i >= 0; i--) {
+			const lineIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
+			if (lineIndentation < initialIndentation && lines[i].trim() !== '') {
+				parentIndentation = lineIndentation;
+
+				// Debug: print parent and the matched property
+				console.log(lines[i].trim() + " -> " + lines[startPos.line].trim());
+
+				startPos = new vscode.Position(i, 0); // Move startPos to the parent
+				break;
+			}
+		}
+
+		let endPos = activeEditor.document.positionAt(text.length); // Default to end of file
+
+		// Iterate through lines until we find a line with the same or lower indentation as the parent
+		for (let i = startPos.line + 1; i < lines.length; i++) {
+			const currentIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
+
+			// Skip empty lines (they don't count as block delimiters)
+			if (lines[i].trim() === '') {
 				continue;
 			}
 
-			// Get the indentation of the matched line
-			const initialIndentation = lines[startPos.line].match(/^\s*/)?.[0].length ?? 0;
-
-			// Find the parent indentation level and update startPos
-			let parentIndentation = initialIndentation;
-			for (let i = startPos.line - 1; i >= 0; i--) {
-					const lineIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
-					if (lineIndentation < initialIndentation && lines[i].trim() !== '') {
-							parentIndentation = lineIndentation;
-
-							// Debug: print parent and the matched property
-							console.log(lines[i].trim() + " -> " + lines[startPos.line].trim());
-
-							startPos = new vscode.Position(i, 0); // Move startPos to the parent
-							break;
-					}
+			// If a line has the same or lower indentation as the parent, stop there
+			if (currentIndentation <= parentIndentation) {
+				endPos = new vscode.Position(i - 1, lines[i - 1].length);
+				break;
 			}
+		}
 
-			let endPos = activeEditor.document.positionAt(text.length); // Default to end of file
-
-			// Iterate through lines until we find a line with the same indentation as the parent
-			for (let i = startPos.line + 1; i < lines.length; i++) {
-					const currentIndentation = lines[i].match(/^\s*/)?.[0].length ?? 0;
-
-					// Skip empty lines (they don't count as block delimiters)
-					if (lines[i].trim() === '') {
-						continue;
-					}
-
-					// If a line has the same indentation as the parent, stop there
-					if (currentIndentation === parentIndentation) {
-							endPos = new vscode.Position(i - 1, 0);
-							break;
-					}
-			}
-
-			const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-			appliedDecorations.push(decoration);
+		const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
+		appliedDecorations.push(decoration);
 	}
 
 	activeEditor.setDecorations(decorationType, appliedDecorations);
