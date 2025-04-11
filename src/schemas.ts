@@ -8909,6 +8909,22 @@ attribute_modifiers:
                     "type": "boolean",
                     "markdownDescription": "Decide if you want to show this font image inside the **emojis** GUI (the one you open with **/e** command)"
                 },
+                "chat": {
+                    "properties": {
+                        "hover": {
+                            "properties": {
+                                "enabled": {
+                                    "type": "boolean",
+                                    "markdownDescription": "(default `true`) Enable hover text when hovering the font image in chat"
+                                },
+                                "override_text": {
+                                    "type": "string",
+                                    "markdownDescription": "(optional) Override the plugin `font-image-chat-hover` language text with a custom text. For example you can use this to show a bigger variant of the font_image, using another ID. Example: I have `smile`, I can set `description: \":smile_big:\"` to show a bigger variant of the emoji."
+                                }
+                            }
+                        }
+                    }
+                },
                 "suggest_in_command": {
                     "type": "boolean",
                     "markdownDescription": "Decide if you want to show this font image in the list of suggestions when you press TAB using the **/e** command"
