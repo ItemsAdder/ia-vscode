@@ -5092,6 +5092,15 @@ attribute_modifiers:
                                 "roty": {
                                     "type": "integer",
                                     "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
+                                },
+                                "directional_mode": {
+                                    "type": "string",
+                                    "markdownDescription": "Enables dynamic rotation of the block.\n\nThis is useful for blocks that need to be rotated based on the direction of the player.\n\n**Warning!** Creating directional blocks will occupy 4 or 6 slots per block. Use with caution.",
+                                    "enum": [
+                                        "FURNACE",
+                                        "DROPPER",
+                                        "LOG"
+                                    ]
                                 }
                             }
                         },
