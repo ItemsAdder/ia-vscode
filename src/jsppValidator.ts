@@ -79,7 +79,7 @@ export function validateWithTypeScript(code: string, errors: ValidationError[]) 
 
 function extractImportedTypes(code: string): string[] {
   const importedTypes: string[] = [];
-  const importRegex = /^import\s+"(.+?)";/gm;
+  const importRegex = /^import\s+"(.+?)"(;|)/gm;
 
   let match;
   while ((match = importRegex.exec(code)) !== null) {
