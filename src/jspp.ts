@@ -98,6 +98,13 @@ const JS_FEATURES = [
     hover: "Places a block with the specified material or custom identifier.\n\n**Example:** `placeBlock(block, \"DIAMOND_BLOCK\")`"
   },
   {
+    label: 'location',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'location(worldName, x, y, z)',
+    documentation: 'Creates a new location object with the specified world and coordinates.',
+    hover: "Creates a new location object with the specified world and coordinates.\n\n**Example:** `location(\"world\", 100, 64, 200)`"
+  },
+  {
     label: 'isHeld',
     kind: vscode.CompletionItemKind.Function,
     detail: 'isHeld(player, identifierOrMaterial)',

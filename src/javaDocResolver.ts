@@ -5,10 +5,11 @@ import * as path from 'path';
 import * as os from 'os';
 import * as unzipper from 'unzipper';
 
-interface MethodInfo {
+interface MemberInfo {
   name: string;
   doc: string;
   returnType: string;
+  type?: string; // `enums`, `functions`, `variables`.
 }
 
 const repositories = [
@@ -22,8 +23,8 @@ const repositories = [
 export class JavaDocResolver {
   private static instance: JavaDocResolver;
   private availableClasses: Set<string> = new Set();
-  private methodCache: Map<string, MethodInfo> = new Map();
-  private classToMethods: Map<string, MethodInfo[]> = new Map();
+  private membersCache: Map<string, MemberInfo> = new Map();
+  private classToMembers: Map<string, MemberInfo[]> = new Map();
   private downloading: Set<string> = new Set();
   private docBasePath = path.join(os.tmpdir(), 'jspp-sources-cache');
   private importMap: Map<string, string> = new Map();
@@ -88,11 +89,11 @@ export class JavaDocResolver {
   }
 
   public getDocumentationFor(symbol: string): string | undefined {
-    return this.methodCache.get(symbol)?.doc;
+    return this.membersCache.get(symbol)?.doc;
   }
 
   public getReturnTypeOf(className: string, methodName: string): string | undefined {
-    const methods = this.classToMethods.get(className);
+    const methods = this.classToMembers.get(className);
     if (!methods) {
       return undefined;
     }
@@ -100,8 +101,8 @@ export class JavaDocResolver {
     return method?.returnType;
   }
 
-  public getMethodsOf(className: string): MethodInfo[] {
-    return this.classToMethods.get(className) ?? [];
+  public getMembersOf(className: string): MemberInfo[] {
+    return this.classToMembers.get(className) ?? [];
   }
 
   public getFullImport(type: string): string | undefined {
@@ -121,11 +122,11 @@ export class JavaDocResolver {
     }
 
     const items: vscode.CompletionItem[] = [];
-    const methods = this.getMethodsOf(className);
-    for (const method of methods) {
-      const item = new vscode.CompletionItem(method.name, vscode.CompletionItemKind.Method);
-      item.detail = method.returnType;
-      item.documentation = method.doc;
+    const members = this.getMembersOf(className);
+    for (const member of members) {
+      const item = new vscode.CompletionItem(member.name, typeToCompletionKind(member?.type));
+      item.detail = member.returnType;
+      item.documentation = member.doc;
       items.push(item);
     }
     return items;
@@ -171,9 +172,9 @@ export class JavaDocResolver {
       const cache = JSON.parse(fs.readFileSync(cacheFilePath, 'utf8'));
       for (const className in cache.classes) {
         const methods = cache.classes[className];
-        this.classToMethods.set(className, methods);
+        this.classToMembers.set(className, methods);
         for (const method of methods) {
-          this.methodCache.set(`${className}#${method.name}`, method);
+          this.membersCache.set(`${className}#${method.name}`, method);
         }
       }
 
@@ -267,7 +268,7 @@ export class JavaDocResolver {
     const cache: { 
       imports: string[],
       classes: {
-        [className: string]: MethodInfo[]
+        [className: string]: MemberInfo[]
       }
     } = {
       imports: [],
@@ -298,7 +299,7 @@ export class JavaDocResolver {
         });
 
         const className = path.basename(fileName, '.java');
-        const methods: MethodInfo[] = [];
+        const members: MemberInfo[] = [];
         let parentClass: string | null = null;
         const interfaces: string[] = [];
 
@@ -337,43 +338,60 @@ export class JavaDocResolver {
             returnType = className;
           }
 
-          const methodInfo: MethodInfo = { name: methodName, doc: docComment, returnType };
+          const methodInfo: MemberInfo = { name: methodName, doc: docComment, returnType, type: 'function' };
 
-          this.methodCache.set(`${className}#${methodName}`, methodInfo);
-          methods.push(methodInfo);
+          this.membersCache.set(`${className}#${methodName}`, methodInfo);
+          members.push(methodInfo);
 
           console.log(`Found method: ${methodName} in class: ${className}`);
         }
 
-        if (methods.length > 0) {
-          cache.classes[className] = methods;
-          this.classToMethods.set(className, methods);
-          console.log(`Loaded ${methods.length} methods for class ${className}`);
-        }
-
         // Recursively load methods from parent class and interfaces
         if (parentClass) {
-          const parentMethods = this.getMethodsOf(parentClass);
+          const parentMethods = this.getMembersOf(parentClass);
           for (const method of parentMethods) {
-            if (!methods.some((m) => m.name === method.name)) {
-              methods.push(method);
+            if (!members.some((m) => m.name === method.name)) {
+              members.push(method);
             }
           }
         }
 
         for (const iface of interfaces) {
-          const interfaceMethods = this.getMethodsOf(iface);
+          const interfaceMethods = this.getMembersOf(iface);
           for (const method of interfaceMethods) {
-            if (!methods.some((m) => m.name === method.name)) {
-              methods.push(method);
+            if (!members.some((m) => m.name === method.name)) {
+              members.push(method);
             }
           }
         }
 
-        if (methods.length > 0) {
-          cache.classes[className] = methods;
-          this.classToMethods.set(className, methods);
-          console.log(`Loaded ${methods.length} methods (including inherited) for class ${className}`);
+        // Extract enums from file
+        const enumMatches = [
+          ...content.matchAll(
+            /enum\s+(\w+)\s*{([\s\S]*?)(?=}\s*;|}\s*$)}/g
+          ),
+        ];
+        for (const enumMatch of enumMatches) {
+          const enumName = enumMatch[1].trim();
+          const enumBody = enumMatch[2].trim();
+          const enumEntries = [...enumBody.matchAll(/\/\*\*([\s\S]*?)\*\/[\s\n\r]*(?:@\w+[\s\n\r]*)*(\w+)\s*\(/g)].map(entryMatch => {
+            const docComment = entryMatch[1].replace(/\s*\*\s?/g, '').trim();
+            const entryName = entryMatch[2].trim();
+            return { name: entryName, doc: docComment, returnType: enumName, type: 'enum' };
+          });
+
+          members.push(...enumEntries);
+          for (const entry of enumEntries) {
+            this.membersCache.set(`${className}#${entry.name}`, entry);
+          }
+
+          console.log(`Loaded ${enumEntries.length} enum entries for enum ${enumName}`);
+        }
+
+        if (members.length > 0) {
+          cache.classes[className] = members;
+          this.classToMembers.set(className, members);
+          console.log(`Loaded ${members.length} members (including inherited methods) for class ${className}`);
         }
       }
 
@@ -386,3 +404,24 @@ export class JavaDocResolver {
     }
   }
 }
+
+
+function typeToCompletionKind(type: string | undefined): vscode.CompletionItemKind | undefined {
+  if (!type) {
+    return vscode.CompletionItemKind.Method;
+  }
+
+  switch (type.toLowerCase()) {
+    case 'class':
+      return vscode.CompletionItemKind.Class;
+    case 'function':
+      return vscode.CompletionItemKind.Method;
+    case 'enum':
+      return vscode.CompletionItemKind.Enum;
+    case 'variable':
+      return vscode.CompletionItemKind.Variable;
+    default:
+      return vscode.CompletionItemKind.Text;
+  }
+}
+
