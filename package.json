@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -31,6 +31,7 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "14.x",
+    "@types/unzipper": "^0.10.11",
     "@types/vscode": "^1.67.0",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
@@ -41,6 +42,8 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
+    "java-parser": "^2.3.3",
+    "unzipper": "^0.12.3",
     "yaml": "^2.7.0"
   },
   "activationEvents": [
@@ -64,6 +67,25 @@
           "description": "Enables dev mode for the extension."
         }
       }
-    }
+    },
+    "languages": [
+      {
+        "id": "jspp",
+        "aliases": [
+          "jspp"
+        ],
+        "extensions": [
+          ".jspp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jspp",
+        "scopeName": "source.jspp",
+        "path": "./syntaxes/jspp.tmLanguage.json"
+      }
+    ]
   }
 }

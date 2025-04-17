@@ -8,6 +8,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as https from 'https';
 
+import { registerJsppLanguageFeatures } from './jspp';
+
 const DEBUG = false;
 
 const SCHEME = "itemsadder";
@@ -126,6 +128,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	originalCopilotEnabled = getCopilotYaml();
+
+	registerJsppLanguageFeatures(context);
 
 	const vscodeYaml = vscode.extensions.getExtension("redhat.vscode-yaml");
 	if(vscodeYaml)
