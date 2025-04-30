@@ -5525,10 +5525,14 @@ attribute_modifiers:
                             "type": "boolean",
                             "markdownDescription": "`true` to automatically generate the JSON model from your textures.\n\n`false` to create the model by yourself.\n\nSet to `true` if you want to use `textures`.\nSet `false` if you want to use `model_path`."
                         },
+                        "model_path": {
+                            "type": "string",
+                            "title": "Set `generate: false` to use this!",
+                            "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
+                        }
                     },
                     "if": {
-                        "properties": {"generate": {"const" : true}},
-                        "required": ["generate"]
+                        "properties": {"generate": {"const" : "true"}}
                     },
                     "then": {
                         "additionalProperties": false,
@@ -6352,7 +6356,7 @@ attribute_modifiers:
                 }
             },
             "if": {
-                "properties" : { "shapeless" : {"const" : false} }
+                "properties" : { "shapeless" : {"const" : "false"} }
             },
             "then": {
                 "required": ["pattern"],

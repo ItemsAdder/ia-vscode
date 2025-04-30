@@ -146,6 +146,17 @@ function validateManually(code: string, errors: ValidationError[] = []): void {
   lines.forEach((line, i) => {
     const trimmed = line.trim();
 
+    // Detect missing semicolon after import statements
+    const missingSemicolonImport = /^\s*import\s+".+?"\s*$/.exec(trimmed);
+    if (missingSemicolonImport) {
+      errors.push({
+        message: 'Missing semicolon after import statement.',
+        line: i + 1,
+        column: trimmed.length,
+        severity: 'warning'
+      });
+    }
+
     // Detect functions with untyped arguments
     const funcWithUntypedArgs = /^\s*[a-zA-Z_][a-zA-Z0-9_<>]*\s+[a-zA-Z_][a-zA-Z0-9_]*\s*\(([^)]*)\)/.exec(trimmed);
     if (funcWithUntypedArgs) {
