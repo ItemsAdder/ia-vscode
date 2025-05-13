@@ -7183,9 +7183,13 @@ attribute_modifiers:
                     "type": "boolean",
                     "markdownDescription": "Default: true. Enable if you want the player to be able to sit on every BARRIER block of the furniture (for multi-seats chairs).\n\nThis works only on solid furnitures!"
                 },
-                "front_view_on_sit": {
+                "passenger_front_view_on_sit": {
                     "type": "boolean",
                     "markdownDescription": "Default: true. Rotate the player to face the front of the furniture when they sit on it."
+                },
+                "passenger_rotate_body": {
+                    "type": "boolean",
+                    "markdownDescription": "Default: false. Rotate the player body while sitting on the furniture."
                 }
             }
         },
