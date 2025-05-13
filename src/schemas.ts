@@ -8284,7 +8284,10 @@ attribute_modifiers:
                 "flow_success_if_message_contains": {
                     "type": "string",
                     "markdownDescription": "The plugin can't automatically identify plugins commands success/fail status, so you have to specify a text that can help the plugin to identify the command status."
-                }
+                },
+                "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
+                "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
         "action_delay.prop": {
@@ -8515,10 +8518,7 @@ attribute_modifiers:
                 "change_me_2": {"$ref": "#/$defs/command"},
                 "change_me_3": {"$ref": "#/$defs/command"},
                 "change_me_4": {"$ref": "#/$defs/command"},
-                "change_me_xx": {"$ref": "#/$defs/command"},
-                "flow": {"$ref": "#/$defs/flow.prop"},
-                "delay": {"$ref": "#/$defs/action_delay.prop"},
-                "permission": {"$ref": "#/$defs/action_permission.prop"}
+                "change_me_xx": {"$ref": "#/$defs/command"}
             }
         },
         "play_particle": {
@@ -8806,8 +8806,11 @@ attribute_modifiers:
                 "damage": {"type": "number", "default": 1},
                 "radius": {"type": "integer", "default": 3},
                 "entity_groups": {
-                    "type": "string",
-                    "enum": ["HOSTILE", "PLAYERS", "PASSIVE"]
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["HOSTILE", "PLAYERS", "PASSIVE"]
+                    },
                 },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
