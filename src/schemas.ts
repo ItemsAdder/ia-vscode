@@ -345,7 +345,20 @@ export const schemas = {
             "properties": {
                 "my_equipment": { "type": "object", "$ref": "#/$defs/equipments_entry" }
             }
-        }
+        },
+        "sounds": {
+            "type": "object",
+            "markdownDescription": "Custom sounds",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/sound"
+            },
+            "properties": {
+                "my_sound": { "$ref": "#/$defs/sound" }
+            }
+        },
     },
     "$defs": {
         "attribute_modifiers": {
@@ -9682,6 +9695,146 @@ attribute_modifiers:
                     "type": "number",
                     "default": 5,
                     "markdownDescription": "Diameter of the teleportation area"
+                }
+            }
+        },
+        "sound": {
+            "$id": "sound",
+            "type": "object",
+            "patternProperties": {
+                "variant.*": { "$ref": "#/$defs/sound_variant" },
+            },
+            "anyOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "settings": { "$ref": "#/$defs/sound_settings" },
+                        "path": {
+                            "type": "string",
+                            "markdownDescription": "Path to the sound file. Example: `contents/my_stuff/sounds/ambient/my_group/custom_sound.ogg` would be `ambient/my_group/custom_sound` (or `my_stuff:ambient/my_group/custom_sound`)"
+                        }
+                    },
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "settings": { "$ref": "#/$defs/sound_settings" },
+                        "paths": {
+                            "type": "array",
+                            "markdownDescription": "Paths to the various variants for this sound file. Example: `contents/my_stuff/sounds/ambient/my_group/custom_sound.ogg` would be `ambient/my_group/custom_sound` (or `my_stuff:ambient/my_group/custom_sound`)",
+                            "items": {
+                                "type": "string",
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "settings": { "$ref": "#/$defs/sound_settings" },
+                        "variant_1": { "$ref": "#/$defs/sound_variant" },
+                        "variant_2": { "$ref": "#/$defs/sound_variant" },
+                        "variant_3": { "$ref": "#/$defs/sound_variant" },
+                        "variant_4": { "$ref": "#/$defs/sound_variant" },
+                    }
+                }
+            ]
+        },
+        "sound_settings": {
+            "$id": "sound_settings",
+            "type": "object",
+            "markdownDescription": "Settings applied to all the variants of this sound",
+            "properties": {
+                "subtitle": {
+                    "type": "string",
+                    "markdownDescription": "(optional) Translated as the subtitle of the sound if Show Subtitles is enabled ingame. Accepts [formatting codes](https://minecraft.fandom.com/wiki/Formatting_codes) and displays them properly in-game."
+                },
+                "replace": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) `true` if the sounds listed in sounds should completely replace the vanilla sound (if available). `false` if the variants listed should be added to the list of default sounds.",
+                },
+                "volume": {
+                    "type": "number",
+                    "markdownDescription": "(default `1.0`) Volume of the sound."
+                },
+                "pitch": {
+                    "type": "number",
+                    "markdownDescription": "(default `1.0`) Pitch of the sound."
+                },
+                "weight": {
+                    "type": "integer",
+                    "markdownDescription": "(default `1.0`) The chance that this sound is selected to play when this sound event is triggered. Example: putting 2 in for the value would be like placing in the name twice."
+                },
+                "stream": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) `true` if this sound should be streamed from its file. It is recommended that this is set to `true` for sounds that have a duration longer than a few seconds to avoid lag. Used for all sounds in the `music` and `record` categories (except Note Block sounds), as (almost) all the sounds that belong to those categories are over a minute long. Optional. If undefined, defaults to `false`. Setting this to `false` allows many more instances of the sound to be ran at the same time while setting it to true only allows 4 instances (of that type) to be ran at the same time."
+                },
+                "attenuation_distance": {
+                    "type": "number",
+                    "markdownDescription": "(default `16.0`) Modify sound reduction rate based on distance. Used by portals, beacons, and conduits."
+                },
+                "preload": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) True if this sound should be loaded when loading the pack instead of when the sound is played. Used by the underwater ambience."
+                },
+                "duration_seconds": {
+                    "type": "number",
+                    "markdownDescription": "This is automatically calculated, no need to set it manually.\n(default `1337.0`) Duration of the sound in seconds."
+                },
+                "quality": {
+                    "type": "number",
+                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 100 is the highest quality."
+                },
+                "mono": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `true`) `true` if the sound should be played in mono. `false` if the sound should be played in stereo. NOTE: `stereo` sounds will ignore the location and play without any distance attenuation. Use `stereo` for sounds that are not location based, like music."
+                }
+            }
+        },
+        "sound_variant": {
+            "$id": "sound_variant",
+            "type": "object",
+            "markdownDescription": "List of sound files that will be played randomly when this sound is played.",
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "markdownDescription": "Path to the sound file. Example: `contents/my_stuff/sounds/ambient/my_group/custom_sound.ogg` would be `ambient/my_group/custom_sound` (or `my_stuff:ambient/my_group/custom_sound`)"
+                },
+                "volume": {
+                    "type": "number",
+                    "markdownDescription": "(default `1.0`) Volume of the sound."
+                },
+                "pitch": {
+                    "type": "number",
+                    "markdownDescription": "(default `1.0`) Pitch of the sound."
+                },
+                "weight": {
+                    "type": "integer",
+                    "markdownDescription": "(default `1.0`) The chance that this sound is selected to play when this sound event is triggered. Example: putting 2 in for the value would be like placing in the name twice."
+                },
+                "stream": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) `true` if this sound should be streamed from its file. It is recommended that this is set to `true` for sounds that have a duration longer than a few seconds to avoid lag. Used for all sounds in the `music` and `record` categories (except Note Block sounds), as (almost) all the sounds that belong to those categories are over a minute long. Optional. If undefined, defaults to `false`. Setting this to `false` allows many more instances of the sound to be ran at the same time while setting it to true only allows 4 instances (of that type) to be ran at the same time."
+                },
+                "attenuation_distance": {
+                    "type": "number",
+                    "markdownDescription": "(default `16.0`) Modify sound reduction rate based on distance. Used by portals, beacons, and conduits."
+                },
+                "preload": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `false`) True if this sound should be loaded when loading the pack instead of when the sound is played. Used by the underwater ambience."
+                },
+                "duration_seconds": {
+                    "type": "number",
+                    "markdownDescription": "WARNING! This is automatically calculated, no need to set it manually.\n(default `1337.0`) Duration of the sound in seconds."
+                },
+                "quality": {
+                    "type": "number",
+                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 100 is the highest quality."
+                },
+                "mono": {
+                    "type": "boolean",
+                    "markdownDescription": "(default `true`) `true` if the sound should be played in mono. `false` if the sound should be played in stereo. NOTE: `stereo` sounds will ignore the location and play without any distance attenuation. Use `stereo` for sounds that are not location based, like music."
                 }
             }
         }

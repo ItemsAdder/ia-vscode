@@ -372,6 +372,10 @@ export async function activate(context: vscode.ExtensionContext) {
 						addSuggestionAvoidDuplicate("play_sound");
 					}
 
+					if (yamlPath.length === 2 && yamlPath[0] === "sounds") {
+						addSuggestionAvoidDuplicate("variant");
+					}
+
 					// Suggest example strings for the item name.
 					if (yamlPath.length === 3 && yamlPath[0] === "items" && yamlPath[2] === "name") {
 						const entryId = yamlPath[1];
@@ -565,6 +569,8 @@ export async function activate(context: vscode.ExtensionContext) {
 							addModelsFromDirectory(element);
 						});
 					}
+
+					// TODO: handle sounds files suggestions
 
 					// If under return_items.replace, suggest the keys of the item to replace
 					if (yamlPath.length >= 5 && yamlPath[0] === "recipes" && yamlPath[1] === "crafting_table" && yamlPath[3] === "return_items" && yamlPath[4] === "replace") {
