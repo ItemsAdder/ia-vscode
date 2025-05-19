@@ -9830,7 +9830,7 @@ attribute_modifiers:
                 },
                 "quality": {
                     "type": "number",
-                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 100 is the highest quality."
+                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 10 is the highest quality."
                 },
                 "mono": {
                     "type": "boolean",
