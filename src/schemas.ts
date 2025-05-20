@@ -9781,9 +9781,9 @@ attribute_modifiers:
                     "type": "number",
                     "markdownDescription": "This is automatically calculated, no need to set it manually.\n(default `1337.0`) Duration of the sound in seconds."
                 },
-                "quality": {
+                "bitrate_quality": {
                     "type": "number",
-                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 100 is the highest quality."
+                    "markdownDescription": "(default `0`) Final bitrate quality of the sound. 0 is the lowest quality and 100 is the highest quality."
                 },
                 "mono": {
                     "type": "boolean",
@@ -9828,9 +9828,9 @@ attribute_modifiers:
                     "type": "number",
                     "markdownDescription": "WARNING! This is automatically calculated, no need to set it manually.\n(default `1337.0`) Duration of the sound in seconds."
                 },
-                "quality": {
+                "bitrate_quality": {
                     "type": "number",
-                    "markdownDescription": "(default `0`) Final quality of the sound. 0 is the lowest quality and 100 is the highest quality."
+                    "markdownDescription": "(default `0`) Final bitrate quality of the sound. 0 is the lowest quality and 100 is the highest quality."
                 },
                 "mono": {
                     "type": "boolean",
