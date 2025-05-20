@@ -2782,7 +2782,9 @@ attribute_modifiers:
                 "type": { "$ref": "#/$defs/bukkit_potion_effect_type" },
                 "amplifier": { "$ref": "#/$defs/potion_amplifier" },
                 "duration": { "$ref": "#/$defs/ticks" },
-                "ambient": { "type": "boolean" }
+                "ambient": { "type": "boolean" },
+                "particles": { "type": "boolean" },
+                "icon": { "type": "boolean" },
             }
         },
         "vanilla_potion_type": {
@@ -5906,6 +5908,16 @@ attribute_modifiers:
                         }
                     }
                 },
+                "jukebox_disc": {
+                    "type": "object",
+                    "markdownDescription": "## Available on `1.21.1+` clients/servers only!\nUse the item as a music disc. Replacement for the old `music_disc` behaviour.",
+                    "properties": {
+                        "song": {
+                            "type": "string",
+                            "markdownDescription": "Namespaced ID of the song to be played when this disc is inserted into a jukebox.\nExample: `my_items:music/awesome_song`.\n\nThe song must be declared in the `sounds` section."
+                        }
+                    }
+                },
                 "behaviours": {"type": "object", "$ref": "#/$defs/behaviours"},
                 "events_cooldown": {
                     "type": "integer",
@@ -7144,7 +7156,7 @@ attribute_modifiers:
         "behaviour.music_disc": {
             "$id": "behaviour.music_disc",
             "type": "object",
-            "markdownDescription": "Tells ItemsAdder that this item is a music disc.\nYou will be able to put it inside a jukebox and make it play a song.",
+            "markdownDescription": "(**Deprecated**) Tells ItemsAdder that this item is a music disc.\nYou will be able to put it inside a jukebox and make it play a song.\n**NOTE**: This should be considered old and you should use the new `jukebox_disc` property instead.",
             "required": ["song"],
             "properties": {
                 "enabled": {"type": "boolean"},
@@ -7156,9 +7168,9 @@ attribute_modifiers:
                             "type": "string",
                             "markdownDescription": "Specify a song name you defined in the songs.json file.\nPlease refer to the tutorial here: https://itemsadder.devs.beer/plugin-usage/adding-content/sounds"
                         },
-                        "markdownDescription": {
+                        "description": {
                             "type": "string",
-                            "markdownDescription": "markdownDescription of the song. This will be shown in Actionbar when you put the disc inside a jukebox"
+                            "markdownDescription": "Description of the song. This will be shown in Actionbar when you put the disc inside a jukebox"
                         }
                     }
                 }
@@ -7814,7 +7826,9 @@ attribute_modifiers:
                                 "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
                                 "amplifier": {"$ref": "#/$defs/potion_amplifier"},
                                 "duration": {"$ref": "#/$defs/ticks"},
-                                "ambient": {"type": "boolean"}
+                                "ambient": {"type": "boolean"},
+                                "particles": { "type": "boolean" },
+                                "icon": { "type": "boolean" },
                             }
                         }
                     },
@@ -7827,7 +7841,9 @@ attribute_modifiers:
                                 "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
                                 "amplifier": {"$ref": "#/$defs/potion_amplifier"},
                                 "duration": {"$ref": "#/$defs/ticks"},
-                                "ambient": {"type": "boolean"}
+                                "ambient": {"type": "boolean"},
+                                "particles": { "type": "boolean" },
+                                "icon": { "type": "boolean" },
                             }
                         }
                     }
@@ -8496,7 +8512,7 @@ attribute_modifiers:
         "action_permission.prop": {
             "$id": "action_permission.prop",
             "type": "string",
-            "markdownDescription": "Permission needed to execute this action"
+            "markdownDescription": "Permission needed to execute this action. You can negate it by putting a `!` at the beginning of the permission.\n\nExample: `!example.permission` will not execute this action if the player has the `example.permission` permission.",
         },
         "play_sound": {
             "$id": "play_sound",
@@ -8791,7 +8807,9 @@ attribute_modifiers:
                 "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
                 "amplifier": {"$ref": "#/$defs/potion_amplifier"},
                 "duration": {"$ref": "#/$defs/ticks"},
-                "ambient": {"type": "boolean"}
+                "ambient": {"type": "boolean"},
+                "particles": { "type": "boolean" },
+                "icon": { "type": "boolean" },
             }
         },
         "remove_potion_effect": {
@@ -8871,6 +8889,8 @@ attribute_modifiers:
                 "amplifier": {"$ref": "#/$defs/potion_amplifier"},
                 "duration": {"$ref": "#/$defs/ticks"},
                 "ambient": {"type": "boolean"},
+                "particles": { "type": "boolean" },
+                "icon": { "type": "boolean" },
                 "delay": {"$ref": "#/$defs/action_delay.prop"},
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
@@ -9708,7 +9728,6 @@ attribute_modifiers:
                 {
                     "type": "object",
                     "properties": {
-                        "settings": { "$ref": "#/$defs/sound_settings" },
                         "path": {
                             "type": "string",
                             "markdownDescription": "Path to the sound file. Example: `contents/my_stuff/sounds/ambient/my_group/custom_sound.ogg` would be `ambient/my_group/custom_sound` (or `my_stuff:ambient/my_group/custom_sound`)"
@@ -9718,7 +9737,6 @@ attribute_modifiers:
                 {
                     "type": "object",
                     "properties": {
-                        "settings": { "$ref": "#/$defs/sound_settings" },
                         "paths": {
                             "type": "array",
                             "markdownDescription": "Paths to the various variants for this sound file. Example: `contents/my_stuff/sounds/ambient/my_group/custom_sound.ogg` would be `ambient/my_group/custom_sound` (or `my_stuff:ambient/my_group/custom_sound`)",
@@ -9731,14 +9749,33 @@ attribute_modifiers:
                 {
                     "type": "object",
                     "properties": {
-                        "settings": { "$ref": "#/$defs/sound_settings" },
                         "variant_1": { "$ref": "#/$defs/sound_variant" },
                         "variant_2": { "$ref": "#/$defs/sound_variant" },
                         "variant_3": { "$ref": "#/$defs/sound_variant" },
                         "variant_4": { "$ref": "#/$defs/sound_variant" },
                     }
                 }
-            ]
+            ],
+            "properties": {
+                "settings": { "$ref": "#/$defs/sound_settings" },
+                "jukebox": {
+                    "type": "object",
+                    "markdownDescription": "Jukebox settings",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                        },
+                        "description": {
+                            "type": "string",
+                            "markdownDescription": "Description of the sound shown in the actionbar when playing the song."
+                        },
+                        "comparator_output": {
+                            "type": "integer",
+                            "markdownDescription": "(optional) The redstone signal output by a comparator when played in a Jukebox, between 0 and 15"
+                        }
+                    }
+                }
+            }
         },
         "sound_settings": {
             "$id": "sound_settings",
