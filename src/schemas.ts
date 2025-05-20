@@ -9767,7 +9767,7 @@ attribute_modifiers:
                         },
                         "description": {
                             "type": "string",
-                            "markdownDescription": "Description of the sound shown in the actionbar when playing the song."
+                            "markdownDescription": "Description of the sound shown in the actionbar when playing the song (uses [Minimessage](https://itemsadder.devs.beer/plugin-usage/text-formatting#minimessage) format)."
                         },
                         "comparator_output": {
                             "type": "integer",
