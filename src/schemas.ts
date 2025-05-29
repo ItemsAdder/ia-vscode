@@ -198,6 +198,19 @@ export const schemas = {
                 "my_decorator": { "type": "object", "$ref": "#/$defs/cave_decorators" }
             }
         },
+        "entities_populator": {
+            "type": "object",
+            "markdownDescription": "Create rules to spawn custom entities around your worlds.",
+            "kind": 5,
+            "detail": "(collection)",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/entity_populator"
+            },
+            "properties": {
+                "my_populator": { "type": "object", "$ref": "#/$defs/entity_populator" }
+            }
+        },
         "font_images": {
             "type": "object",
             "markdownDescription": "Create your own font characters. You can use them as emoji, GUI texture, HUD...\nIt's basically an image shown in texts.",
@@ -287,10 +300,10 @@ export const schemas = {
             "detail": "(collection)",
             "additionalProperties": {
                 "type": "object",
-                "$ref": "#/$defs/entity"
+                "$ref": "#/$defs/custom_entity"
             },
             "properties": {
-                "my_entity": { "type": "object", "$ref": "#/$defs/entity" }
+                "my_entity": { "type": "object", "$ref": "#/$defs/custom_entity" }
             }
         },
         "emotes": {
@@ -7035,6 +7048,185 @@ attribute_modifiers:
                 "position": {"type": "string", "enum": ["SURFACE", "CEILING"]}
             }
         },
+        "entity_populator": {
+            "$id": "entity_populator",
+            "type": "object",
+            "required": [
+                "entity",
+            ],
+            "properties": {
+                "entity": {
+                    "type": "string",
+                    "markdownDescription": "Custom ItemsAdder entity.\n**Do not use Vanilla entities, they are not supported**"
+                },
+                "spawn_logic": {
+                    "markdownDescription": "How the entity will be spawned.\n- `REPLACE`: Replaces an existing entity with the custom entity.\n- `SPAWN_NEAR`: Spawns the custom entity near an existing entity of the specified types.\n\nNote: This uses the Minecraft spawn logic, so gemerule `doMobSpawning false` will make this stop working.",
+                    "properties": {
+                        "method": {
+                            "type": "string",
+                            "enum": ["REPLACE", "SPAWN_NEAR"]
+                        },
+                        "types": {
+                            "type": "array",
+                            "markdownDescription": "List of the entity types that can be replaced or that will be used to spawn the custom entity near them.",
+                            "items": {
+                                "type": "string",
+                                "$ref": "#/$defs/bukkit_entity_type"
+                            }
+                        },
+                    }
+                },
+                "chance": {
+                    "type": "number", 
+                    "markdownDescription": "Chance of this rule to be triggered.",
+                    "default": 15,
+                    "minimum": 0,
+                    "maximum": 100,
+                },
+                "amount": {
+                    "type": "integer", 
+                    "markdownDescription": "Amount of entities to spawn when this rule is triggered. Usually 1 is enough.",
+                },
+                "biomes": {
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/bukkit_biome"}
+                },
+                "worlds": {
+                    "type": "array",
+                    "markdownDescription": "Worlds list in which you want to spawn blocks. You can put a `!` in front to negate, and also use `*` in front or at the end to match any world starting with a particular text.",
+                    "items": {
+                        "anyOf": [
+                            {"type": "string"},
+                            {
+                                "type": "string",
+                                "enum": ["world", "world_nether", "world_the_end"],
+                                "default": "world"
+                            }
+                        ]
+                    }
+                },
+                "location_range": {
+                    "type": "object",
+                    "markdownDescription": "Location range for the entity to spawn.\nThis is useful to spawn entities only in a specific area and increase difficulty when far from spawn.",
+                    "properties": {
+                        "x": {
+                            "type": "object",
+                            "properties": {
+                                "min": {
+                                    "type": "integer",
+                                    "markdownDescription": "Minimum Y coordinate for the entity to spawn"
+                                },
+                                "max": {
+                                    "type": "integer",
+                                    "markdownDescription": "Maximum Y coordinate for the entity to spawn"
+                                }
+                            }
+                        },
+                        "y": {
+                            "type": "object",
+                            "properties": {
+                                "min": {
+                                    "type": "integer",
+                                    "markdownDescription": "Minimum Y coordinate for the entity to spawn"
+                                },
+                                "max": {
+                                    "type": "integer",
+                                    "markdownDescription": "Maximum Y coordinate for the entity to spawn"
+                                }
+                            }
+                        },
+                        "z": {
+                            "type": "object",
+                            "properties": {
+                                "min": {
+                                    "type": "integer",
+                                    "markdownDescription": "Minimum Y coordinate for the entity to spawn"
+                                },
+                                "max": {
+                                    "type": "integer",
+                                    "markdownDescription": "Maximum Y coordinate for the entity to spawn"
+                                }
+                            }
+                        }
+                    }
+                },
+                "weather": {
+                    "type": "array",
+                    "markdownDescription": "Weather conditions for the entity to spawn.\nThis is useful to spawn entities only during rain or thunder.",
+                    "items": {
+                        "type": "string",
+                        "enum": ["CLEAR", "RAIN", "THUNDER", "SNOW"],
+                    }
+                },
+                "time": {
+                    "type": "object",
+                    "markdownDescription": "Time range for the entity to spawn.\nThis is useful to spawn entities only during the day or night. Add as many `interval_1` as you want (replace 1 with 2, 3, etc.).",
+                     "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/time_interval"
+                    },
+                    "properties": {
+                        "interval_1": { "type": "object", "$ref": "#/$defs/time_interval" },
+                        "interval_2": { "type": "object", "$ref": "#/$defs/time_interval" },
+                        "interval_3": { "type": "object", "$ref": "#/$defs/time_interval" },
+                        "interval_4": { "type": "object", "$ref": "#/$defs/time_interval" },
+                    }
+                },
+                "light_level": {
+                    "type": "object",
+                    "markdownDescription": "Light level range for the entity to spawn.\nThis is useful to spawn entities only in dark places, like caves.",
+                    "properties": {
+                        "min": {
+                            "type": "integer",
+                            "markdownDescription": "Minimum light level for the entity to spawn",
+                            "minimum": 0,
+                            "maximum": 15
+                        },
+                        "max": {
+                            "type": "integer",
+                            "markdownDescription": "Maximum light level for the entity to spawn",
+                            "minimum": 0,
+                            "maximum": 15
+                        }
+                    }
+                }
+            }
+        },
+        "time_interval": {
+            "$id": "time_interval",
+            "type": "object",
+            "required": ["min", "max"],
+            "properties": {
+                "min": {
+                    "type": "integer",
+                    "markdownDescription": "Minimum time in ticks for the interval.",
+                    "defaultSnippets": [
+                        {"body": "0", "label": "day"},
+                        {"body": "9000", "label": "afternoor"},
+                        {"body": "18000", "label": "midnight"},
+                        {"body": "1000", "label": "morning"},
+                        {"body": "14000", "label": "night"},
+                        {"body": "6000", "label": "noon"},
+                        {"body": "23000", "label": "sunrise"},
+                        {"body": "12000", "label": "sunset"},
+                    ]
+                },
+                "max": {
+                    "type": "integer",
+                    "markdownDescription": "Maximum time in ticks for the interval.",
+                    "defaultSnippets": [
+                        {"body": "0", "label": "day"},
+                        {"body": "9000", "label": "afternoor"},
+                        {"body": "18000", "label": "midnight"},
+                        {"body": "1000", "label": "morning"},
+                        {"body": "14000", "label": "night"},
+                        {"body": "6000", "label": "noon"},
+                        {"body": "23000", "label": "sunrise"},
+                        {"body": "12000", "label": "sunset"},
+                    ]
+                }
+            }
+        },
         "trees_populators": {
             "$id": "trees_populators",
             "type": "object",
@@ -9425,8 +9617,8 @@ attribute_modifiers:
                 },
             }
         },
-        "entity": {
-            "$id": "entity",
+        "custom_entity": {
+            "$id": "custom_entity",
             "type": "object",
             "required": ["model_folder"],
             "properties": {
@@ -9587,7 +9779,13 @@ attribute_modifiers:
                             "markdownDescription": "Interrupts the emote. Default `false`."
                         }
                     }
-                }
+                },
+                "speed": {
+                    "properties": {
+                        "movement": {"type": "number"},
+                        "flying": {"type": "number"}
+                    }
+                },
             }
         },
         "ticks": {
