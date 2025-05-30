@@ -431,20 +431,12 @@ export async function activate(context: vscode.ExtensionContext) {
 							return;
 						}
 
-						const workspaceFolders = vscode.workspace.workspaceFolders;
-						if (!workspaceFolders) {
-							console.warn('No workspace open.');
-							return;
-						}
-
-						const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
 						const currentFilePath = document.uri.fsPath;
-
-						// Get the namespace of the file
-						const namespace = currentFilePath.split("contents\\")[1].split("\\")[0];
-						if (!namespace) {
+						const result = getWorkspacePathAndNamespaceFromFilePath(currentFilePath);
+						if (!result) {
 							return;
 						}
+						const { workspacePath, namespace } = result;
 
 						// Find all textures in the current project
 						const possiblePaths = [
@@ -505,20 +497,16 @@ export async function activate(context: vscode.ExtensionContext) {
 							return;
 						}
 
-						const workspaceFolders = vscode.workspace.workspaceFolders;
-						if (!workspaceFolders) {
-							console.warn('No workspace open.');
-							return;
-						}
 
-						const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
 						const currentFilePath = document.uri.fsPath;
 
-						// Get the namespace of the file
-						const namespace = currentFilePath.split("contents\\")[1].split("\\")[0];
-						if (!namespace) {
+						// Get the namespace of the file and workspace path
+						const result = getWorkspacePathAndNamespaceFromFilePath(currentFilePath);
+						if (!result) {
 							return;
 						}
+						const { workspacePath, namespace } = result;
+
 
 						// Find all textures in the current project
 						const possiblePaths = [
@@ -933,14 +921,6 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 			return;
 		}
 
-		const workspaceFolders = vscode.workspace.workspaceFolders;
-		if (!workspaceFolders) {
-			console.warn('No workspace open.');
-			return;
-		}
-
-		const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
-
 		const textureNode = resourceNode.get('texture', true);
 		const texturesNode = resourceNode.get('textures', true);
 
@@ -961,6 +941,11 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 				}
 				return undefined;
 			}
+			const result = getWorkspacePathAndNamespaceFromFilePath(activeEditor.document.uri.fsPath);
+			if (!result) {
+				return undefined;
+			}
+			const { workspacePath, } = result;
 
 			const possiblePaths = [
 				path.join(workspacePath, fileNamespace, `textures`, `${texturePathWithoutNamespace}`),
@@ -1077,6 +1062,11 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 			if(namespace === "minecraft") {
 				return "minecraft"; // Shit
 			}
+			const result = getWorkspacePathAndNamespaceFromFilePath(activeEditor.document.uri.fsPath);
+			if (!result) {
+				return undefined;
+			}
+			const { workspacePath,  } = result;
 
 			const possiblePaths = [
 				path.join(workspacePath, fileNamespace, `models`, `${fileNoNamespace}`),
@@ -1483,4 +1473,16 @@ async function restoreOriginalSettings() {
 		}
 	}
 	console.log('Restored original settings for YAML!');
+}
+
+function getWorkspacePathAndNamespaceFromFilePath(filePath: string): { workspacePath: string, namespace: string } | undefined {
+	const splitContentsResult = filePath.split("contents\\");
+	if (splitContentsResult.length < 2) {
+		console.warn('No path "contents" found in the file path.');
+		return undefined;
+	}
+	return {
+		workspacePath: splitContentsResult[0] + "\\contents",
+		namespace: splitContentsResult[1].split("\\")[0]
+	};
 }
