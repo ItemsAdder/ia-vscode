@@ -198,7 +198,7 @@ export const schemas = {
                 "my_decorator": { "type": "object", "$ref": "#/$defs/cave_decorators" }
             }
         },
-        "entities_populator": {
+        "entities_populators": {
             "type": "object",
             "markdownDescription": "Create rules to spawn custom entities around your worlds.",
             "kind": 5,
@@ -6857,11 +6857,12 @@ attribute_modifiers:
             "type": "object",
             "required": ["name", "value", "type"],
             "properties": {
-                "name": {"type": "string", "default": "ItemsAdderMob"},
-                "value": {"type": "string", "default": "iamobs:red_ender_dragon"},
+                "name": {"type": "string", "default": "ItemsAdderEntity"},
+                "value": {"type": "string", "default": "namespace:identifier"},
                 "type": {
                     "type": "string",
-                    "enum": ["string", "int", "float", "double", "byte", "short"]
+                    "enum": ["string", "int", "float", "double", "byte", "short"],
+                    "default": "string",
                 }
             }
         },
@@ -7055,6 +7056,11 @@ attribute_modifiers:
                 "entity",
             ],
             "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "markdownDescription": "Enable or disable this entity populator."
+                },
                 "entity": {
                     "type": "string",
                     "markdownDescription": "Custom ItemsAdder entity.\n**Do not use Vanilla entities, they are not supported**"
@@ -9635,6 +9641,10 @@ attribute_modifiers:
                     "markdownDescription": "The base Vanilla entity type",
                     "$ref": "#/$defs/bukkit_entity_type"
                 },
+                "eyes_height": {
+                    "type": "number",
+                    "markdownDescription": "Height of the eyes of the entity, used for head look calculations. Default: `1.62`"
+                },
                 "silent": {
                     "type": "boolean",
                     "markdownDescription": "Make the base Vanilla entity silent"
@@ -9672,6 +9682,38 @@ attribute_modifiers:
                     "type": "boolean",
                     "markdownDescription": "Default: `true`"
                 },
+                "sounds": {
+                    "type": "object",
+                    "markdownDescription": "Custom entity sounds",
+                    "properties": {
+                        "ambient": {
+                            "type": "object",
+                            "markdownDescription": "Sound played when the entity is idle.",
+                            "properties": {
+                                "sound": {
+                                    "type": "string",
+                                    "markdownDescription": "Sound played when the entity is idle. Example: `minecraft:entity.zombie.ambient`"
+                                },
+                                "chance_per_tick": {
+                                    "type": "number",
+                                    "markdownDescription": "Chance of the sound to be played per tick. Default: `1` (1%)"
+                                },
+                                "cooldown_ticks": {
+                                    "type": "integer",
+                                    "markdownDescription": "Cooldown in ticks before the sound can be played again. Default: `100` (1 second)"
+                                }
+                            }
+                        },
+                        "hurt": {
+                            "type": "string",
+                            "markdownDescription": "Sound played when the entity is hurt. Example: `minecraft:entity.zombie.hurt`"
+                        },
+                        "death": {
+                            "type": "string",
+                            "markdownDescription": "Sound played when the entity dies. Example: `minecraft:entity.zombie.death`"
+                        }
+                    }
+                }
             }
         },
         "custom_block_variant": {
@@ -9744,6 +9786,10 @@ attribute_modifiers:
                 "can_player_move": {
                     "type": "boolean",
                     "markdownDescription": "If player can move around and jump during animation."
+                },
+                "track_player_rotation": {
+                    "type": "boolean",
+                    "markdownDescription": "If the emote model head should track the player's head and body rotations. If set to `false`, the head will not rotate and will stay in the same position during the emote."
                 },
                 "cancel_conditions": {
                     "type": "object",
