@@ -133,6 +133,9 @@ function preprocessJavaLikeCode(code: string): string {
   // Remove types from function arguments
   code = code.replace(functionArgsRegex, "$2");
 
+  // Remove f and d suffix from floating point and double numbers
+  code = code.replace(/(\d+)([fFdD])/g, "$1");
+
   return code;
 }
 
