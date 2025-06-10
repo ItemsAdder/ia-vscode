@@ -136,6 +136,9 @@ function preprocessJavaLikeCode(code: string): string {
   // Remove f and d suffix from floating point and double numbers
   code = code.replace(/(\d+)([fFdD])/g, "$1");
 
+  // Replace final attribute with nothing
+  code = code.replace(/\bfinal\b/g, "");
+
   return code;
 }
 

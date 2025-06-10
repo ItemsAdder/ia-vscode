@@ -109,15 +109,30 @@ export const schemas = {
                     }
                 },
                 "mobs": {
+                    "deprecated": true,
+                    "doNotSuggest": true,
+                    "type": "object",
+                    "kind": 5,
+                    "detail": "(blocks loots)",
+                    "markdownDescription": "(**OLD NAME**, use the new `entities` instead.)",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/loot.entities"
+                    },
+                    "properties": {
+                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.entities" }
+                    }
+                },
+                "entities": {
                     "type": "object",
                     "kind": 5,
                     "detail": "(blocks loots)",
                     "additionalProperties": {
                         "type": "object",
-                        "$ref": "#/$defs/loot.mobs"
+                        "$ref": "#/$defs/loot.entities"
                     },
                     "properties": {
-                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.mobs" }
+                        "my_loot": { "type": "object", "$ref": "#/$defs/loot.entities" }
                     }
                 },
                 "fishing": {
@@ -131,6 +146,32 @@ export const schemas = {
                     "properties": {
                         "my_loot": { "type": "object", "$ref": "#/$defs/loot.fishing" }
                     }
+                }
+            }
+        },
+        "scripts": {
+            "type": "object",
+            "kind": 5,
+            "detail": "(collection)",
+            "markdownDescription": "Scripts that run custom code on specific events.\nFor now they can be executed on items and custom entities.",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/script"
+            },
+            "properties": {
+                "my_custom_item": { "$ref": "#/$defs/script" }
+            }
+        },
+        "script": {
+            "type": "object",
+            "markdownDescription": "Scripts that run custom code on specific events. For now they can be executed on items and custom entities.",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                },
+                "path": {
+                    "type": "string",
+                    "markdownDescription": "Path to the `.jspp` script file. It is a relative path in the current namespace folder.\nExample: `scripts/my_script` refers to `contents/myitems/scripts/my_script.jspp`",
                 }
             }
         },
@@ -4536,162 +4577,173 @@ attribute_modifiers:
             "type": "string",
             "enum": ["MASTER", "MUSIC", "RECORDS", "WEATHER", "BLOCKS", "HOSTILE", "NEUTRAL", "PLAYERS", "AMBIENT", "VOICE"]
         },
+        "custom_and_bukkit_entity_type": {
+            "$id": "custom_and_bukkit_entity_type",
+            "type": "string",
+            "title": "Custom and Bukkit Entity Type",
+            "markdownDescription": "Bukkit and custom entities",
+            "examples": ["ZOMBIE", "SKELETON", "my_entities:entity_1", "my_entities:entity_2"],
+            "anyOf": [
+                {"type": "string"},
+                {"$ref": "#/$defs/bukkit_entity_type"}
+            ]
+        },
         "bukkit_entity_type": {
             "$id": "bukkit_entity_type",
             "type": "string",
             "markdownDescription": "Vanilla entities",
-            "enum": [
-                'ACACIA_BOAT',
-                'ACACIA_CHEST_BOAT',
-                'ALLAY',
-                'AREA_EFFECT_CLOUD',
-                'ARMADILLO',
-                'ARMOR_STAND',
-                'ARROW',
-                'AXOLOTL',
-                'BAMBOO_CHEST_RAFT',
-                'BAMBOO_RAFT',
-                'BAT',
-                'BEE',
-                'BIRCH_BOAT',
-                'BIRCH_CHEST_BOAT',
-                'BLAZE',
-                'BLOCK_DISPLAY',
-                'BOGGED',
-                'BREEZE',
-                'BREEZE_WIND_CHARGE',
-                'CAMEL',
-                'CAT',
-                'CAVE_SPIDER',
-                'CHERRY_BOAT',
-                'CHERRY_CHEST_BOAT',
-                'CHEST_MINECART',
-                'CHICKEN',
-                'COD',
-                'COMMAND_BLOCK_MINECART',
-                'COW',
-                'CREAKING',
-                'CREAKING_TRANSIENT',
-                'CREEPER',
-                'DARK_OAK_BOAT',
-                'DARK_OAK_CHEST_BOAT',
-                'DOLPHIN',
-                'DONKEY',
-                'DRAGON_FIREBALL',
-                'DROWNED',
-                'EGG',
-                'ELDER_GUARDIAN',
-                'END_CRYSTAL',
-                'ENDER_DRAGON',
-                'ENDER_PEARL',
-                'ENDERMAN',
-                'ENDERMITE',
-                'EVOKER',
-                'EVOKER_FANGS',
-                'EXPERIENCE_BOTTLE',
-                'EXPERIENCE_ORB',
-                'EYE_OF_ENDER',
-                'FALLING_BLOCK',
-                'FIREBALL',
-                'FIREWORK_ROCKET',
-                'FISHING_BOBBER',
-                'FOX',
-                'FROG',
-                'FURNACE_MINECART',
-                'GHAST',
-                'GIANT',
-                'GLOW_ITEM_FRAME',
-                'GLOW_SQUID',
-                'GOAT',
-                'GUARDIAN',
-                'HOGLIN',
-                'HOPPER_MINECART',
-                'HORSE',
-                'HUSK',
-                'ILLUSIONER',
-                'INTERACTION',
-                'IRON_GOLEM',
-                'ITEM',
-                'ITEM_DISPLAY',
-                'ITEM_FRAME',
-                'JUNGLE_BOAT',
-                'JUNGLE_CHEST_BOAT',
-                'LEASH_KNOT',
-                'LIGHTNING_BOLT',
-                'LLAMA',
-                'LLAMA_SPIT',
-                'MAGMA_CUBE',
-                'MANGROVE_BOAT',
-                'MANGROVE_CHEST_BOAT',
-                'MARKER',
-                'MINECART',
-                'MOOSHROOM',
-                'MULE',
-                'OAK_BOAT',
-                'OAK_CHEST_BOAT',
-                'OCELOT',
-                'OMINOUS_ITEM_SPAWNER',
-                'PAINTING',
-                'PALE_OAK_BOAT',
-                'PALE_OAK_CHEST_BOAT',
-                'PANDA',
-                'PARROT',
-                'PHANTOM',
-                'PIG',
-                'PIGLIN',
-                'PIGLIN_BRUTE',
-                'PILLAGER',
-                'PLAYER',
-                'POLAR_BEAR',
-                'POTION',
-                'PUFFERFISH',
-                'RABBIT',
-                'RAVAGER',
-                'SALMON',
-                'SHEEP',
-                'SHULKER',
-                'SHULKER_BULLET',
-                'SILVERFISH',
-                'SKELETON',
-                'SKELETON_HORSE',
-                'SLIME',
-                'SMALL_FIREBALL',
-                'SNIFFER',
-                'SNOW_GOLEM',
-                'SNOWBALL',
-                'SPAWNER_MINECART',
-                'SPECTRAL_ARROW',
-                'SPIDER',
-                'SPRUCE_BOAT',
-                'SPRUCE_CHEST_BOAT',
-                'SQUID',
-                'STRAY',
-                'STRIDER',
-                'TADPOLE',
-                'TEXT_DISPLAY',
-                'TNT',
-                'TNT_MINECART',
-                'TRADER_LLAMA',
-                'TRIDENT',
-                'TROPICAL_FISH',
-                'TURTLE',
-                'UNKNOWN',
-                'VEX',
-                'VILLAGER',
-                'VINDICATOR',
-                'WANDERING_TRADER',
-                'WARDEN',
-                'WIND_CHARGE',
-                'WITCH',
-                'WITHER',
-                'WITHER_SKELETON',
-                'WITHER_SKULL',
-                'WOLF',
-                'ZOGLIN',
-                'ZOMBIE',
-                'ZOMBIE_HORSE',
-                'ZOMBIE_VILLAGER',
-                'ZOMBIFIED_PIGLIN',
+            "anyOf": [
+                { "const": "ACACIA_BOAT"},
+                { "const": "ACACIA_CHEST_BOAT"},
+                { "const": "ALLAY"},
+                { "const": "AREA_EFFECT_CLOUD"},
+                { "const": "ARMADILLO"},
+                { "const": "ARMOR_STAND"},
+                { "const": "ARROW"},
+                { "const": "AXOLOTL"},
+                { "const": "BAMBOO_CHEST_RAFT"},
+                { "const": "BAMBOO_RAFT"},
+                { "const": "BAT"},
+                { "const": "BEE"},
+                { "const": "BIRCH_BOAT"},
+                { "const": "BIRCH_CHEST_BOAT"},
+                { "const": "BLAZE"},
+                { "const": "BLOCK_DISPLAY"},
+                { "const": "BOGGED"},
+                { "const": "BREEZE"},
+                { "const": "BREEZE_WIND_CHARGE"},
+                { "const": "CAMEL"},
+                { "const": "CAT"},
+                { "const": "CAVE_SPIDER"},
+                { "const": "CHERRY_BOAT"},
+                { "const": "CHERRY_CHEST_BOAT"},
+                { "const": "CHEST_MINECART"},
+                { "const": "CHICKEN"},
+                { "const": "COD"},
+                { "const": "COMMAND_BLOCK_MINECART"},
+                { "const": "COW"},
+                { "const": "CREAKING"},
+                { "const": "CREAKING_TRANSIENT"},
+                { "const": "CREEPER"},
+                { "const": "DARK_OAK_BOAT"},
+                { "const": "DARK_OAK_CHEST_BOAT"},
+                { "const": "DOLPHIN"},
+                { "const": "DONKEY"},
+                { "const": "DRAGON_FIREBALL"},
+                { "const": "DROWNED"},
+                { "const": "EGG"},
+                { "const": "ELDER_GUARDIAN"},
+                { "const": "END_CRYSTAL"},
+                { "const": "ENDER_DRAGON"},
+                { "const": "ENDER_PEARL"},
+                { "const": "ENDERMAN"},
+                { "const": "ENDERMITE"},
+                { "const": "EVOKER"},
+                { "const": "EVOKER_FANGS"},
+                { "const": "EXPERIENCE_BOTTLE"},
+                { "const": "EXPERIENCE_ORB"},
+                { "const": "EYE_OF_ENDER"},
+                { "const": "FALLING_BLOCK"},
+                { "const": "FIREBALL"},
+                { "const": "FIREWORK_ROCKET"},
+                { "const": "FISHING_BOBBER"},
+                { "const": "FOX"},
+                { "const": "FROG"},
+                { "const": "FURNACE_MINECART"},
+                { "const": "GHAST"},
+                { "const": "GIANT"},
+                { "const": "GLOW_ITEM_FRAME"},
+                { "const": "GLOW_SQUID"},
+                { "const": "GOAT"},
+                { "const": "GUARDIAN"},
+                { "const": "HOGLIN"},
+                { "const": "HOPPER_MINECART"},
+                { "const": "HORSE"},
+                { "const": "HUSK"},
+                { "const": "ILLUSIONER"},
+                { "const": "INTERACTION"},
+                { "const": "IRON_GOLEM"},
+                { "const": "ITEM"},
+                { "const": "ITEM_DISPLAY"},
+                { "const": "ITEM_FRAME"},
+                { "const": "JUNGLE_BOAT"},
+                { "const": "JUNGLE_CHEST_BOAT"},
+                { "const": "LEASH_KNOT"},
+                { "const": "LIGHTNING_BOLT"},
+                { "const": "LLAMA"},
+                { "const": "LLAMA_SPIT"},
+                { "const": "MAGMA_CUBE"},
+                { "const": "MANGROVE_BOAT"},
+                { "const": "MANGROVE_CHEST_BOAT"},
+                { "const": "MARKER"},
+                { "const": "MINECART"},
+                { "const": "MOOSHROOM"},
+                { "const": "MULE"},
+                { "const": "OAK_BOAT"},
+                { "const": "OAK_CHEST_BOAT"},
+                { "const": "OCELOT"},
+                { "const": "OMINOUS_ITEM_SPAWNER"},
+                { "const": "PAINTING"},
+                { "const": "PALE_OAK_BOAT"},
+                { "const": "PALE_OAK_CHEST_BOAT"},
+                { "const": "PANDA"},
+                { "const": "PARROT"},
+                { "const": "PHANTOM"},
+                { "const": "PIG"},
+                { "const": "PIGLIN"},
+                { "const": "PIGLIN_BRUTE"},
+                { "const": "PILLAGER"},
+                { "const": "PLAYER"},
+                { "const": "POLAR_BEAR"},
+                { "const": "POTION"},
+                { "const": "PUFFERFISH"},
+                { "const": "RABBIT"},
+                { "const": "RAVAGER"},
+                { "const": "SALMON"},
+                { "const": "SHEEP"},
+                { "const": "SHULKER"},
+                { "const": "SHULKER_BULLET"},
+                { "const": "SILVERFISH"},
+                { "const": "SKELETON"},
+                { "const": "SKELETON_HORSE"},
+                { "const": "SLIME"},
+                { "const": "SMALL_FIREBALL"},
+                { "const": "SNIFFER"},
+                { "const": "SNOW_GOLEM"},
+                { "const": "SNOWBALL"},
+                { "const": "SPAWNER_MINECART"},
+                { "const": "SPECTRAL_ARROW"},
+                { "const": "SPIDER"},
+                { "const": "SPRUCE_BOAT"},
+                { "const": "SPRUCE_CHEST_BOAT"},
+                { "const": "SQUID"},
+                { "const": "STRAY"},
+                { "const": "STRIDER"},
+                { "const": "TADPOLE"},
+                { "const": "TEXT_DISPLAY"},
+                { "const": "TNT"},
+                { "const": "TNT_MINECART"},
+                { "const": "TRADER_LLAMA"},
+                { "const": "TRIDENT"},
+                { "const": "TROPICAL_FISH"},
+                { "const": "TURTLE"},
+                { "const": "UNKNOWN"},
+                { "const": "VEX"},
+                { "const": "VILLAGER"},
+                { "const": "VINDICATOR"},
+                { "const": "WANDERING_TRADER"},
+                { "const": "WARDEN"},
+                { "const": "WIND_CHARGE"},
+                { "const": "WITCH"},
+                { "const": "WITHER"},
+                { "const": "WITHER_SKELETON"},
+                { "const": "WITHER_SKULL"},
+                { "const": "WOLF"},
+                { "const": "ZOGLIN"},
+                { "const": "ZOMBIE"},
+                { "const": "ZOMBIE_HORSE"},
+                { "const": "ZOMBIE_VILLAGER"},
+                { "const": "ZOMBIFIED_PIGLIN"},
             ]
         },
         "bukkit_particle": {
@@ -6737,8 +6789,13 @@ attribute_modifiers:
                 },
                 "nbt": {"$ref": "#/$defs/nbt"},
                 "drop_only_first": {
+                    "deprecated": true,
+                    "doNotSuggest": true,
+                    "markdownDescription": "(**OLD NAME**, use the new `stop_on_first_success` instead.)."
+                },
+                "stop_on_first_success": {
                     "type": "boolean",
-                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from doing each of the loot actions (drops, exp, etc...) that succeed into extracting a correct chance to be done. \nWARNING: this would make your loot harder to happen."
                 },
                 "items": {
                     "markdownDescription": "List of the possible result drops and their chances",
@@ -6783,22 +6840,39 @@ attribute_modifiers:
                         "change_me_2": {"type": "object", "$ref": "#/$defs/exp_result"},
                         "change_me_xxx": {"type": "object", "$ref": "#/$defs/exp_result"}
                     }
-                }
+                },
+                "commands": {
+                    "markdownDescription": "List of the possible commands to be executed when a block is broken",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/loot_commands_list"
+                    },
+                    "properties": {
+                        "my_group_1": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_2": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_3": {"type": "object", "$ref": "#/$defs/loot_commands_list"}
+                    }
+                },
             }
         },
-        "loot.mobs": {
-            "$id": "loot.mobs",
+        "loot.entities": {
+            "$id": "loot.entities",
             "type": "object",
             "requires": ["type", "items"],
             "properties": {
                 "enabled": {"type": "boolean"},
                 "type": {
-                    "markdownDescription": "**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/bukkit_entity_type"
+                    "$ref": "#/$defs/custom_and_bukkit_entity_type",
                 },
                 "drop_only_first": {
+                    "deprecated": true,
+                    "doNotSuggest": true,
+                    "markdownDescription": "(**OLD NAME**, use the new `stop_on_first_success` instead.)."
+                },
+                "stop_on_first_success": {
                     "type": "boolean",
-                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from doing each of the loot actions (drops, exp, etc...) that succeed into extracting a correct chance to be done. \nWARNING: this would make your loot harder to happen."
                 },
                 "items": {
                     "markdownDescription": "List of the possible result drops and their chances",
@@ -6828,6 +6902,19 @@ attribute_modifiers:
                         "change_me": {"type": "object", "$ref": "#/$defs/exp_result"},
                         "change_me_2": {"type": "object", "$ref": "#/$defs/exp_result"},
                         "change_me_xxx": {"type": "object", "$ref": "#/$defs/exp_result"}
+                    }
+                },
+                "commands": {
+                    "markdownDescription": "List of the possible commands to be executed when a mob is killed",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/loot_commands_list"
+                    },
+                    "properties": {
+                        "my_group_1": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_2": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_3": {"type": "object", "$ref": "#/$defs/loot_commands_list"}
                     }
                 },
                 "nbt": {"$ref": "#/$defs/nbt"},
@@ -6873,8 +6960,13 @@ attribute_modifiers:
             "properties": {
                 "enabled": {"type": "boolean"},
                 "drop_only_first": {
+                    "deprecated": true,
+                    "doNotSuggest": true,
+                    "markdownDescription": "(**OLD NAME**, use the new `stop_on_first_success` instead.)."
+                },
+                "stop_on_first_success": {
                     "type": "boolean",
-                    "markdownDescription": "This allows you to stop the plugin from dropping each of the items that succeed into extracting a correct chance to be dropped. \nWARNING: this would make your items harder to be dropped."
+                    "markdownDescription": "This allows you to stop the plugin from doing each of the loot actions (drops, exp, etc...) that succeed into extracting a correct chance to be done. \nWARNING: this would make your loot harder to happen."
                 },
                 "items": {
                     "markdownDescription": "List of the possible result drops and their chances",
@@ -6905,6 +6997,78 @@ attribute_modifiers:
                         "change_me_2": {"type": "object", "$ref": "#/$defs/exp_result"},
                         "change_me_xxx": {"type": "object", "$ref": "#/$defs/exp_result"}
                     }
+                },
+                "commands": {
+                    "markdownDescription": "List of the possible commands to be executed when a player catches a fish",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "$ref": "#/$defs/loot_commands_list"
+                    },
+                    "properties": {
+                        "my_group_1": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_2": {"type": "object", "$ref": "#/$defs/loot_commands_list"},
+                        "my_group_3": {"type": "object", "$ref": "#/$defs/loot_commands_list"}
+                    }
+                },
+            }
+        },
+        "loot_commands_list": {
+            "$id": "loot_commands_list",
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "$ref": "#/$defs/loot_commands_list_entry"
+            },
+            "properties": {
+                "chance": {"type": "number", "default": 100},
+                "my_command_1": {"type": "object", "$ref": "#/$defs/loot_commands_list_entry"},
+                "my_command_2": {"type": "object", "$ref": "#/$defs/loot_commands_list_entry"},
+                "my_command_3": {"type": "object", "$ref": "#/$defs/loot_commands_list_entry"}
+            }
+        },
+        "loot_commands_list_entry": {
+            "$id": "loot_commands_list_entry",
+            "type": "object",
+            "required": ["command"],
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "markdownDescription": `Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:
+                    \n\n\`{player}\` is the player who triggered this
+                    \n\n\`{world}\` is the world where this was triggered
+                    \n\n\`{target-player}\` is the player triggered this
+                    \n\n\`{target-world}\` is the x location of where this was triggered
+                    \n\n\`{target-x}\` is the x location of where this was triggered
+                    \n\n\`{target-y}\` is the x location of where this was triggered
+                    \n\n\`{target-z}\` is the x location of where this was triggered
+                    \n\n\`{target-yaw}\` is the yaw
+                    \n\n\`{target-inverse-yaw}\` is the inverse-yaw 
+                    \n\n\`{target-pitch}\` is the pitch 
+                    \n\n\`{debug-event-name}\` is the current Bukkit event which triggered the action (useful only to devs).
+                    \n\n\nExample: \`tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}\``,
+                    "defaultSnippets": [
+                        {
+                            "body": "minecraft:tell {player} Test",
+                            "description": "Example tell command"
+                        },
+                        {
+                            "body": "minecraft:give {player} minecraft:diamond 1",
+                            "description": "Example give command"
+                        },
+                        {
+                            "body": "execute at {player} run minecraft:tp LoneDev ~ ~2 ~",
+                            "description": "Example teleport +2 on Y axis"
+                        },
+                        {
+                            "body": "minecraft:tp {player} {target-x} 200 {target-z}",
+                            "description": "Example teleport on same x, z but 200 on Y axis"
+                        }
+                    ]
+                },
+                "as_console": { 
+                    "type": "boolean",
+                    "markdownDescription": "Default: `true`. Execute the command as console or as the current player.",
                 }
             }
         },
@@ -8515,7 +8679,10 @@ attribute_modifiers:
 
                     ]
                 },
-                "as_console": {"type": "boolean", "examples": [false]},
+                "as_console": {
+                    "type": "boolean", 
+                    "markdownDescription": "Default: `false`. Execute the command as console or as the current player.",
+                },
                 "flow_success_if_message_contains": {
                     "type": "string",
                     "markdownDescription": "The plugin can't automatically identify plugins commands success/fail status, so you have to specify a text that can help the plugin to identify the command status."
@@ -9175,6 +9342,91 @@ attribute_modifiers:
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
         },
+        // #region Entity events
+        "entity_events": {
+            "$id": "entity_events",
+            "markdownDescription": "Entity events are used to trigger actions when an event is triggered for a custom entity",
+            "type": "object",
+            "properties": {
+                "interact": {
+                    "markdownDescription": "Actions executed when a player interacts with a custom entity",
+                    "$ref": "#/$defs/entity_actions"
+                },
+                "attack": {
+                    "markdownDescription": "Actions executed when a custom entity attacks another entity",
+                    "$ref": "#/$defs/entity_actions"
+                },
+                "attacked": {
+                    "markdownDescription": "Actions executed when a custom entity is attacked by another entity",
+                    "$ref": "#/$defs/entity_actions"
+                },
+                "damaged": {
+                    "markdownDescription": "Actions executed when a custom entity takes damage",
+                    "$ref": "#/$defs/entity_actions"
+                },
+                "death": {
+                    "markdownDescription": "Actions executed when a custom entity dies",
+                    "$ref": "#/$defs/entity_actions"
+                },
+            }
+        },
+        "entity_actions": {
+            "$id": "actions",
+            "type": "object",
+            "markdownDescription": "Actions to be executed on this event.\n\nYou can set as many actions as you wish, you can event put the **same action multiple times**, you just have to make them start with the correct name, then append a `_1`, `_2`, `_3`...\nExample: `play_sound_1`, `play_sound_2`, `play_sound_3`.",
+            "patternProperties": {
+                "^summon_entity(.*)$": {"$ref": "#/$defs/summon_entity"},
+                "^execute_command(.*)$": {"$ref": "#/$defs/execute_command"},
+            },
+            "properties": {
+                "summon_entity": {"$ref": "#/$defs/summon_entity"},
+                "execute_command": {"$ref": "#/$defs/entity_execute_command"},
+            }
+        },
+        "summon_entity": {
+            "$id": "summon_entity",
+            "markdownDescription": "Summon a custom entity",
+            "required": ["entity"],
+            "properties": {
+                "entity": {
+                    "type": "string",
+                    "markdownDescription": "The custom entity ID to summon. Example: `mobs:custom_entity_1`."
+                },
+                "max_per_chunk": {
+                    "type": "integer",
+                    "markdownDescription": "Maximum number of entities that can be summoned in a chunk. If the chunk already has this many entities, the entity will not be summoned."
+                },
+                "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
+                "permission": {"$ref": "#/$defs/action_permission.prop"}
+            }
+        },
+        "entity_execute_command": {
+            "$id": "entity_execute_command",
+            "markdownDescription": "Execute a command when an entity event is triggered",
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "markdownDescription": "The command to execute when the entity event is triggered. Example: `tellraw {player} {\"text\":\"hello\"}"
+                },
+                "as_console": {
+                    "type": "boolean",
+                    "markdownDescription": "Default: `true`. Execute the command as console or as the current player.",
+                },
+                "silent": {
+                    "type": "boolean",
+                    "markdownDescription": "If true, the command will be executed silently, without sending any messages to the player or console."
+                },
+                "flow_success_if_message_contains": {
+                    "type": "string",
+                    "markdownDescription": "The plugin can't automatically identify plugins commands success/fail status, so you have to specify a text that can help the plugin to identify the command status."
+                },
+                "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
+                "permission": {"$ref": "#/$defs/action_permission.prop"}
+            }
+        },
+        // #endregion Entity events
         "font_image": {
             "$id": "font_image",
             "type": "object",
@@ -9650,9 +9902,21 @@ attribute_modifiers:
                     "markdownDescription": "Make the base Vanilla entity silent"
                 },
                 "can_sun_burn": {
+                    "type": "boolean",
+                    "markdownDescription": "(**OLD NAME**, use the new `sun_burn` instead.)",
+                    "doNotSuggest": true,
+                    "deprecated": true
+                },
+                "sun_burn": {
                     "type": "boolean"
                 },
                 "can_drop_loot": {
+                    "type": "boolean",
+                    "markdownDescription": "(**OLD NAME**, use the new `drops_vanilla_loot` instead.)",
+                    "doNotSuggest": true,
+                    "deprecated": true
+                },
+                "drop_vanilla_loot": {
                     "type": "boolean",
                     "markdownDescription": "Allow dropping the Vanilla entity loot on death or not."
                 },
@@ -9713,7 +9977,8 @@ attribute_modifiers:
                             "markdownDescription": "Sound played when the entity dies. Example: `minecraft:entity.zombie.death`"
                         }
                     }
-                }
+                },
+                "events": {"type": "object", "$ref": "#/$defs/entity_events"},
             }
         },
         "custom_block_variant": {

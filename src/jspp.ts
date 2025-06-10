@@ -18,7 +18,16 @@ const JS_FEATURES = [
     kind: vscode.CompletionItemKind.Function,
     detail: 'delay(ticks, callback)',
     documentation: 'Executes a function after a certain number of ticks.',
-    hover: "Executes a function after a certain number of ticks.\n\n**Example:** `delay(20, () => {...})`"
+    hover: `Executes a function after a certain number of ticks.
+
+## Examples
+\`\`\`js
+delay(20, () -> {...});
+
+delay(20, () -> {
+  msg($player, "This message is delayed by 20 ticks.");
+});
+\`\`\``
   },
   {
     label: 'msg',
@@ -154,6 +163,15 @@ const JS_FEATURES = [
     hover: "Represents the custom stack object of this event.\n\n**Example:** `customStack`",
     // type: "dev.lone.itemsadder.api.CustomStack"
     type: "CustomStack"
+  },
+  {
+    label: "$customEntity",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$customEntity",
+    documentation: "(Built-in variable) Represents a custom entity object.",
+    hover: "Represents the custom entity object of this event.\n\n**Example:** `customEntity`",
+    // type: "dev.lone.itemsadder.api.CustomEntity"
+    type: "CustomEntity"
   }
 ];
 
