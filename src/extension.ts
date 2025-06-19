@@ -658,25 +658,21 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	};
 
-	if (Array.isArray(schemas.$defs.bukkit_entity_type.anyOf)) {
-		schemas.$defs.bukkit_entity_type.anyOf.forEach((entry: any) => {
-			const element = entry.const;
-			if (!element) return;
-			typesDecos.entities.decos[element] = vscode.window.createTextEditorDecorationType({
-				gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/mc-entities-icons/master/icons/${element}.gif`),
-				gutterIconSize: "contain",
-				overviewRulerColor: 'blue',
-				overviewRulerLane: vscode.OverviewRulerLane.Right,
-				light: {
-					color: '#886c99',
-				},
-				dark: {
-					color: '#886c99',
-				},
-			});
-			typesDecos.entities.data[element] = [];
+	schemas.$defs.bukkit_entity_type.enum.forEach((element: string) => {
+		typesDecos.entities.decos[element] = vscode.window.createTextEditorDecorationType({
+			gutterIconPath: vscode.Uri.parse(`https://raw.githubusercontent.com/LoneDev6/mc-entities-icons/master/icons/${element}.gif`),
+			gutterIconSize: "contain",
+			overviewRulerColor: 'blue',
+			overviewRulerLane: vscode.OverviewRulerLane.Right,
+			light: {
+				color: '#886c99',
+			},
+			dark: {
+				color: '#886c99',
+			},
 		});
-	}
+		typesDecos.entities.data[element] = [];
+	});
 
 	schemas.$defs.bukkit_materials.enum.forEach(element => {
 		let fileName = element.toLowerCase().replace(/_/g, '-');
@@ -713,7 +709,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		// NOTE: ACACIA_BOAT causes issues because it's available on both materials and entities.
 		// For this reason it doesn't show at all.
 		decorateEnums(doc, text, activeEditor, "Vanilla material", schemas.$defs.bukkit_materials.enum, typesDecos.materials);
-		decorateAnyOfEnumLike(doc, text, activeEditor, "Vanilla entity type", schemas.$defs.bukkit_entity_type.anyOf, typesDecos.entities);
+		decorateEnums(doc, text, activeEditor, "Vanilla entity type", schemas.$defs.bukkit_entity_type.enum, typesDecos.entities);
 	
 		decorateGenericTexts(activeEditor, "This property is **enabled**", / true/g, greenTextDeco);
 	
@@ -1192,35 +1188,6 @@ function decorateGenericTexts(activeEditor : vscode.TextEditor, description : st
 	}
 
 	activeEditor.setDecorations(decorationType, appliedDecorations);
-}
-
-function decorateAnyOfEnumLike(
-	doc: YAML.Document.Parsed<any, true>,
-	text: string,
-	activeEditor: vscode.TextEditor,
-	description: string,
-	enumsAnyOfSchema: any[],
-	decos: any
-) {
-	// Extract all possible values from anyOf (objects with "const" property)
-	const values = enumsAnyOfSchema
-		.map(entry => entry && typeof entry === "object" && "const" in entry ? entry.const : undefined)
-		.filter((v): v is string => typeof v === "string");
-
-	values.forEach(element => {
-		decos.data[element] = [];
-		// Space is important to match the property after : only and not random texts containing the enum.
-		// For example it will match `property: ZOMBIE` and not `RANDOMSTRINGZOMBIE1234`.
-		var regEx = new RegExp(`^\\s*\\w+\\s*:\\s*${element}\\b`, 'gm');
-		let match;
-		while ((match = regEx.exec(text))) {
-			const startPos = activeEditor.document.positionAt(match.index + 1);
-			const endPos = activeEditor.document.positionAt(match.index + match[0].length);
-			const decoration = { range: new vscode.Range(startPos, endPos), hoverMessage: description };
-			decos.data[element].push(decoration);
-		}
-		activeEditor.setDecorations(decos.decos[element], decos.data[element]);
-	});
 }
 
 function decorateEnums(doc: YAML.Document.Parsed<any, true>, text: string, activeEditor : vscode.TextEditor, description : string, enumsSchema: any[], decos : any) {

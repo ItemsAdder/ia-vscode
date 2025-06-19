@@ -556,18 +556,18 @@ attribute_modifiers:
             "markdownDescription": "Examples: **STONE**, **itemsadder:ruby**, **ruby**",
             "type": "string",
             "anyOf": [
-                {"$ref": "#/$defs/bukkit_materials"},
-                {"additionalProperties": {"type": "string"}}
+                {"type": "string"},
+                {"$ref": "#/$defs/bukkit_materials"}
             ]
         },
-        "vanilla_and_custom_blocks": {
-            "$id": "vanilla_and_custom_blocks",
+        "bukkit_and_custom_blocks": {
+            "$id": "bukkit_and_custom_blocks",
+            "type": "string",
             "title": "Vanilla / ItemsAdder custom blocks",
             "markdownDescription": "Examples: **STONE**, **itemsadder:ruby_block**, **crying_obsidian**",
-            "type": "string",
             "anyOf": [
-                {"$ref": "#/$defs/bukkit_blocks"},
-                {"additionalProperties": {"type": "string"}}
+                {"type": "string"},
+                {"$ref": "#/$defs/bukkit_blocks"}
             ]
         },
         "bukkit_materials": {
@@ -2106,9 +2106,9 @@ attribute_modifiers:
         },
         "bukkit_blocks": {
             "$id": "bukkit_blocks",
+            "type": "string",
             "title": "Vanilla blocks",
             "markdownDescription": "Examples: **STONE**, **DIAMOND_BLOCK**",
-            "type": "string",
             "anyOf": [
                 {
                     "type": "string",
@@ -2602,6 +2602,7 @@ attribute_modifiers:
                         'POLISHED_TUFF_STAIRS',
                         'POLISHED_TUFF_WALL',
                         'POTATOES',
+                        'POPPY',
                         'POWDER_SNOW_CAULDRON',
                         'POWERED_RAIL',
                         'PRISMARINE_BRICK_SLAB',
@@ -4592,158 +4593,158 @@ attribute_modifiers:
             "$id": "bukkit_entity_type",
             "type": "string",
             "markdownDescription": "Vanilla entities",
-            "anyOf": [
-                { "const": "ACACIA_BOAT"},
-                { "const": "ACACIA_CHEST_BOAT"},
-                { "const": "ALLAY"},
-                { "const": "AREA_EFFECT_CLOUD"},
-                { "const": "ARMADILLO"},
-                { "const": "ARMOR_STAND"},
-                { "const": "ARROW"},
-                { "const": "AXOLOTL"},
-                { "const": "BAMBOO_CHEST_RAFT"},
-                { "const": "BAMBOO_RAFT"},
-                { "const": "BAT"},
-                { "const": "BEE"},
-                { "const": "BIRCH_BOAT"},
-                { "const": "BIRCH_CHEST_BOAT"},
-                { "const": "BLAZE"},
-                { "const": "BLOCK_DISPLAY"},
-                { "const": "BOGGED"},
-                { "const": "BREEZE"},
-                { "const": "BREEZE_WIND_CHARGE"},
-                { "const": "CAMEL"},
-                { "const": "CAT"},
-                { "const": "CAVE_SPIDER"},
-                { "const": "CHERRY_BOAT"},
-                { "const": "CHERRY_CHEST_BOAT"},
-                { "const": "CHEST_MINECART"},
-                { "const": "CHICKEN"},
-                { "const": "COD"},
-                { "const": "COMMAND_BLOCK_MINECART"},
-                { "const": "COW"},
-                { "const": "CREAKING"},
-                { "const": "CREAKING_TRANSIENT"},
-                { "const": "CREEPER"},
-                { "const": "DARK_OAK_BOAT"},
-                { "const": "DARK_OAK_CHEST_BOAT"},
-                { "const": "DOLPHIN"},
-                { "const": "DONKEY"},
-                { "const": "DRAGON_FIREBALL"},
-                { "const": "DROWNED"},
-                { "const": "EGG"},
-                { "const": "ELDER_GUARDIAN"},
-                { "const": "END_CRYSTAL"},
-                { "const": "ENDER_DRAGON"},
-                { "const": "ENDER_PEARL"},
-                { "const": "ENDERMAN"},
-                { "const": "ENDERMITE"},
-                { "const": "EVOKER"},
-                { "const": "EVOKER_FANGS"},
-                { "const": "EXPERIENCE_BOTTLE"},
-                { "const": "EXPERIENCE_ORB"},
-                { "const": "EYE_OF_ENDER"},
-                { "const": "FALLING_BLOCK"},
-                { "const": "FIREBALL"},
-                { "const": "FIREWORK_ROCKET"},
-                { "const": "FISHING_BOBBER"},
-                { "const": "FOX"},
-                { "const": "FROG"},
-                { "const": "FURNACE_MINECART"},
-                { "const": "GHAST"},
-                { "const": "GIANT"},
-                { "const": "GLOW_ITEM_FRAME"},
-                { "const": "GLOW_SQUID"},
-                { "const": "GOAT"},
-                { "const": "GUARDIAN"},
-                { "const": "HOGLIN"},
-                { "const": "HOPPER_MINECART"},
-                { "const": "HORSE"},
-                { "const": "HUSK"},
-                { "const": "ILLUSIONER"},
-                { "const": "INTERACTION"},
-                { "const": "IRON_GOLEM"},
-                { "const": "ITEM"},
-                { "const": "ITEM_DISPLAY"},
-                { "const": "ITEM_FRAME"},
-                { "const": "JUNGLE_BOAT"},
-                { "const": "JUNGLE_CHEST_BOAT"},
-                { "const": "LEASH_KNOT"},
-                { "const": "LIGHTNING_BOLT"},
-                { "const": "LLAMA"},
-                { "const": "LLAMA_SPIT"},
-                { "const": "MAGMA_CUBE"},
-                { "const": "MANGROVE_BOAT"},
-                { "const": "MANGROVE_CHEST_BOAT"},
-                { "const": "MARKER"},
-                { "const": "MINECART"},
-                { "const": "MOOSHROOM"},
-                { "const": "MULE"},
-                { "const": "OAK_BOAT"},
-                { "const": "OAK_CHEST_BOAT"},
-                { "const": "OCELOT"},
-                { "const": "OMINOUS_ITEM_SPAWNER"},
-                { "const": "PAINTING"},
-                { "const": "PALE_OAK_BOAT"},
-                { "const": "PALE_OAK_CHEST_BOAT"},
-                { "const": "PANDA"},
-                { "const": "PARROT"},
-                { "const": "PHANTOM"},
-                { "const": "PIG"},
-                { "const": "PIGLIN"},
-                { "const": "PIGLIN_BRUTE"},
-                { "const": "PILLAGER"},
-                { "const": "PLAYER"},
-                { "const": "POLAR_BEAR"},
-                { "const": "POTION"},
-                { "const": "PUFFERFISH"},
-                { "const": "RABBIT"},
-                { "const": "RAVAGER"},
-                { "const": "SALMON"},
-                { "const": "SHEEP"},
-                { "const": "SHULKER"},
-                { "const": "SHULKER_BULLET"},
-                { "const": "SILVERFISH"},
-                { "const": "SKELETON"},
-                { "const": "SKELETON_HORSE"},
-                { "const": "SLIME"},
-                { "const": "SMALL_FIREBALL"},
-                { "const": "SNIFFER"},
-                { "const": "SNOW_GOLEM"},
-                { "const": "SNOWBALL"},
-                { "const": "SPAWNER_MINECART"},
-                { "const": "SPECTRAL_ARROW"},
-                { "const": "SPIDER"},
-                { "const": "SPRUCE_BOAT"},
-                { "const": "SPRUCE_CHEST_BOAT"},
-                { "const": "SQUID"},
-                { "const": "STRAY"},
-                { "const": "STRIDER"},
-                { "const": "TADPOLE"},
-                { "const": "TEXT_DISPLAY"},
-                { "const": "TNT"},
-                { "const": "TNT_MINECART"},
-                { "const": "TRADER_LLAMA"},
-                { "const": "TRIDENT"},
-                { "const": "TROPICAL_FISH"},
-                { "const": "TURTLE"},
-                { "const": "UNKNOWN"},
-                { "const": "VEX"},
-                { "const": "VILLAGER"},
-                { "const": "VINDICATOR"},
-                { "const": "WANDERING_TRADER"},
-                { "const": "WARDEN"},
-                { "const": "WIND_CHARGE"},
-                { "const": "WITCH"},
-                { "const": "WITHER"},
-                { "const": "WITHER_SKELETON"},
-                { "const": "WITHER_SKULL"},
-                { "const": "WOLF"},
-                { "const": "ZOGLIN"},
-                { "const": "ZOMBIE"},
-                { "const": "ZOMBIE_HORSE"},
-                { "const": "ZOMBIE_VILLAGER"},
-                { "const": "ZOMBIFIED_PIGLIN"},
+            "enum": [
+               "ACACIA_BOAT",
+               "ACACIA_CHEST_BOAT",
+               "ALLAY",
+               "AREA_EFFECT_CLOUD",
+               "ARMADILLO",
+               "ARMOR_STAND",
+               "ARROW",
+               "AXOLOTL",
+               "BAMBOO_CHEST_RAFT",
+               "BAMBOO_RAFT",
+               "BAT",
+               "BEE",
+               "BIRCH_BOAT",
+               "BIRCH_CHEST_BOAT",
+               "BLAZE",
+               "BLOCK_DISPLAY",
+               "BOGGED",
+               "BREEZE",
+               "BREEZE_WIND_CHARGE",
+               "CAMEL",
+               "CAT",
+               "CAVE_SPIDER",
+               "CHERRY_BOAT",
+               "CHERRY_CHEST_BOAT",
+               "CHEST_MINECART",
+               "CHICKEN",
+               "COD",
+               "COMMAND_BLOCK_MINECART",
+               "COW",
+               "CREAKING",
+               "CREAKING_TRANSIENT",
+               "CREEPER",
+               "DARK_OAK_BOAT",
+               "DARK_OAK_CHEST_BOAT",
+               "DOLPHIN",
+               "DONKEY",
+               "DRAGON_FIREBALL",
+               "DROWNED",
+               "EGG",
+               "ELDER_GUARDIAN",
+               "END_CRYSTAL",
+               "ENDER_DRAGON",
+               "ENDER_PEARL",
+               "ENDERMAN",
+               "ENDERMITE",
+               "EVOKER",
+               "EVOKER_FANGS",
+               "EXPERIENCE_BOTTLE",
+               "EXPERIENCE_ORB",
+               "EYE_OF_ENDER",
+               "FALLING_BLOCK",
+               "FIREBALL",
+               "FIREWORK_ROCKET",
+               "FISHING_BOBBER",
+               "FOX",
+               "FROG",
+               "FURNACE_MINECART",
+               "GHAST",
+               "GIANT",
+               "GLOW_ITEM_FRAME",
+               "GLOW_SQUID",
+               "GOAT",
+               "GUARDIAN",
+               "HOGLIN",
+               "HOPPER_MINECART",
+               "HORSE",
+               "HUSK",
+               "ILLUSIONER",
+               "INTERACTION",
+               "IRON_GOLEM",
+               "ITEM",
+               "ITEM_DISPLAY",
+               "ITEM_FRAME",
+               "JUNGLE_BOAT",
+               "JUNGLE_CHEST_BOAT",
+               "LEASH_KNOT",
+               "LIGHTNING_BOLT",
+               "LLAMA",
+               "LLAMA_SPIT",
+               "MAGMA_CUBE",
+               "MANGROVE_BOAT",
+               "MANGROVE_CHEST_BOAT",
+               "MARKER",
+               "MINECART",
+               "MOOSHROOM",
+               "MULE",
+               "OAK_BOAT",
+               "OAK_CHEST_BOAT",
+               "OCELOT",
+               "OMINOUS_ITEM_SPAWNER",
+               "PAINTING",
+               "PALE_OAK_BOAT",
+               "PALE_OAK_CHEST_BOAT",
+               "PANDA",
+               "PARROT",
+               "PHANTOM",
+               "PIG",
+               "PIGLIN",
+               "PIGLIN_BRUTE",
+               "PILLAGER",
+               "PLAYER",
+               "POLAR_BEAR",
+               "POTION",
+               "PUFFERFISH",
+               "RABBIT",
+               "RAVAGER",
+               "SALMON",
+               "SHEEP",
+               "SHULKER",
+               "SHULKER_BULLET",
+               "SILVERFISH",
+               "SKELETON",
+               "SKELETON_HORSE",
+               "SLIME",
+               "SMALL_FIREBALL",
+               "SNIFFER",
+               "SNOW_GOLEM",
+               "SNOWBALL",
+               "SPAWNER_MINECART",
+               "SPECTRAL_ARROW",
+               "SPIDER",
+               "SPRUCE_BOAT",
+               "SPRUCE_CHEST_BOAT",
+               "SQUID",
+               "STRAY",
+               "STRIDER",
+               "TADPOLE",
+               "TEXT_DISPLAY",
+               "TNT",
+               "TNT_MINECART",
+               "TRADER_LLAMA",
+               "TRIDENT",
+               "TROPICAL_FISH",
+               "TURTLE",
+               "UNKNOWN",
+               "VEX",
+               "VILLAGER",
+               "VINDICATOR",
+               "WANDERING_TRADER",
+               "WARDEN",
+               "WIND_CHARGE",
+               "WITCH",
+               "WITHER",
+               "WITHER_SKELETON",
+               "WITHER_SKULL",
+               "WOLF",
+               "ZOGLIN",
+               "ZOMBIE",
+               "ZOMBIE_HORSE",
+               "ZOMBIE_VILLAGER",
+               "ZOMBIFIED_PIGLIN",
             ]
         },
         "bukkit_particle": {
@@ -5120,7 +5121,7 @@ attribute_modifiers:
                                 },
                                 "break_particles_material": {
                                     "markdownDescription": "Alternative to 'break_particles' property.\n\nSpecify which texture the break particle will have (more control compared to break_particles).\n**Accepts only vanilla blocks and custom items!**",
-                                    "$ref": "#/$defs/vanilla_and_custom_blocks"
+                                    "$ref": "#/$defs/bukkit_and_custom_blocks"
                                 },
                                 "shift_up": {
                                     "type": "boolean",
@@ -5760,6 +5761,27 @@ attribute_modifiers:
                 "max_stack_size": {
                     "type": "integer",
                     "markdownDescription": "Max stack size of the item",
+                },
+                "auto_update": {
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If the item should be automatically updated when the resource pack is updated.\n\nIf set to `false` you will need to use the `/iaitem update` command to update the item."
+                        },
+                        "fix_unstackable_items_on_click": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) On click, force merging of items if they are similar but `name`, `item_name`, `lore` and some more are different, but `namespace` and `id` are the same. Note: this will be ignored if the global setting in config.yml is `false`.",
+                        },
+                        "properties": {
+                            "type": "object",
+                            "properties": {
+                                "enchantments_mode": {
+                                    "type": "string",
+                                    "enum": ["REPLACE", "MERGE"],
+                                }
+                            }
+                        }
+                    }
                 },
                 "consumable": {
                     "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nConsumable item. Can be eaten or drank or used in a general way if no food properties are set.",
@@ -6785,7 +6807,7 @@ attribute_modifiers:
                 "enabled": {"type": "boolean"},
                 "type": {
                     "markdownDescription": "**Accepts only blocks, don't set items as type!**",
-                    "$ref": "#/$defs/vanilla_and_custom_blocks"
+                    "$ref": "#/$defs/bukkit_and_custom_blocks"
                 },
                 "nbt": {"$ref": "#/$defs/nbt"},
                 "drop_only_first": {
@@ -9427,6 +9449,294 @@ attribute_modifiers:
             }
         },
         // #endregion Entity events
+        "entity_goals": {
+            "$id": "entity_goals",
+            "markdownDescription": "Execute a command when an entity event is triggered",
+            "patternProperties": {
+                "^look_at_entity(.*)$": { "$ref": "#/$defs/look_at_entity" },
+                "^random_look_around(.*)$": { "$ref": "#/$defs/random_look_around" },
+                "^random_wander_around(.*)$": { "$ref": "#/$defs/random_wander_around" },
+                "^attack_near(.*)$": { "$ref": "#/$defs/nearest_attackable_target" },
+                "^melee_attack(.*)$": { "$ref": "#/$defs/melee_attack" },
+                "^ranged_bow_attack(.*)$": { "$ref": "#/$defs/ranged_bow_attack" },
+                "^avoid_entity(.*)$": { "$ref": "#/$defs/avoid_entity" },
+                "^hurt_by_target(.*)$": { "$ref": "#/$defs/hurt_by_target" },
+                "^restrict_sun(.*)$": { "$ref": "#/$defs/restrict_sun" },
+                "^float(.*)$": { "$ref": "#/$defs/float" },
+                "^move_to_block(.*)$": { "$ref": "#/$defs/move_to_block" },
+                "^open_door(.*)$": { "$ref": "#/$defs/open_door" },
+                "^break_door(.*)$": { "$ref": "#/$defs/break_door" },
+                "^eat_block(.*)$": { "$ref": "#/$defs/eat_block" }
+            },
+            "properties": {
+                "look_at_entity": { "$ref": "#/$defs/look_at_entity" },
+                "random_look_around": { "$ref": "#/$defs/random_look_around" },
+                "random_wander_around": { "$ref": "#/$defs/random_wander_around" },
+                "attack_near": { "$ref": "#/$defs/attack_near" },
+                "melee_attack": { "$ref": "#/$defs/melee_attack" },
+                "ranged_bow_attack": { "$ref": "#/$defs/ranged_bow_attack" },
+                "avoid_entity": { "$ref": "#/$defs/avoid_entity" },
+                "hurt_by_target": { "$ref": "#/$defs/hurt_by_target" },
+                "restrict_sun": { "$ref": "#/$defs/restrict_sun" },
+                "float": { "$ref": "#/$defs/float" },
+                "move_to_block": { "$ref": "#/$defs/move_to_block" },
+                "open_door": { "$ref": "#/$defs/open_door" },
+                "break_door": { "$ref": "#/$defs/break_door" },
+                "eat_block": { "$ref": "#/$defs/eat_block" },
+            }
+        },
+        // #region Entity Goals
+        "base_goal_properties": {
+            "$id": "base_goal_properties",
+            "type": "object",
+            "properties": {
+                "enabled": { "type": "boolean" },
+                "replace_vanilla": {
+                    "type": "boolean",
+                    "markdownDescription": "Replace the vanilla goal (if any of this type) with this one. If false, this goal will be added to the existing goals."
+                },
+                "priority": {
+                    "type": "integer",
+                    "markdownDescription": "Priority of this goal. Higher priority means this goal will be executed before other goals with lower priority."
+                }
+            }
+        },
+        "look_at_entity": {
+            "$id": "look_at_entity",
+            "markdownDescription": "Entity goal to make the entity look at another entity",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "entity": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "chance": {
+                            "type": "number",
+                            "markdownDescription": "(default `100`) Chance of this goal being executed in percentage."
+                        },
+                        "look_forward": { "type": "boolean" }
+                    }
+                }
+            ]
+        },
+        "random_look_around": {
+            "$id": "random_look_around",
+            "markdownDescription": "Entity goal to make the entity look around randomly",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" }
+            ]
+        },
+        "random_wander_around": {
+            "$id": "random_wander_around",
+            "markdownDescription": "Entity goal to make the entity look around randomly",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "speed_modifier": {
+                            "type": "number",
+                            "markdownDescription": "(default `1.0`) Speed modifier of the entity while wandering around."
+                        },
+                        "interval": {
+                            "type": "integer",
+                            "markdownDescription": "(default `10`) Interval in ticks between each random wander action."
+                        },
+                        "check_no_action_time": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If true, the entity will only wander around if it has not performed any action in the last 10 seconds (hardcoded vanilla value, not customizable)."
+                        }
+                    }
+                }
+            ]
+        },
+        "attack_near": {
+            "$id": "attack_near",
+            "markdownDescription": "Entity goal to make the entity find the nearest attackable target",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "entity": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "interval": {
+                            "type": "integer",
+                            "markdownDescription": "(default `10`) Interval in ticks between each target search action."
+                        },
+                        "check_visibility": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If true, the entity will only target entities that are visible to it."
+                        },
+                        "check_can_navigate": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If true, the entity will only target entities that it can navigate to."
+                        }
+                    }
+                }
+            ]
+        },
+        "melee_attack": {
+            "$id": "melee_attack",
+            "markdownDescription": "Entity goal to make the entity attack with melee attacks",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "speed_modifier": {
+                            "type": "number",
+                            "markdownDescription": "(default `1.0`) Speed modifier of the entity while attacking."
+                        },
+                        "pause_when_idle": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If true, the entity will pause its attack when it is not moving."
+                        }
+                    }
+                }
+            ]
+        },
+        "ranged_bow_attack": {
+            "$id": "ranged_bow_attack",
+            "markdownDescription": "Entity goal to make the entity attack with a bow",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "speed_modifier": {
+                            "type": "number",
+                            "markdownDescription": "(default `1.0`) Speed modifier of the entity while attacking."
+                        },
+                        "attack_interval_min": {
+                            "type": "integer",
+                            "markdownDescription": "(default `20`) Minimum interval in ticks between each ranged attack."
+                        },
+                        "attack_radius": {
+                            "type": "integer",
+                            "markdownDescription": "(default `16`) Maximum distance in blocks from the target entity at which the entity will attack."
+                        }
+                    }
+                }
+            ]
+        },
+        "avoid_entity": {
+            "$id": "avoid_entity",
+            "markdownDescription": "Entity goal to make the entity avoid another entity",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "properties": {
+                        "entities": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                    }
+                }
+            ]
+        },
+        "hurt_by_target": {
+            "$id": "hurt_by_target",
+            "markdownDescription": "Entity goal to make the entity remember the last entity that hurt it",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "no_revenge_types": {
+                            "type": "array",
+                            "markdownDescription": "List of entity types that will not trigger revenge.",
+                            "items": {
+                                "$ref": "#/$defs/bukkit_entity_type"
+                            }
+                        },
+                        "alert_others_types": {
+                            "type": "array",
+                            "markdownDescription": "List of entity types that will be alerted when this entity is hurt.",
+                            "items": {
+                                "$ref": "#/$defs/bukkit_entity_type"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "restrict_sun": {
+            "$id": "restrict_sun",
+            "markdownDescription": "Entity goal to make the entity avoid sunlight",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" }
+            ]
+        },
+        "float": {
+            "$id": "float",
+            "markdownDescription": "Entity goal to make the entity float on water",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" }
+            ]
+        },
+        "move_to_block": {
+            "$id": "move_to_block",
+            "markdownDescription": "Entity goal to make the entity move to a specific block",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "blocks": {
+                            "type": "array",
+                            "markdownDescription": "List of blocks that the entity will move to.\nExample: `STONE`, `minecraft:cherry_trapdoor[open=true]`, `test:my_block`.",
+                            "items": {"$ref": "#/$defs/bukkit_and_custom_blocks"}
+                        },
+                        "speed_modifier": {
+                            "type": "number",
+                            "markdownDescription": "(default `1.0`) Speed modifier of the entity while moving to the block."
+                        },
+                        "search_range": {
+                            "type": "integer",
+                            "markdownDescription": "(default `16`) Maximum distance in blocks from the entity at which the entity will search for a block to move to."
+                        }
+                    }
+                }
+            ]
+        },
+        "open_door": {
+            "$id": "open_door",
+            "markdownDescription": "Entity goal to make the entity open a door",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "close": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `false`) If true, the entity will close the door after opening it."
+                        }
+                    }
+                }
+            ]
+        },
+        "break_door": {
+            "$id": "break_door",
+            "markdownDescription": "Entity goal to make the entity break a door",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" }
+            ]
+        },
+        "eat_block": {
+            "$id": "eat_block",
+            "markdownDescription": "Entity goal to make the entity eat a block",
+            "allOf": [
+                { "$ref": "#/$defs/base_goal_properties" },
+                {
+                    "type": "object",
+                    "properties": {
+                        "blocks": {
+                            "type": "array",
+                            "markdownDescription": "List of blocks that the entity will eat.\nExample: `STONE`, `minecraft:cherry_trapdoor[open=true]`, `test:my_block`.",
+                            "items": { "$ref": "#/$defs/bukkit_and_custom_blocks" }
+                        }
+                    }
+                }
+            ]
+        },
+        // #endregion Entity Goals
         "font_image": {
             "$id": "font_image",
             "type": "object",
@@ -9979,6 +10289,7 @@ attribute_modifiers:
                     }
                 },
                 "events": {"type": "object", "$ref": "#/$defs/entity_events"},
+                "goals": {"type": "object", "$ref": "#/$defs/entity_goals"},
             }
         },
         "custom_block_variant": {
