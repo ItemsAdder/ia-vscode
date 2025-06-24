@@ -12,6 +12,52 @@ const JS_FEATURES = [
     documentation: 'Imports a class from another file.',
     hover: "Imports a class.\n\n**Example:** `import \"your.package.here\"`"
   },
+  // Variables
+  {
+    label: "$player",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$player",
+    documentation: "(Built-in variable) The player that triggered the event.",
+    hover: "The player that triggered the event.\n\n**Example:** `player`",
+    // type: "org.bukkit.entity.Player"
+    type: "Player"
+  },
+  {
+    label: "$event",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$event",
+    documentation: "(Built-in variable) The event that was triggered.",
+    hover: "The event that was triggered.\n\n**Example:** `event`",
+    // type: "org.bukkit.event.Event"
+    type: "Event"
+  },
+  {
+    label: "$itemStack",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$itemStack",
+    documentation: "(Built-in variable) Represents an ItemStack object from Bukkit.",
+    hover: "Represents the Bukkit ItemStack of the custom stack object of this event.\n\n**Example:** `itemStack`",
+    // type: "org.bukkit.inventory.ItemStack"
+    type: "ItemStack"
+  },
+  {
+    label: "$customStack",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$customStack",
+    documentation: "(Built-in variable) Represents a custom stack object.",
+    hover: "Represents the custom stack object of this event.\n\n**Example:** `customStack`",
+    // type: "dev.lone.itemsadder.api.CustomStack"
+    type: "CustomStack"
+  },
+  {
+    label: "$customEntity",
+    kind: vscode.CompletionItemKind.Variable,
+    detail: "$customEntity",
+    documentation: "(Built-in variable) Represents a custom entity object.",
+    hover: "Represents the custom entity object of this event.\n\n**Example:** `customEntity`",
+    // type: "dev.lone.itemsadder.api.CustomEntity"
+    type: "CustomEntity"
+  },
   // Functions
   {
     label: 'delay',
@@ -184,51 +230,86 @@ delay(20, () -> {
   \`\`\`
   `
   },
-  // Variables
+  // WorldUtils
   {
-    label: "$player",
-    kind: vscode.CompletionItemKind.Variable,
-    detail: "$player",
-    documentation: "(Built-in variable) The player that triggered the event.",
-    hover: "The player that triggered the event.\n\n**Example:** `player`",
-    // type: "org.bukkit.entity.Player"
-    type: "Player"
+    label: 'isCustomBlock',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'isCustomBlock(block)',
+    documentation: 'Returns true if the block is a custom block.',
+    hover: "Checks if the given block is a custom block.\n\n**Example:** `isCustomBlock(block)`"
   },
   {
-    label: "$event",
-    kind: vscode.CompletionItemKind.Variable,
-    detail: "$event",
-    documentation: "(Built-in variable) The event that was triggered.",
-    hover: "The event that was triggered.\n\n**Example:** `event`",
-    // type: "org.bukkit.event.Event"
-    type: "Event"
+    label: 'customBlock',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'customBlock(block)',
+    documentation: 'Gets the CustomBlock for the block.',
+    hover: "Gets the CustomBlock instance for the given block.\n\n**Example:** `customBlock(block)`"
   },
   {
-    label: "$itemStack",
-    kind: vscode.CompletionItemKind.Variable,
-    detail: "$itemStack",
-    documentation: "(Built-in variable) Represents an ItemStack object from Bukkit.",
-    hover: "Represents the Bukkit ItemStack of the custom stack object of this event.\n\n**Example:** `itemStack`",
-    // type: "org.bukkit.inventory.ItemStack"
-    type: "ItemStack"
+    label: 'block',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'block(worldName, x, y, z)',
+    documentation: 'Gets the block at the given coordinates.',
+    hover: "Gets the block at the specified coordinates in the given world.\n\n**Example:** `block(\"world\", 100, 64, 200)`"
   },
   {
-    label: "$customStack",
-    kind: vscode.CompletionItemKind.Variable,
-    detail: "$customStack",
-    documentation: "(Built-in variable) Represents a custom stack object.",
-    hover: "Represents the custom stack object of this event.\n\n**Example:** `customStack`",
-    // type: "dev.lone.itemsadder.api.CustomStack"
-    type: "CustomStack"
+    label: 'removeBlock',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'removeBlock(block)',
+    documentation: 'Removes the block.',
+    hover: "Removes the specified block.\n\n**Example:** `removeBlock(block)`"
   },
   {
-    label: "$customEntity",
-    kind: vscode.CompletionItemKind.Variable,
-    detail: "$customEntity",
-    documentation: "(Built-in variable) Represents a custom entity object.",
-    hover: "Represents the custom entity object of this event.\n\n**Example:** `customEntity`",
-    // type: "dev.lone.itemsadder.api.CustomEntity"
-    type: "CustomEntity"
+    label: 'placeBlock',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'placeBlock(block, materialOrIdentifier)',
+    documentation: 'Places a block with the given material or identifier.',
+    hover: "Places a block with the specified material or custom identifier.\n\n**Example:** `placeBlock(block, \"DIAMOND_BLOCK\")`"
+  },
+  {
+    label: 'location',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'location(worldName, x, y, z)',
+    documentation: 'Creates a location object.',
+    hover: "Creates a new location object with the specified world and coordinates.\n\n**Example:** `location(\"world\", 100, 64, 200)`"
+  },
+  {
+    label: 'playParticle',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'playParticle(location, particleName, count = 1, offsetX = 0, offsetY = 0, offsetZ = 0, extra = 0)',
+    documentation: 'Spawns a particle effect at a location.',
+    hover: `Spawns a particle effect at the given location.
+
+  **Overloads:**
+  - playParticle(location, particleName)
+  - playParticle(location, particleName, count)
+  - playParticle(location, particleName, count, offsetX, offsetY, offsetZ, extra)
+  - playParticle(world, x, y, z, particleName, count, offsetX, offsetY, offsetZ, extra)
+
+  **Example:**
+  \`\`\`js
+  playParticle(location, "minecraft:small_flame");
+  playParticle(world, 100, 64, 200, "SMOKE", 10, 0.5, 0.5, 0.5, 0.1);
+  \`\`\`
+  `
+  },
+  {
+    label: 'playSound',
+    kind: vscode.CompletionItemKind.Function,
+    detail: 'playSound(location, soundName)\nplaySound(location, soundName, volume, pitch)',
+    documentation: 'Plays a sound at a location.',
+    hover: `Plays a sound at the given location.
+
+**Overloads:**
+- playSound(location, soundName)
+- playSound(location, soundName, volume, pitch)
+
+**Example:**
+\`\`\`js
+playSound(location, "minecraft:entity.player.levelup");
+playSound(location, "minecraft:block.note_block.bell", 2.0, 0.5);
+\`\`\`
+`
   },
   // Data Utilities
   {
@@ -891,86 +972,200 @@ delay(20, () -> {
       'let value = getDataString(entity, "myplugin", "mykey", "default");',
       '```'
     ].join('\n')
-  },
-  // WorldUtils
-  {
-    label: 'isCustomBlock',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'isCustomBlock(block)',
-    documentation: 'Returns true if the block is a custom block.',
-    hover: "Checks if the given block is a custom block.\n\n**Example:** `isCustomBlock(block)`"
-  },
-  {
-    label: 'customBlock',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'customBlock(block)',
-    documentation: 'Gets the CustomBlock for the block.',
-    hover: "Gets the CustomBlock instance for the given block.\n\n**Example:** `customBlock(block)`"
-  },
-  {
-    label: 'block',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'block(worldName, x, y, z)',
-    documentation: 'Gets the block at the given coordinates.',
-    hover: "Gets the block at the specified coordinates in the given world.\n\n**Example:** `block(\"world\", 100, 64, 200)`"
-  },
-  {
-    label: 'removeBlock',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'removeBlock(block)',
-    documentation: 'Removes the block.',
-    hover: "Removes the specified block.\n\n**Example:** `removeBlock(block)`"
-  },
-  {
-    label: 'placeBlock',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'placeBlock(block, materialOrIdentifier)',
-    documentation: 'Places a block with the given material or identifier.',
-    hover: "Places a block with the specified material or custom identifier.\n\n**Example:** `placeBlock(block, \"DIAMOND_BLOCK\")`"
-  },
-  {
-    label: 'location',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'location(worldName, x, y, z)',
-    documentation: 'Creates a location object.',
-    hover: "Creates a new location object with the specified world and coordinates.\n\n**Example:** `location(\"world\", 100, 64, 200)`"
-  },
-  {
-    label: 'playParticle',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'playParticle(location, particleName, count = 1, offsetX = 0, offsetY = 0, offsetZ = 0, extra = 0)',
-    documentation: 'Spawns a particle effect at a location.',
-    hover: `Spawns a particle effect at the given location.
+  }
+];
 
-  **Overloads:**
-  - playParticle(location, particleName)
-  - playParticle(location, particleName, count)
-  - playParticle(location, particleName, count, offsetX, offsetY, offsetZ, extra)
-  - playParticle(world, x, y, z, particleName, count, offsetX, offsetY, offsetZ, extra)
+export function registerJsppLanguageFeatures(context: vscode.ExtensionContext) {
+  const diagnostics = vscode.languages.createDiagnosticCollection('jspp');
+  context.subscriptions.push(diagnostics);
 
-  **Example:**
-  \`\`\`js
-  playParticle(location, "minecraft:small_flame");
-  playParticle(world, 100, 64, 200, "SMOKE", 10, 0.5, 0.5, 0.5, 0.1);
-  \`\`\`
-  `
-  },
-  {
-    label: 'playSound',
-    kind: vscode.CompletionItemKind.Function,
-    detail: 'playSound(location, soundName)\nplaySound(location, soundName, volume, pitch)',
-    documentation: 'Plays a sound at a location.',
-    hover: `Plays a sound at the given location.
+  const resolver = JavaDocResolver.getInstance();
 
-**Overloads:**
-- playSound(location, soundName)
-- playSound(location, soundName, volume, pitch)
+  async function validateAndSetDiagnostics(doc: vscode.TextDocument) {
+    if (doc.languageId !== 'jspp') {
+      return;
+    }
 
-**Example:**
-\`\`\`js
-playSound(location, "minecraft:entity.player.levelup");
-playSound(location, "minecraft:block.note_block.bell", 2.0, 0.5);
-\`\`\`
-`
-  },
-  // --- Unificati in
+    const errors = validate(doc.getText());
+    const diag = errors.map(err => new vscode.Diagnostic(
+      new vscode.Range(err.line - 1, err.column, err.line - 1, err.column + 1),
+      err.message,
+      err.severity === 'error' ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
+    ));
+
+    diagnostics.set(doc.uri, diag);
+
+    await resolver.processFile(doc);
+  }
+
+  vscode.workspace.onDidSaveTextDocument(doc => {
+    validateAndSetDiagnostics(doc);
+  });
+
+  vscode.workspace.onDidChangeTextDocument(event => {
+    validateAndSetDiagnostics(event.document);
+  });
+
+  vscode.workspace.textDocuments.forEach(doc => {
+    validateAndSetDiagnostics(doc);
+  });
+
+  vscode.languages.registerHoverProvider('jspp', {
+    provideHover(document, position, token) {
+      const range = document.getWordRangeAtPosition(position);
+      const word = document.getText(range);
+
+      const feature = JS_FEATURES.find(f => f.label === word);
+      if (feature && feature.hover) {
+        return new vscode.Hover(new vscode.MarkdownString(feature.hover));
+      }
+
+      return null;
+    }
+  });
+
+  vscode.languages.registerCompletionItemProvider('jspp', {
+    provideCompletionItems(document, position, token, context) {
+      const line = document.lineAt(position.line).text.slice(0, position.character);
+
+      // Ensure the completion is not triggered after a '.', it already handled by the chain completion
+      if (line.trim().endsWith('.')) {
+        return [];
+      }
+
+      const allCompletions = [];
+
+      // Check if the line matches the pattern for `import "xxx"`
+      const importMatch = /import\s+"([^"]*)$/.exec(line);
+      if (importMatch) {
+        const partialImport = importMatch[1];
+        // Provide completion items for packages or classes
+        allCompletions.push(...resolver.provideImportCompletions(partialImport));
+      }
+
+      // Collect known variables in the current file
+      const text = document.getText(new vscode.Range(new vscode.Position(0, 0), position)); // Only get the text up to the current position
+      const variableMatches = [
+        ...text.matchAll(/^\s*(?:var|let|const|[A-Z][a-zA-Z0-9_]*)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=/gm)
+      ];
+      const knownVariables = variableMatches.map(match => match[1]);
+
+      const variableCompletionItems = knownVariables.map(variable => {
+        const item = new vscode.CompletionItem(variable, vscode.CompletionItemKind.Variable);
+        item.detail = "Variable";
+        item.documentation = `Variable declared in the current file: ${variable}`;
+        return item;
+      });
+
+      allCompletions.push(...variableCompletionItems);
+
+      allCompletions.push(...JS_FEATURES.map(feature => {
+        const item = new vscode.CompletionItem(feature.label, feature.kind);
+        item.detail = feature.detail;
+        item.documentation = new vscode.MarkdownString(feature.documentation);
+        return item;
+      }));
+
+      return allCompletions;
+    }
+  });
+
+  context.subscriptions.push(
+    vscode.languages.registerHoverProvider('jspp', {
+      provideHover(document, position) {
+        const wordRange = document.getWordRangeAtPosition(position);
+        if (!wordRange) {
+          return;
+        }
+
+        const word = document.getText(wordRange); // ex: getScheduler
+        const lineText = document.lineAt(position.line).text;
+
+        // Takes the part before the selected method
+        const beforeWord = lineText.slice(0, wordRange.start.character);
+        const classMatch = /([A-Z][a-zA-Z0-9_]*)\s*(?:\.\s*)?$/.exec(beforeWord);
+        const className = classMatch?.[1] ?? null;
+
+        const symbol = className ? `${className}#${word}` : word;
+
+        console.log(`Looking for documentation for ${symbol}`);
+        const doc = resolver.getDocumentationFor(symbol);
+        if (doc) {
+          return new vscode.Hover(new vscode.MarkdownString(doc));
+        }
+
+        console.log(`Looking for documentation for ${symbol}`);
+
+      }
+    })
+  );
+
+  vscode.languages.registerCompletionItemProvider('jspp', {
+    provideCompletionItems(document, position) {
+      const lineText = document.lineAt(position.line).text;
+      const partial = lineText.slice(0, position.character);
+
+      // If linetext empty I can provide the whole list of classes available.
+      if (lineText.trim().length === 0) {
+        return resolver.provideCompletionItems();
+      }
+  
+      // Force matching of chains even if it ends with "."
+      // Match the entire chain, regardless of the method
+      const parts = [...partial.matchAll(/([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\(|\.|$)/g)].map(m => m[1]);
+      if (!parts) {
+        return;
+      }
+      if (parts.length === 0) {
+        return;
+      }
+  
+      let currentType: string | undefined = undefined;
+  
+      // Search for the type of the first declared variable
+      // Check if the first part is a built-in variable
+      const builtInVariable = JS_FEATURES.find(f => f.label === parts[0] && f.kind === vscode.CompletionItemKind.Variable);
+      if (builtInVariable && builtInVariable.type) {
+        currentType = builtInVariable.type;
+      } else {
+        // Otherwise, search for the type of the first declared variable in the document
+        for (let i = position.line; i >= 0; i--) {
+          const line = document.lineAt(i).text;
+          const regex = new RegExp(`\\b(\\w+)\\s+${parts[0]}\\b`);
+          const match = regex.exec(line);
+          if (match) {
+            currentType = match[1];
+            break;
+          }
+        }
+      }
+
+      // If not found, assume static class
+      if (!currentType) {
+        currentType = parts[0];
+      }
+  
+      // Resolve the chain
+      for (let i = 1; i < parts.length; i++) {
+        const method = parts[i];
+        if (!currentType) {
+          return;
+        }
+  
+        const returnType = resolver.getReturnTypeOf(currentType, method);
+        if (!returnType) {
+          console.warn(`Return type not found for ${currentType}.${method}`);
+          return;
+        }
+  
+        currentType = resolver.getFullImport(returnType) ?? returnType;
+      }
+  
+      if (!currentType) {
+        return;
+      }
+      return resolver.provideCompletionItems(currentType);
+    }
+  }, '.');
+
+}
