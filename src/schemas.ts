@@ -162,19 +162,6 @@ export const schemas = {
                 "my_custom_item": { "$ref": "#/$defs/script" }
             }
         },
-        "script": {
-            "type": "object",
-            "markdownDescription": "Scripts that run custom code on specific events. For now they can be executed on items and custom entities.",
-            "properties": {
-                "enabled": {
-                    "type": "boolean",
-                },
-                "path": {
-                    "type": "string",
-                    "markdownDescription": "Path to the `.jspp` script file. It is a relative path in the current namespace folder.\nExample: `scripts/my_script` refers to `contents/myitems/scripts/my_script.jspp`",
-                }
-            }
-        },
         "worlds_populators": {
             "type": "object",
             "markdownDescription": "(**OLD NAME**, use the new `blocks_populators` instead.)",
@@ -7519,7 +7506,6 @@ attribute_modifiers:
                 "block_trade_machine": {"$ref": "#/$defs/behaviour.trade_machine"},
                 "furniture_trade_machine": {"$ref": "#/$defs/behaviour.trade_machine"},
                 "vehicle": {"$ref": "#/$defs/behaviour.vehicle"},
-                "mob": {"$ref": "#/$defs/behaviour.mob"},
                 "liquid_analyzer": {
                     "type": "boolean",
                     "markdownDescription": "Tells ItemsAdder that this item is a liquid analyzer.\nYou will be able to check which custom liquid you're looking at."
@@ -8092,216 +8078,6 @@ attribute_modifiers:
                 }
             }
         },
-        "behaviour.mob": {
-            "$id": "behaviour.mob",
-            "type": "object",
-            "markdownDescription": "(This is an old feature, it probably will be removed in the future.)\nTells ItemsAdder that this item is a custom mob.\nYou will be able to spawn it using eggs (create them), spawn in the world and drop items on death (loots).",
-            "required": ["ai"],
-            "doNotSuggest": true,
-            "deprecated": true,
-            "properties": {
-                "enabled": {"type": "boolean"},
-                "ai": {
-                    "markdownDescription": "AI of the mob.\n**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/bukkit_entity_type"
-                },
-                "visual": {
-                    "markdownDescription": "Appearence of the mob.\nDEFAULT is ZOMBIE because it can holt items on head.\n**Accepts only vanilla mobs**\n\n",
-                    "$ref": "#/$defs/bukkit_entity_type"
-                },
-                "animation": {
-                    "markdownDescription": "Items models used as animation for the mob",
-                    "properties": {
-                        "attack": {
-                            "type": "string",
-                            "markdownDescription": "Item used to represent the attack animation of this mob"
-                        },
-                        "walk": {
-                            "type": "string",
-                            "markdownDescription": "Item used to represent the walk animation of this mob"
-                        }
-                    }
-                },
-                "invisible": {
-                    "type": "boolean",
-                    "markdownDescription": "If the vanilla entity is invisible. **true** by default"
-                },
-                "boss_bar": {
-                    "type": "object",
-                    "required": ["enabled"],
-                    "markdownDescription": "Show bossbar even if IA is not of a boss (WITHER, ENDER_DRAGON)",
-                    "properties": {
-                        "enabled": {"type": "boolean"},
-                        "style": {
-                            "type": "string",
-                            "enum": [
-                                "SOLID",
-                                "SEGMENTED_6",
-                                "SEGMENTED_10",
-                                "SEGMENTED_12",
-                                "SEGMENTED_20"
-                            ]
-                        },
-                        "color": {
-                            "type": "string",
-                            "enum": [
-                                "PINK",
-                                "BLUE",
-                                "RED",
-                                "GREEN",
-                                "YELLOW",
-                                "PURPLE",
-                                "WHITE"
-                            ]
-                        }
-                    }
-                },
-                "baby": {
-                    "type": "boolean",
-                    "markdownDescription": "If the vanilla entity is a baby. This is useful for ZOMBIE type to have a smaller entity"
-                },
-                "hit_color": {
-                    "type": "string",
-                    "markdownDescription": "Color shown when the entity takes damage.\nSet any color in HEX or name (just like armors).\n\n **DEFAULT** is: ff7e7e"
-                },
-                "clear_inventory": {
-                    "type": "boolean",
-                    "markdownDescription": "Clear inventory on spawn (because sometimes ZOMBIES and other mobs spawn with swords/armors)"
-                },
-                "lock_head_rotation": {
-                    "properties": {"x": {"type": "number"}, "y": {"type": "number"}}
-                },
-                "y_offset": {
-                    "type": "number",
-                    "markdownDescription": "This tells ItemsAdder to shift the mob on the Y axis. Useful for SQUIDs and other mobs."
-                },
-                "upside_down": {"markdownDescription": "Dinnerbone", "type": "boolean"},
-                "size": {"markdownDescription": "Size of Slime, Phantom...", "type": "integer"},
-                "max_health": {"type": "number"},
-                "speed": {
-                    "properties": {
-                        "movement": {"type": "number"},
-                        "flying": {"type": "number"}
-                    }
-                },
-                "special": {
-                    "wither_projectile": {
-                        "type": "string",
-                        "enum": [
-                            "ARROW",
-                            "THROWN_EXP_BOTTLE",
-                            "EGG",
-                            "ENDER_PEARL",
-                            "FIREBALL",
-                            "FISHING_HOOK",
-                            "SPLASH_POTION",
-                            "SNOWBALL",
-                            "TRIDENT"
-                        ]
-                    }
-                },
-                "potion_effects": {
-                    "patternProperties": {
-                        "^potion_effect(.*)$": {
-                            "type": "object",
-                            "markdownDescription": "Apply potion effect to the mob on spawn",
-                            "properties": {
-                                "every_ticks": {"$ref": "#/$defs/ticks"},
-                                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
-                                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
-                                "duration": {"$ref": "#/$defs/ticks"},
-                                "ambient": {"type": "boolean"},
-                                "particles": { "type": "boolean" },
-                                "icon": { "type": "boolean" },
-                            }
-                        }
-                    },
-                    "properties": {
-                        "potion_effect": {
-                            "type": "object",
-                            "markdownDescription": "Apply potion effect to the mob on spawn",
-                            "properties": {
-                                "every_ticks": {"$ref": "#/$defs/ticks"},
-                                "type": {"$ref": "#/$defs/bukkit_potion_effect_type"},
-                                "amplifier": {"$ref": "#/$defs/potion_amplifier"},
-                                "duration": {"$ref": "#/$defs/ticks"},
-                                "ambient": {"type": "boolean"},
-                                "particles": { "type": "boolean" },
-                                "icon": { "type": "boolean" },
-                            }
-                        }
-                    }
-                },
-                "replace_mobs_spawn": {
-                    "type": "object",
-                    "additionalProperties": {"$ref": "#/$defs/replace_mobs_spawn"},
-                    "properties": {
-                        "change_me": {"$ref": "#/$defs/replace_mobs_spawn"},
-                        "change_me_2": {"$ref": "#/$defs/replace_mobs_spawn"},
-                        "change_me_xxx": {"$ref": "#/$defs/replace_mobs_spawn"}
-                    }
-                }
-            }
-        },
-        "replace_mobs_spawn": {
-            "$id": "replace_mobs_spawn",
-            "type": "object",
-            "properties": {
-                "type": {
-                    "markdownDescription": "**Accepts only vanilla mobs**",
-                    "$ref": "#/$defs/bukkit_entity_type"
-                },
-                "reason": {
-                    "enum": [
-                        "NATURAL",
-                        "JOCKEY",
-                        "SPAWNER",
-                        "EGG",
-                        "SPAWNER_EGG",
-                        "LIGHTNING",
-                        "BUILD_SNOWMAN",
-                        "BUILD_IRONGOLEM",
-                        "BUILD_WITHER",
-                        "VILLAGE_DEFENSE",
-                        "VILLAGE_INVASION",
-                        "BREEDING",
-                        "SLIME_SPLIT",
-                        "REINFORCEMENTS",
-                        "NETHER_PORTAL",
-                        "DISPENSE_EGG",
-                        "INFECTION",
-                        "CURED",
-                        "OCELOT_BABY",
-                        "SILVERFISH_BLOCK",
-                        "MOUNT",
-                        "TRAP",
-                        "ENDER_PEARL",
-                        "SHOULDER_ENTITY",
-                        "DROWNED",
-                        "EXPLOSION",
-                        "RAID",
-                        "PATROL",
-                        "BEEHIVE",
-                        "PIGLIN_ZOMBIFIED",
-                        "CUSTOM",
-                        "DEFAULT"
-                    ]
-                },
-                "chance": {"type": "number", "default": 99.9},
-                "max_sky_light": {
-                    "type": "integer",
-                    "markdownDescription": "Max light that triggers this action. 15 is outside",
-                    "minimum": -1,
-                    "maximum": 16
-                },
-                "time": {
-                    "properties": {
-                        "start": {"enum": ["ANY", "DAY", "NOON", "NIGHT", "MIDNIGHT"]},
-                        "end": {"enum": ["ANY", "DAY", "NOON", "NIGHT", "MIDNIGHT"]}
-                    }
-                }
-            }
-        },
         "behaviour.liquid_bucket": {
             "$id": "behaviour.liquid_bucket",
             "type": "object",
@@ -8561,47 +8337,41 @@ attribute_modifiers:
             "type": "object",
             "markdownDescription": "Actions to be executed on this event.\n\nYou can set as many actions as you wish, you can event put the **same action multiple times**, you just have to make them start with the correct name, then append a _1, _2, _3...\nExample: play_sound_1, play_sound_2, play_sound_3\n\nMore info here: https://itemsadder.devs.beer/plugin-usage/adding-content/item-properties/events/actions",
             "patternProperties": {
-                "^play_sound(.*)$": {"$ref": "#/$defs/play_sound"},
-                "^stop_sound(.*)$": {"$ref": "#/$defs/stop_sound"},
-                "^cancel(.*)$": {"$ref": "#/$defs/cancel"},
-                "^execute_commands(.*)$": {"$ref": "#/$defs/execute_commands"},
-                "^play_particle(.*)$": {"$ref": "#/$defs/play_particle"},
-                "^shoot_particle(.*)$": {"$ref": "#/$defs/shoot_particle"},
-                "^play_effect(.*)$": {"$ref": "#/$defs/play_effect"},
-                "^increment_durability(.*)$": {
-                    "$ref": "#/$defs/decrement_increment_durability"
-                },
-                "^decrement_durability(.*)$": {
-                    "$ref": "#/$defs/decrement_increment_durability"
-                },
-                "^decrement_usages(.*)$": {"$ref": "#/$defs/decrement_usages"},
-                "^increment_amount(.*)$": {"$ref": "#/$defs/increment_amount"},
-                "^decrement_amount(.*)$": {"$ref": "#/$defs/decrement_amount"},
-                "^drop_exp(.*)$": {"$ref": "#/$defs/drop_exp"},
-                "^feed(.*)$": {"$ref": "#/$defs/feed"},
-                "^replace_properties(.*)$": {"$ref": "#/$defs/replace_properties"},
-                "^give_item(.*)$": {"$ref": "#/$defs/give_item"},
-                "^replace_near_blocks(.*)$": {"$ref": "#/$defs/replace_near_blocks"},
-                "^glow_near_blocks(.*)$": {"$ref": "#/$defs/glow_near_blocks"},
-                "^replace_block(.*)$": {"$ref": "#/$defs/replace_block"},
-                "^multiple_break(.*)$": {"$ref": "#/$defs/multiple_break"},
-                "^potion_effect(.*)$": {"$ref": "#/$defs/potion_effect"},
-                "^remove_potion_effect(.*)$": {"$ref": "#/$defs/remove_potion_effect"},
-                "^explosion(.*)$": {"$ref": "#/$defs/explosion"},
-                "^damage_near_entities(.*)$": {"$ref": "#/$defs/damage_near_entities"},
-                "^damage_entity_in_sight(.*)$": {
-                    "$ref": "#/$defs/damage_entity_in_sight"
-                },
-                "^damage_entity(.*)$": {"$ref": "#/$defs/damage_entity"},
-                "^target_potion_effect(.*)$": {"$ref": "#/$defs/target_potion_effect"},
-                "^target_remove_potion_effect(.*)$": {
-                    "$ref": "#/$defs/target_remove_potion_effect"
-                },
-                "^increment_player_stat(.*)$": {"$ref": "#/$defs/increment_player_stat"},
-                "^decrement_player_stat(.*)$": {"$ref": "#/$defs/decrement_player_stat"},
-                "^set_block(.*)$": {"$ref": "#/$defs/set_block"},
-                "^place_furniture(.*)$": {"$ref": "#/$defs/place_furniture"},
-                "^drop_item(.*)$": {"$ref": "#/$defs/drop_item"}
+                "^play_sound(.*)$": { "$ref": "#/$defs/play_sound" },
+                "^stop_sound(.*)$": { "$ref": "#/$defs/stop_sound" },
+                "^cancel(.*)$": { "$ref": "#/$defs/cancel" },
+                "^execute_commands(.*)$": { "$ref": "#/$defs/execute_commands" },
+                "^play_particle(.*)$": { "$ref": "#/$defs/play_particle" },
+                "^shoot_particle(.*)$": { "$ref": "#/$defs/shoot_particle" },
+                "^play_effect(.*)$": { "$ref": "#/$defs/play_effect" },
+                "^increment_durability(.*)$": { "$ref": "#/$defs/decrement_increment_durability" },
+                "^decrement_durability(.*)$": { "$ref": "#/$defs/decrement_increment_durability" },
+                "^decrement_usages(.*)$": { "$ref": "#/$defs/decrement_usages" },
+                "^increment_amount(.*)$": { "$ref": "#/$defs/increment_amount" },
+                "^decrement_amount(.*)$": { "$ref": "#/$defs/decrement_amount" },
+                "^drop_exp(.*)$": { "$ref": "#/$defs/drop_exp" },
+                "^feed(.*)$": { "$ref": "#/$defs/feed" },
+                "^replace_properties(.*)$": { "$ref": "#/$defs/replace_properties" },
+                "^give_item(.*)$": { "$ref": "#/$defs/give_item" },
+                "^replace_near_blocks(.*)$": { "$ref": "#/$defs/replace_near_blocks" },
+                "^glow_near_blocks(.*)$": { "$ref": "#/$defs/glow_near_blocks" },
+                "^replace_block(.*)$": { "$ref": "#/$defs/replace_block" },
+                "^multiple_break(.*)$": { "$ref": "#/$defs/multiple_break" },
+                "^potion_effect(.*)$": { "$ref": "#/$defs/potion_effect" },
+                "^remove_potion_effect(.*)$": { "$ref": "#/$defs/remove_potion_effect" },
+                "^explosion(.*)$": { "$ref": "#/$defs/explosion" },
+                "^damage_near_entities(.*)$": { "$ref": "#/$defs/damage_near_entities" },
+                "^damage_entity_in_sight(.*)$": { "$ref": "#/$defs/damage_entity_in_sight" },
+                "^damage_entity(.*)$": { "$ref": "#/$defs/damage_entity" },
+                "^target_potion_effect(.*)$": { "$ref": "#/$defs/target_potion_effect" },
+                "^target_remove_potion_effect(.*)$": { "$ref": "#/$defs/target_remove_potion_effect" },
+                "^increment_player_stat(.*)$": { "$ref": "#/$defs/increment_player_stat" },
+                "^decrement_player_stat(.*)$": { "$ref": "#/$defs/decrement_player_stat" },
+                "^play_totem_animation(.*)$": { "$ref": "#/$defs/play_totem_animation" },
+                "^script(.*)$": { "$ref": "#/$defs/script_execute" },
+                "^drop_item(.*)$": { "$ref": "#/$defs/drop_item" },
+                "^set_block(.*)$": { "$ref": "#/$defs/set_block" },
+                "^place_furniture(.*)$": { "$ref": "#/$defs/place_furniture" }
             },
             "properties": {
                 "play_sound": {"$ref": "#/$defs/play_sound"},
@@ -8611,12 +8381,8 @@ attribute_modifiers:
                 "play_particle": {"$ref": "#/$defs/play_particle"},
                 "shoot_particle": {"$ref": "#/$defs/shoot_particle"},
                 "play_effect": {"$ref": "#/$defs/play_effect"},
-                "increment_durability": {
-                    "$ref": "#/$defs/decrement_increment_durability"
-                },
-                "decrement_durability": {
-                    "$ref": "#/$defs/decrement_increment_durability"
-                },
+                "increment_durability": { "$ref": "#/$defs/decrement_increment_durability" },
+                "decrement_durability": { "$ref": "#/$defs/decrement_increment_durability" },
                 "decrement_usages": {"$ref": "#/$defs/decrement_usages"},
                 "increment_amount": {"$ref": "#/$defs/increment_amount"},
                 "decrement_amount": {"$ref": "#/$defs/decrement_amount"},
@@ -8635,12 +8401,11 @@ attribute_modifiers:
                 "damage_entity_in_sight": {"$ref": "#/$defs/damage_entity_in_sight"},
                 "damage_entity": {"$ref": "#/$defs/damage_entity"},
                 "target_potion_effect": {"$ref": "#/$defs/target_potion_effect"},
-                "target_remove_potion_effect": {
-                    "$ref": "#/$defs/target_remove_potion_effect"
-                },
+                "target_remove_potion_effect": { "$ref": "#/$defs/target_remove_potion_effect" },
                 "increment_player_stat": {"$ref": "#/$defs/increment_player_stat"},
                 "decrement_player_stat": {"$ref": "#/$defs/decrement_player_stat"},
                 "play_totem_animation": {"$ref": "#/$defs/play_totem_animation"},
+                "script": {"$ref": "#/$defs/script_execute"},
                 "drop_item": {"$ref": "#/$defs/drop_item"},
                 "set_block": {"$ref": "#/$defs/set_block"},
                 "place_furniture": {"$ref": "#/$defs/place_furniture"}
@@ -9461,7 +9226,7 @@ attribute_modifiers:
                 "^ranged_bow_attack(.*)$": { "$ref": "#/$defs/ranged_bow_attack" },
                 "^avoid_entity(.*)$": { "$ref": "#/$defs/avoid_entity" },
                 "^hurt_by_target(.*)$": { "$ref": "#/$defs/hurt_by_target" },
-                "^restrict_sun(.*)$": { "$ref": "#/$defs/restrict_sun" },
+                "^avoid_sun(.*)$": { "$ref": "#/$defs/avoid_sun" },
                 "^float(.*)$": { "$ref": "#/$defs/float" },
                 "^move_to_block(.*)$": { "$ref": "#/$defs/move_to_block" },
                 "^open_door(.*)$": { "$ref": "#/$defs/open_door" },
@@ -9469,6 +9234,10 @@ attribute_modifiers:
                 "^eat_block(.*)$": { "$ref": "#/$defs/eat_block" }
             },
             "properties": {
+                "clear_all": {
+                    "type": "boolean",
+                    "markdownDescription": "If true, all vanilla entity goals will be cleared before adding the new ones. If false, the new goals will be added to the existing ones."
+                },
                 "look_at_entity": { "$ref": "#/$defs/look_at_entity" },
                 "random_look_around": { "$ref": "#/$defs/random_look_around" },
                 "random_wander_around": { "$ref": "#/$defs/random_wander_around" },
@@ -9477,7 +9246,7 @@ attribute_modifiers:
                 "ranged_bow_attack": { "$ref": "#/$defs/ranged_bow_attack" },
                 "avoid_entity": { "$ref": "#/$defs/avoid_entity" },
                 "hurt_by_target": { "$ref": "#/$defs/hurt_by_target" },
-                "restrict_sun": { "$ref": "#/$defs/restrict_sun" },
+                "avoid_sun": { "$ref": "#/$defs/avoid_sun" },
                 "float": { "$ref": "#/$defs/float" },
                 "move_to_block": { "$ref": "#/$defs/move_to_block" },
                 "open_door": { "$ref": "#/$defs/open_door" },
@@ -9510,11 +9279,19 @@ attribute_modifiers:
                     "type": "object",
                     "properties": {
                         "entity": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "selector": { "$ref": "#/$defs/entity_goal_selector" },
                         "chance": {
                             "type": "number",
-                            "markdownDescription": "(default `100`) Chance of this goal being executed in percentage."
+                            "markdownDescription": "(default `20`) Chance of this goal being executed in percentage."
                         },
-                        "look_forward": { "type": "boolean" }
+                        "range": {
+                            "type": "integer",
+                            "markdownDescription": "(default `8`) Maximum distance in blocks from the target entity at which the entity will look at it."
+                        },
+                        "look_forward": { 
+                            "type": "boolean",
+                            "markdownDescription": "(default `false`) If true, the entity will look at the target entity's forward direction instead of its position."
+                        }
                     }
                 }
             ]
@@ -9559,6 +9336,11 @@ attribute_modifiers:
                     "type": "object",
                     "properties": {
                         "entity": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "selector": { "$ref": "#/$defs/entity_goal_selector" },
+                        "must_be_angry_at": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `true`) If true, the entity will only target entities that it is angry at. This is useful for entities that have a specific target they are angry at, like wolves."
+                        },
                         "interval": {
                             "type": "integer",
                             "markdownDescription": "(default `10`) Interval in ticks between each target search action."
@@ -9597,7 +9379,7 @@ attribute_modifiers:
         },
         "ranged_bow_attack": {
             "$id": "ranged_bow_attack",
-            "markdownDescription": "Entity goal to make the entity attack with a bow",
+            "markdownDescription": "Entity goal to make the entity attack with a bow. Note: This goal will only work with vanilla base entity types: `BOGGED`, `DROWNED`, `ILLUSIONER`, `LLAMA`, `PIGLIN`, `PILLAGER`, `SKELETON`, `SNOW_GOLEM`, `STRAY`, `TRADER_LLAMA`, `WITCH`, `WITHER`, `WITHER_SKELETON`.",
             "allOf": [
                 { "$ref": "#/$defs/base_goal_properties" },
                 {
@@ -9626,10 +9408,40 @@ attribute_modifiers:
                 { "$ref": "#/$defs/base_goal_properties" },
                 {
                     "properties": {
-                        "entities": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "entity": { "$ref": "#/$defs/custom_and_bukkit_entity_type" },
+                        "selector": { "$ref": "#/$defs/entity_goal_selector" }
                     }
                 }
             ]
+        },
+        "entity_goal_selector": {
+            "$id": "entity_goal_selector",
+            "properties": {
+                "min_health": {
+                    "type": "number",
+                    "markdownDescription": "(default `0.0`) Minimum health of the entity to apply this goal. If the entity's health is below this value, the goal will not be applied."
+                },
+                "max_health": {
+                    "type": "number",
+                    "markdownDescription": "(default `20.0`) Maximum health of the entity to apply this goal. If the entity's health is above this value, the goal will not be applied."
+                },
+                "equipment": {
+                    "type": "object",
+                    "markdownDescription": "Equipment of the entity to apply this goal. If the entity's equipment does not match this value, the goal will not be applied.",
+                    "properties": {
+                        "match_all": {
+                            "type": "boolean",
+                            "markdownDescription": "(default `false`) If true, the entity's equipment must match all the specified items. If false, the entity's equipment must match at least one of the specified items."
+                        },
+                        "head": { "$ref": "#/$defs/bukkit_materials_and_customitems" },
+                        "chest": { "$ref": "#/$defs/bukkit_materials_and_customitems" },
+                        "legs": { "$ref": "#/$defs/bukkit_materials_and_customitems" },
+                        "feet": { "$ref": "#/$defs/bukkit_materials_and_customitems" },
+                        "main_hand": { "$ref": "#/$defs/bukkit_materials_and_customitems" },
+                        "off_hand": { "$ref": "#/$defs/bukkit_materials_and_customitems" }
+                    },
+                }
+            }
         },
         "hurt_by_target": {
             "$id": "hurt_by_target",
@@ -9639,14 +9451,14 @@ attribute_modifiers:
                 {
                     "type": "object",
                     "properties": {
-                        "no_revenge_types": {
+                        "ignore_damage_from": {
                             "type": "array",
-                            "markdownDescription": "List of entity types that will not trigger revenge.",
+                            "markdownDescription": "List of vanilla entity types that will not trigger revenge.",
                             "items": {
                                 "$ref": "#/$defs/bukkit_entity_type"
                             }
                         },
-                        "alert_others_types": {
+                        "alert_others": {
                             "type": "array",
                             "markdownDescription": "List of entity types that will be alerted when this entity is hurt.",
                             "items": {
@@ -9657,8 +9469,8 @@ attribute_modifiers:
                 }
             ]
         },
-        "restrict_sun": {
-            "$id": "restrict_sun",
+        "avoid_sun": {
+            "$id": "avoid_sun",
             "markdownDescription": "Entity goal to make the entity avoid sunlight",
             "allOf": [
                 { "$ref": "#/$defs/base_goal_properties" }
@@ -10694,6 +10506,32 @@ attribute_modifiers:
                     "markdownDescription": "(default `true`) `true` if the sound should be played in mono. `false` if the sound should be played in stereo. NOTE: `stereo` sounds will ignore the location and play without any distance attenuation. Use `stereo` for sounds that are not location based, like music."
                 }
             }
-        }
+        },
+        "script": {
+            "$id": "script",
+            "type": "object",
+            "markdownDescription": "Scripts that run custom code on specific events. For now they can be executed on items and custom entities.",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                },
+                "path": {
+                    "type": "string",
+                    "markdownDescription": "Path to the `.jspp` script file. It is a relative path in the current namespace folder.\nExample: `scripts/my_script` refers to `contents/myitems/scripts/my_script.jspp`",
+                }
+            }
+        },
+        "script_execute": {
+            "$id": "script",
+            "type": "object",
+            "markdownDescription": "Script that run custom code on that specific events.",
+            "required": ["name"],
+            "properties": {
+                "name": {"type": "string"},
+                "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
+                "permission": {"$ref": "#/$defs/action_permission.prop"}
+            }
+        },
     }
 };
