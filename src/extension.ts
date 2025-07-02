@@ -409,7 +409,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					}
 
 					// Suggest textures
-					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && yamlPath[3] === "texture" || yamlPath[3] === "textures") {
+					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && (yamlPath[3] === "texture" || yamlPath[3] === "textures" || yamlPath[3] === "icon")) {
 						// Check if the current line value stars by minecraft:, to avoid pollution of the suggestions.
 						VANILLA_TEXTURES_PATHS.forEach((element: any) => {
 							const elementNoExt = `minecraft:${element}`;
@@ -943,6 +943,7 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 		const workspacePath = workspaceFolders[0].uri.fsPath; // Assume the first workspace
 
 		const textureNode = resourceNode.get('texture', true);
+		const iconNode = resourceNode.get('icon', true);
 		const texturesNode = resourceNode.get('textures', true);
 
 		const checkPath = (texturePath: string) => {
@@ -969,7 +970,14 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 				path.join(workspacePath, fileNamespace, `resourcepack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
 				path.join(workspacePath, fileNamespace, `resourcepack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
 				path.join(workspacePath, fileNamespace, `resource_pack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
-				path.join(workspacePath, fileNamespace, `resource_pack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`)
+				path.join(workspacePath, fileNamespace, `resource_pack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+
+				path.join(workspacePath, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, textureNamespace, `assets`, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, textureNamespace, `resourcepack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, textureNamespace, `resourcepack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, textureNamespace, `resource_pack`, `assets`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
+				path.join(workspacePath, textureNamespace, `resource_pack`, textureNamespace, `textures`, `${texturePathWithoutNamespace}`),
 			];
 
 			if(DEBUG) {
@@ -990,31 +998,7 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 		const isFileSaved = !activeEditor.document.isDirty;
 
 		if (textureNode) {
-			const texturePath = textureNode.value as string;
-			const foundUri = checkPath(texturePath);
-			const startPos = activeEditor.document.positionAt(textureNode.range[0]);
-			const endPos = activeEditor.document.positionAt(textureNode.range[1]);
-			let decoration;
-			if (!foundUri) {
-				diagnosticsArr.push(new vscode.Diagnostic(
-					new vscode.Range(startPos, endPos),
-					"Texture not found!",
-					isFileSaved ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
-				));
-				decoration = vscode.window.createTextEditorDecorationType({
-					gutterIconPath: extContext.asAbsolutePath('images/missing.png').replace(/\\/g, "/"),
-					gutterIconSize: 'contain'
-				});
-			} else {
-				decoration = vscode.window.createTextEditorDecorationType({
-					gutterIconPath: foundUri,
-					gutterIconSize: 'contain'
-				});
-			}
-
-			decorations.push({ range: new vscode.Range(startPos, endPos) });
-			activeEditor.setDecorations(decoration, decorations);
-			activeDecorationsTextures.push(decoration);
+			checkIfTextureExists(textureNode, checkPath, isFileSaved, diagnosticsArr);
 		} else {
 			if (texturesNode && YAML.isSeq(texturesNode) && texturesNode.range) {
 				texturesNode.items.forEach((item: any) => {
@@ -1046,7 +1030,40 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 				});
 			}
 		}
+
+		if(iconNode) {
+			checkIfTextureExists(iconNode, checkPath, isFileSaved, diagnosticsArr);
+		}
+
 		return;
+	}
+
+	function checkIfTextureExists(propertyNode: any, checkPath: Function, isFileSaved: boolean, diagnosticsArr: vscode.Diagnostic[]) {
+		const texturePath = propertyNode.value as string;
+		const foundUri = checkPath(texturePath);
+		const startPos = activeEditor.document.positionAt(propertyNode.range[0]);
+		const endPos = activeEditor.document.positionAt(propertyNode.range[1]);
+		let decoration;
+		if (!foundUri) {
+			diagnosticsArr.push(new vscode.Diagnostic(
+				new vscode.Range(startPos, endPos),
+				"Texture not found!",
+				isFileSaved ? vscode.DiagnosticSeverity.Error : vscode.DiagnosticSeverity.Warning
+			));
+			decoration = vscode.window.createTextEditorDecorationType({
+				gutterIconPath: extContext.asAbsolutePath('images/missing.png').replace(/\\/g, "/"),
+				gutterIconSize: 'contain'
+			});
+		} else {
+			decoration = vscode.window.createTextEditorDecorationType({
+				gutterIconPath: foundUri,
+				gutterIconSize: 'contain'
+			});
+		}
+
+		decorations.push({ range: new vscode.Range(startPos, endPos) });
+		activeEditor.setDecorations(decoration, decorations);
+		activeDecorationsTextures.push(decoration);
 	}
 
 	function checkModelExistence(resourceNode: any, fileNamespace: string, diagnosticsArr: vscode.Diagnostic[]){
@@ -1085,7 +1102,14 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 				path.join(workspacePath, fileNamespace, `resourcepack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
 				path.join(workspacePath, fileNamespace, `resourcepack`, namespace, `models`, `${fileNoNamespace}`),
 				path.join(workspacePath, fileNamespace, `resource_pack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
-				path.join(workspacePath, fileNamespace, `resource_pack`, namespace, `models`, `${fileNoNamespace}`)
+				path.join(workspacePath, fileNamespace, `resource_pack`, namespace, `models`, `${fileNoNamespace}`),
+
+				path.join(workspacePath, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, namespace, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, namespace, `resourcepack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, namespace, `resourcepack`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, namespace, `resource_pack`, `assets`, namespace, `models`, `${fileNoNamespace}`),
+				path.join(workspacePath, namespace, `resource_pack`, namespace, `models`, `${fileNoNamespace}`)
 			];
 
 			console.log("Possible paths:", possiblePaths);

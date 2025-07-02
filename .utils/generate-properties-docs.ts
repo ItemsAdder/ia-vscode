@@ -1,4 +1,4 @@
-// Example: `ts-node .\generate-properties-docs.ts ..\src\schemas.ts Actions actions`
+// Example: `ts-node .\generate-properties-docs.ts ..\src\schemas.ts Actions actions true`
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -9,7 +9,7 @@ interface Schema {
 
 const args = process.argv.slice(2);
 if (args.length < 3 || args.length > 4) {
-  console.error('Usage: ts-node .\generate-properties-docs.ts <path-to-schemas.ts> <title> <basePath>');
+  console.error('Usage: ts-node .\generate-properties-docs.ts <path-to-schemas.ts> <title> <basePath> [printProperties]');
   process.exit(1);
 }
 
@@ -28,8 +28,8 @@ async function run() {
   }
 
   const markdown = generateMarkdownFromBasePath(schemas);
-  fs.writeFileSync(`output/${basePath}.md`, markdown);
-  console.log(`✅ Markdown generated at: output/${basePath}.md`);
+  fs.writeFileSync(`output/${basePath}.mdx`, markdown);
+  console.log(`✅ Markdown generated at: output/${basePath}.mdx`);
 }
 
 function printPropertiesRecursive(

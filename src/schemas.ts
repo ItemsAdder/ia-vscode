@@ -5596,6 +5596,12 @@ attribute_modifiers:
                         "model_path": {
                             "type": "string",
                             "title": "Set `generate: false` to use this!",
+                            "markdownDescription": "# Set `generate: false` to use this!\nPath to the model file.\n\nExample: `item/my_item`, `my_items:item/my_item` or `minecraft:item/diamond`.",
+                            "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
+                        },
+                        "icon": {
+                            "type": "string",
+                            "title": "(1.21.4+ clients only!) Texture to be shown in inventory instead of the item model.\nExample: `item/my_item_icon`, `my_items:item/my_item_icon` or `minecraft:item/diamond`.",
                             "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
                         }
                     },
@@ -5643,6 +5649,11 @@ attribute_modifiers:
                                 "type": "string",
                                 "markdownDescription": "(optional) Parent model of the item.\n\nThis is useful to create items that are based on other items.\nThis option is generally used by advanced resourcepacks artists."
                             },
+                            "icon": {
+                                "type": "string",
+                                "title": "(1.21.4+ clients only!) Texture to be shown in inventory instead of the item model.\nExample: `item/my_item_icon`, `my_items:item/my_item_icon` or `minecraft:item/diamond`.",
+                                "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
+                            }
                         }
                     },
                     "else": {
@@ -5666,6 +5677,12 @@ attribute_modifiers:
                             "model_path": {
                                 "type": "string",
                                 "title": "Set `generate: false` to use this!",
+                                "markdownDescription": "# Set `generate: false` to use this!\nPath to the model file.\n\nExample: `item/my_item`, `my_items:item/my_item` or `minecraft:item/diamond`.",
+                                "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
+                            },
+                            "icon": {
+                                "type": "string",
+                                "title": "(1.21.4+ clients only!) Texture to be shown in inventory instead of the item model.\nExample: `item/my_item_icon`, `my_items:item/my_item_icon` or `minecraft:item/diamond`.",
                                 "defaultSnippets": [{"body": "item/$0"}, {"body": "block/$0"}]
                             }
                         },

@@ -97,7 +97,7 @@ export const items = [
         "resource": {
           "material": "PAPER",
           "generate": false,
-          "model_path": "minecraft:item/diamond_block"
+          "model_path": "minecraft:block/diamond_block"
         },
         "specific_properties": {
           "block": {
@@ -118,7 +118,7 @@ export const items = [
         "resource": {
           "material": "PAPER",
           "generate": false,
-          "model_path": "minecraft:item/emerald_block"
+          "model_path": "minecraft:block/emerald_block"
         },
         "specific_properties": {
           "block": {
