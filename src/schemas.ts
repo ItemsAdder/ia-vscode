@@ -9625,6 +9625,42 @@ attribute_modifiers:
                     "type": "integer",
                     "default": 8,
                     "markdownDescription": "Y position of this image on screen. This can't be changed at runtime and must be decided now.\nYou can shift this image up or down using this value.\nIf you're making an **emoji** a value of **8** is enough"
+                },
+                "shadow": {
+                    "markdownDescription": "## Available on `1.21.4+` only!\nThis property allows you to add a shadow to the font image, making it more visible on different backgrounds.",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "markdownDescription": "## Available on `1.21.4+` only!\nEnable shadow for this font image."
+                        },
+                        "color": {
+                            "kind": 19,
+                            "markdownDescription": "## Available on `1.21.4+` only!\nThe color of the shadow.\n\nThis can be a hex color code, an integer or a string with a hex color code.\n\nExample: `ff0000` (red), `#ff0000` (red), `16711680` (red in decimal).",
+                            "default": "ff0000",
+                            "anyOf": [
+                                {
+                                    "type": "string",
+                                    "enum": [
+                                        "ff7e7e",
+                                        "75bebe",
+                                        "16d4ff",
+                                        "530766",
+                                        "00ff72",
+                                        "010002",
+                                        "570e11",
+                                        "d36823",
+                                        "ff0000"
+                                    ]
+                                },
+                                { "type": "integer" },
+                                {
+                                    "patternProperties": {
+                                        "^(#|)[0-9a-f]{3,6}$": { "type": "string" }
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         },
