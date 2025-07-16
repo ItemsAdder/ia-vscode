@@ -7062,8 +7062,16 @@ attribute_modifiers:
                     "type": "string",
                     "markdownDescription": `Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:
                     \n\n\`{player}\` is the player who triggered this
-                    \n\n\`{world}\` is the world where this was triggered
+                    \n\n\`{player-x}\` is the x location of the player which triggered this event
+                    \n\n\`{player-y}\` is the x location of the player which triggered this event
+                    \n\n\`{player-z}\` is the x location of the player which triggered this event
+                    \n\n\`{player-yaw}\` is the yaw of the player which triggered this event
+                    \n\n\`{player-inverse-yaw}\` is the inverse-yaw of the player which triggered this event
+                    \n\n\`{player-pitch}\` is the pitch of the player which triggered this event
+                    \n\n\`{player-world}\` is the world of the player which triggered this event
+
                     \n\n\`{target-player}\` is the player triggered this
+                    \n\n\`{world}\` is the world where this was triggered
                     \n\n\`{target-world}\` is the x location of where this was triggered
                     \n\n\`{target-x}\` is the x location of where this was triggered
                     \n\n\`{target-y}\` is the x location of where this was triggered
@@ -7071,6 +7079,7 @@ attribute_modifiers:
                     \n\n\`{target-yaw}\` is the yaw
                     \n\n\`{target-inverse-yaw}\` is the inverse-yaw 
                     \n\n\`{target-pitch}\` is the pitch 
+                    
                     \n\n\`{debug-event-name}\` is the current Bukkit event which triggered the action (useful only to devs).
                     \n\n\nExample: \`tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}\``,
                     "defaultSnippets": [
@@ -8462,7 +8471,28 @@ attribute_modifiers:
             "properties": {
                 "command": {
                     "type": "string",
-                    "markdownDescription": "Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:\n\n`{player}` is the player who used this item\n\n`{target-player}` is the player interacted/attacked\n\n`{target-x}` is the x location of player/block interacted/attacked\n\n`{target-y}` is the x location of player/block interacted/attacked\n\n`{target-z}` is the x location of player/block interacted/attacked\n\n`{debug-event-name}` is the current Bukkit event which triggered the action (useful only to devs).\n\n\nExample: `tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}`",
+                    "markdownDescription": `Command to be executed (**without** the **/**)\n\n\nYou can use these placeholders:
+                    \n\n\`{player}\` is the player who triggered this
+                    \n\n\`{player-x}\` is the x location of the player which triggered this event
+                    \n\n\`{player-y}\` is the x location of the player which triggered this event
+                    \n\n\`{player-z}\` is the x location of the player which triggered this event
+                    \n\n\`{player-yaw}\` is the yaw of the player which triggered this event
+                    \n\n\`{player-inverse-yaw}\` is the inverse-yaw of the player which triggered this event
+                    \n\n\`{player-pitch}\` is the pitch of the player which triggered this event
+                    \n\n\`{player-world}\` is the world of the player which triggered this event
+
+                    \n\n\`{target-player}\` is the player triggered this
+                    \n\n\`{world}\` is the world where this was triggered
+                    \n\n\`{target-world}\` is the x location of where this was triggered
+                    \n\n\`{target-x}\` is the x location of where this was triggered
+                    \n\n\`{target-y}\` is the x location of where this was triggered
+                    \n\n\`{target-z}\` is the x location of where this was triggered
+                    \n\n\`{target-yaw}\` is the yaw
+                    \n\n\`{target-inverse-yaw}\` is the inverse-yaw 
+                    \n\n\`{target-pitch}\` is the pitch 
+                    
+                    \n\n\`{debug-event-name}\` is the current Bukkit event which triggered the action (useful only to devs).
+                    \n\n\nExample: \`tell {target-player} Hello {target-player}, your coords are {target-x} {target-y} {target-z}\``,
                     "defaultSnippets": [
                         {
                             "body": "minecraft:tell {player} Test", 

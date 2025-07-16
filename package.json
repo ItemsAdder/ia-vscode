@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.2.31",
+  "version": "0.2.32",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
