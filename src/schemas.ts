@@ -10303,6 +10303,24 @@ attribute_modifiers:
                         "flying": {"type": "number"}
                     }
                 },
+                "background_music": {
+                    "type": "object",
+                    "markdownDescription": "Background music played during the emote animation.",
+                    "properties": {
+                        "sound": {
+                            "properties": {
+                                "name": { "$ref": "#/$defs/vanilla_and_custom_sound" },
+                                "category": {"$ref": "#/$defs/bukkit_sound_category"},
+                                "volume": { "type": "number" },
+                                "pitch": { "type": "number" }
+                            }
+                        },
+                        "repeat_interval_seconds": {
+                            "type": "number",
+                            "markdownDescription": "(optional) Repeat interval in seconds. Set it to the duration of the audio in seconds. Default `0` (no repeat)."
+                        }
+                    }
+                }
             }
         },
         "ticks": {
