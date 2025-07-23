@@ -7771,6 +7771,20 @@ attribute_modifiers:
                                     "type": "number"
                                 }
                             }
+                        },
+                        "render_size": {
+                            "type": "object",
+                            "markdownDescription": "This is used to let the game hide the model when the player is not looking at it.",
+                            "properties": {
+                                "width": {
+                                    "type": "number",
+                                    "markdownDescription": "Width of the model in blocks. This is used to hide the model when the player is not looking at it."
+                                },
+                                "height": {
+                                    "type": "number",
+                                    "markdownDescription": "Height of the model in blocks. This is used to hide the model when the player is not looking at it."
+                                }
+                            }
                         }
                     }
                 },
@@ -9263,12 +9277,12 @@ attribute_modifiers:
         // #endregion Entity events
         "entity_goals": {
             "$id": "entity_goals",
-            "markdownDescription": "Execute a command when an entity event is triggered",
+            "markdownDescription": "Goals are used to define the behavior of custom entities.",
             "patternProperties": {
                 "^look_at_entity(.*)$": { "$ref": "#/$defs/look_at_entity" },
                 "^random_look_around(.*)$": { "$ref": "#/$defs/random_look_around" },
                 "^random_wander_around(.*)$": { "$ref": "#/$defs/random_wander_around" },
-                "^attack_near(.*)$": { "$ref": "#/$defs/nearest_attackable_target" },
+                "^attack_near(.*)$": { "$ref": "#/$defs/attack_near" },
                 "^melee_attack(.*)$": { "$ref": "#/$defs/melee_attack" },
                 "^ranged_bow_attack(.*)$": { "$ref": "#/$defs/ranged_bow_attack" },
                 "^avoid_entity(.*)$": { "$ref": "#/$defs/avoid_entity" },
