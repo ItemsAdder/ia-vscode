@@ -409,7 +409,10 @@ export async function activate(context: vscode.ExtensionContext) {
 					}
 
 					// Suggest textures
-					if (yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && (yamlPath[3] === "texture" || yamlPath[3] === "textures" || yamlPath[3] === "icon")) {
+					if (
+						(yamlPath.length === 4 && yamlPath[0] === "items" && yamlPath[2] === "resource" && (yamlPath[3] === "texture" || yamlPath[3] === "textures" || yamlPath[3] === "icon")) ||
+						(yamlPath.length === 5 && yamlPath[0] === "items" && yamlPath[2] === "graphics" && (yamlPath[3] === "texture" || yamlPath[3] === "textures" || yamlPath[3] === "icon"))
+					) {
 						// Check if the current line value stars by minecraft:, to avoid pollution of the suggestions.
 						VANILLA_TEXTURES_PATHS.forEach((element: any) => {
 							const elementNoExt = `minecraft:${element}`;
@@ -880,6 +883,22 @@ function handleForcedDiagnostics(doc: YAML.Document.Parsed<any, true>, text: str
 			const hasTexture = resourceNode.has('texture');
 			const hasTextures = resourceNode.has('textures');
 			const hasModelPath = resourceNode.has('model_path');
+			
+			const hasGraphics = item.has('graphics');
+			const hasResource = item.has('resource');
+
+			if(hasGraphics && hasResource) {
+				if (resourceNode.range) {
+					const startPos = activeEditor.document.positionAt(resourceNode.range[0]);
+					const endPos = activeEditor.document.positionAt(resourceNode.range[1]);
+					const diagnostic = new vscode.Diagnostic(
+						new vscode.Range(startPos, endPos),
+						"Use either `resource` or `graphics` property, not both.",
+						vscode.DiagnosticSeverity.Error
+					);
+					diagnosticsArr.push(diagnostic);
+				}
+			}
 
 			if (hasTexture && hasTextures) {
 				if (resourceNode.range) {
@@ -1221,7 +1240,7 @@ function decorateEnums(doc: YAML.Document.Parsed<any, true>, text: string, activ
 		// Space is important to match the property after : only and not random texts containing the enum.
 		// For example it will match `property: ZOMBIE` and not `RANDOMSTRINGZOMBIE1234`.
 		// var regEx = new RegExp(" " + element + "\n", 'g');
-		var regEx = new RegExp(`^\\s*\\w+\\s*:\\s*${element}\\b`, 'gm');
+		var regEx = new RegExp(`^\\s*\\w+\\s*:\\s*\\b${element}\\b`, 'gmi');
 		let match;
 		while ((match = regEx.exec(text))) {
 	
