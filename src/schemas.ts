@@ -10006,7 +10006,7 @@ attribute_modifiers:
         "recipe.smithing": {
             "$id": "recipe.smithing",
             "type": "object",
-            "required": ["base", "addition", "result"],
+            "required": ["template", "base", "addition", "result"],
             "properties": {
                 "enabled": {"type": "boolean", "default": true},
                 "permission_suffix": {"type": "string"},
@@ -11988,7 +11988,7 @@ attribute_modifiers:
         "play_sound": {
             "$id": "play_sound",
             "markdownDescription": "Play a Vanilla sound or Custom sound",
-            "required": ["name", "volume", "pitch"],
+            "required": ["name"],
             "properties": {
                 "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
                 "volume": {"type": "number", "minimum": 0},
@@ -12231,7 +12231,7 @@ attribute_modifiers:
         "replace_block": {
             "$id": "replace_block",
             "markdownDescription": "Replace vanilla/custom blocks in interact location (or on the player location if this event is not an interact one)",
-            "required": ["from", "to", "decrement_durability"],
+            "required": ["from", "to"],
             "properties": {
                 "from": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
                 "to": {"$ref": "#/$defs/vanilla_and_custom_blocks"},
