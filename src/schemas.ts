@@ -8624,10 +8624,9 @@ attribute_modifiers:
             "type": "object",
             "additionalProperties": true,
             "anyOf": [
-                { "required": ["resource", "name"] },
-                { "required": ["resource", "display_name"] },
-                { "required": ["graphics", "name"] },
-                { "required": ["graphics", "display_name"] }
+                { "required": ["resource"] },
+                { "required": ["graphics"] },
+                { "required": ["variant_of"] },
             ],
             "properties": {
                 "enabled": {
@@ -10784,6 +10783,7 @@ attribute_modifiers:
                 "music_disc": {"$ref": "#/$defs/behaviour.music_disc"},
                 "gun": {"$ref": "#/$defs/behaviour.gun"},
                 "furniture_sit": {"$ref": "#/$defs/behaviour.furniture_sit"},
+                "furniture_consumable": {"$ref": "#/$defs/behaviour.furniture_consumable"},
                 "furniture": {"$ref": "#/$defs/behaviour.furniture"},
                 "complex_furniture": {"$ref": "#/$defs/behaviour.complex_furniture"},
                 "entity_summoner": {"$ref": "#/$defs/behaviour.entity_summoner"},
@@ -10869,6 +10869,31 @@ attribute_modifiers:
                 "passenger_rotate_body": {
                     "type": "boolean",
                     "markdownDescription": "Default: false. Rotate the player body while sitting on the furniture."
+                }
+            }
+        },
+        "behaviour.furniture_consumable": {
+            "$id": "behaviour.furniture_consumable",
+            "type": "object",
+            "markdownDescription": "Tells ItemsAdder that this item is a consumable, similar to vanilla cake.",
+            "required": ["furniture_list", "hunger"],
+            "properties": {
+                "enabled": {"type": "boolean"},
+                "furniture_list": {
+                    "type": "array",
+                    "markdownDescription": "List of furniture items to be placed on each consumption.",
+                    "items": {
+                        "type": "string",
+                        "markdownDescription": "Furniture item to be placed on each consumption.",
+                    }
+                },
+                "hunger": {
+                    "type": "integer",
+                    "markdownDescription": "Amount of hunger restored on each consumption."
+                },
+                "saturation": {
+                    "type": "number",
+                    "markdownDescription": "Amount of saturation restored on each consumption."
                 }
             }
         },
@@ -11119,7 +11144,15 @@ attribute_modifiers:
                             "markdownDescription": "Offset the placement of the complex furniture on the wall. Can be positive or negative."
                         }
                     }
-                }
+                },
+                 "fixed_rotation": {
+                    "type": "boolean",
+                    "markdownDescription": "If the vehicle has fixed rotation (to place it precisely)"
+                },
+                "opposite_direction": {
+                    "type": "boolean",
+                    "markdownDescription": "Makes the model rotate 180 degrees automatically when placed"
+                },
             }
         },
         "behaviour.entity_summoner": {
@@ -11669,7 +11702,9 @@ attribute_modifiers:
                 "^script(.*)$": { "$ref": "#/$defs/script_execute" },
                 "^drop_item(.*)$": { "$ref": "#/$defs/drop_item" },
                 "^set_block(.*)$": { "$ref": "#/$defs/set_block" },
-                "^place_furniture(.*)$": { "$ref": "#/$defs/place_furniture" }
+                "^place_furniture(.*)$": { "$ref": "#/$defs/place_furniture" },
+                "^replace_furniture(.*)$": { "$ref": "#/$defs/replace_furniture" },
+                "^remove_furniture(.*)$": { "$ref": "#/$defs/remove_furniture" },
             },
             "properties": {
                 "play_sound": {"$ref": "#/$defs/play_sound"},
@@ -11706,7 +11741,9 @@ attribute_modifiers:
                 "script": {"$ref": "#/$defs/script_execute"},
                 "drop_item": {"$ref": "#/$defs/drop_item"},
                 "set_block": {"$ref": "#/$defs/set_block"},
-                "place_furniture": {"$ref": "#/$defs/place_furniture"}
+                "place_furniture": {"$ref": "#/$defs/place_furniture"},
+                "replace_furniture": {"$ref": "#/$defs/replace_furniture"},
+                "remove_furniture": {"$ref": "#/$defs/remove_furniture"}
             }
         },
         "interact": {
@@ -12433,6 +12470,25 @@ attribute_modifiers:
                 "flow": {"$ref": "#/$defs/flow.prop"},
                 "permission": {"$ref": "#/$defs/action_permission.prop"}
             }
+        },
+        "replace_furniture": {
+            "$id": "replace_furniture",
+            "markdownDescription": "Replaces the current furniture. Useful on interact events.",
+            "required": ["furniture"],
+            "properties": {
+                "furniture": {"type": "string"},
+                "decrement_durability": {"type": "integer"},
+                "decrement_amount": {"type": "integer"},
+                "delay": {"$ref": "#/$defs/action_delay.prop"},
+                "flow": {"$ref": "#/$defs/flow.prop"},
+                "permission": {"$ref": "#/$defs/action_permission.prop"}
+            }
+        },
+        "remove_furniture": {
+            "$id": "remove_furniture",
+            "markdownDescription": "Removes the current furniture. Useful on interact events.",
+            "type": "boolean",
+            "examples": [true]
         },
         "drop_item": {
             "$id": "drop_item",
@@ -13607,6 +13663,10 @@ attribute_modifiers:
                             "markdownDescription": "(optional) Repeat interval in seconds. Set it to the duration of the audio in seconds. Default `0` (no repeat)."
                         }
                     }
+                },
+                "third_person_view": {
+                    "type": "boolean",
+                    "markdownDescription": "If the emote should be played in third person view. Default `false` (first person view). Requires ItemsAdder 4.0.16+"
                 }
             }
         },
