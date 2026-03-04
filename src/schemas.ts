@@ -11147,7 +11147,11 @@ attribute_modifiers:
                 },
                  "fixed_rotation": {
                     "type": "boolean",
-                    "markdownDescription": "If the vehicle has fixed rotation (to place it precisely)"
+                    "markdownDescription": "If the vehicle has fixed rotation (to place it with a precise rotation)"
+                },
+                 "fixed_position": {
+                    "type": "boolean",
+                    "markdownDescription": "If the vehicle has fixed position (to place it on a precise location)"
                 },
                 "opposite_direction": {
                     "type": "boolean",
