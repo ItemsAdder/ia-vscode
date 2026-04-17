@@ -11012,6 +11012,10 @@ attribute_modifiers:
                                 "item_frame"
                             ]
                         },
+                        "auto_update_in_world": {
+                            "type": "boolean",
+                            "markdownDescription": "Automatically apply changes of this config to entities already placed in the world. Default value is in `config.yml` as `auto_update_transformations`, which can be used to globally disable or enable this feature."
+                        },
                         "transform": {
                             "type": "string",
                             "enum": [
