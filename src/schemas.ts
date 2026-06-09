@@ -8173,292 +8173,7 @@ attribute_modifiers:
             "$id": "specific_properties",
             "type": "object",
             "properties": {
-                "block": {
-                    "required": ["placed_model"],
-                    "properties": {
-                        "placed_model": {
-                            "type": "object",
-                            "required": ["type"],
-                            "properties": {
-                                "type": {
-                                    "type": "string",
-                                    "enum": [
-                                        "REAL_NOTE",
-                                        "REAL_TRANSPARENT",
-                                        "REAL_WIRE",
-                                        "TILE",
-                                        "REAL",
-                                        "FIRE"
-                                    ],
-                                    "default": "REAL_NOTE",
-                                    "markdownDescription": "(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
-                                },
-                                "break_particles": {
-                                    "markdownDescription": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
-                                    "type": "string",
-                                    "enum": ["VANILLA", "BLOCK", "ITEM"]
-                                },
-                                "break_particles_material": {
-                                    "markdownDescription": "Alternative to 'break_particles' property.\n\nSpecify which texture the break particle will have (more control compared to break_particles).\n**Accepts only vanilla blocks and custom items!**",
-                                    "$ref": "#/$defs/bukkit_and_custom_blocks"
-                                },
-                                "shift_up": {
-                                    "type": "boolean",
-                                    "markdownDescription": "This allows to make some blocks placed one block up. This is useful for REAL_WIRE blocks to create tall plants."
-                                },
-                                "placeable_on_other_real_wire": {
-                                    "type": "boolean",
-                                    "markdownDescription": "This allows to make this REAL_WIRE block placeable on top of another REAL_WIRE block."
-                                },
-                                "placeable_on_water": {
-                                    "type": "boolean",
-                                    "markdownDescription": "This allows to make this block placeable directly on water surface."
-                                },
-                                "placeable_on_lava": {
-                                    "type": "boolean",
-                                    "markdownDescription": "This allows to make this block placeable directly on lava surface."
-                                },
-                                "custom_variants" : {
-                                    "type": "object",
-                                    "kind": 5,
-                                    "detail": "(Custom block variant)",
-                                    "additionalProperties": {
-                                        "type": "object",
-                                        "$ref": "#/$defs/custom_block_variant"
-                                    },
-                                    "properties": {
-                                        "variant_1": {
-                                            "type": "object",
-                                            "$ref": "#/$defs/custom_block_variant"
-                                        },
-                                        "variant_2": {
-                                            "type": "object",
-                                            "$ref": "#/$defs/custom_block_variant"
-                                        },
-                                        "variant_3": {
-                                            "type": "object",
-                                            "$ref": "#/$defs/custom_block_variant"
-                                        },
-                                        "variant_xxx": {
-                                            "type": "object",
-                                            "$ref": "#/$defs/custom_block_variant"
-                                        }
-                                    }
-                                },
-                                "rotx": {
-                                    "type": "integer",
-                                    "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
-                                },
-                                "roty": {
-                                    "type": "integer",
-                                    "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
-                                },
-                                "directional_mode": {
-                                    "type": "string",
-                                    "markdownDescription": "Enables dynamic rotation of the block.\n\nThis is useful for blocks that need to be rotated based on the direction of the player.\n\n**Warning!** Creating directional blocks will occupy 4 or 6 slots per block. Use with caution.",
-                                    "enum": [
-                                        "FURNACE",
-                                        "DROPPER",
-                                        "LOG"
-                                    ]
-                                }
-                            }
-                        },
-                        "hardness": {"markdownDescription": "Mining hardness", "type": "number"},
-                        "blast_resistance": {
-                            "markdownDescription": "Explosion resistance. It is hardness*3 by default if you don't set blast_resistance.",
-                            "type": "number"
-                        },
-                        "no_explosion": {
-                            "markdownDescription": "Totally immune from explosions, ignoring blast_resistance",
-                            "type": "boolean"
-                        },
-                        "sound": {
-                            "properties": {
-                                "break": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
-                                },
-                                "place": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
-                                },
-                                "hit": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
-                                },
-                                "step": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
-                                },
-                                "fall": {
-                                    "properties": {
-                                        "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
-                                        "volume": {"type": "number"},
-                                        "pitch": {"type": "number"}
-                                    }
-                                }
-                            }
-                        },
-                        "cancel_drop": {
-                            "type": "boolean",
-                            "markdownDescription": "(**OLD NAME**, use the new `drop_when_mined` instead.). This option allows you to avoid the block from being dropped when broken by players.",
-                            "deprecated": true,
-                            "doNotSuggest": true
-                        },
-                        "drop_when_mined": {
-                            "type": "boolean",
-                            "markdownDescription": "Set if the block should drop when mined by a player.",
-                            "default": true
-                        },
-                        "drop_on_silk_touch": {
-                            "type": "boolean",
-                            "markdownDescription": "Set if the block should drop when mined by a player with silk touch enchanted tool.",
-                        },
-                        "drop_on_shears": {
-                            "type": "boolean",
-                            "markdownDescription": "Set if the block should drop when mined by a player with shears.",
-                        },
-                        "light_level": {
-                            "type": "integer",
-                            "markdownDescription": "Set this to make the block emit light.",
-                            "minimum": 1,
-                            "maximum": 15
-                        },
-                        "permission_suffix": {
-                            "properties": {
-                                "break": {
-                                    "type": "string",
-                                    "markdownDescription": "Partial permission used to allow a player to break the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.break.iasurvival.ruby_block`."
-                                },
-                                "place": {
-                                    "type": "string",
-                                    "markdownDescription": "Partial permission used to allow a player to place the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.place.iasurvival.ruby_block`."
-                                }
-                            }
-                        },
-                        "break_tools_blacklist": {
-                            "type": "array",
-                            "markdownDescription": "Blacklist of tools that cannot break this block",
-                            "items": {
-                                "anyOf": [
-                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
-                                    {
-                                        "type": "string",
-                                        "enum": [
-                                            "HAND",
-                                            "hand",
-                                            "pickaxe",
-                                            "PICKAXE",
-                                            "axe",
-                                            "AXE",
-                                            "SHOVEL",
-                                            "shovel",
-                                            "hoe",
-                                            "HOE",
-                                            "sword",
-                                            "SWORD"
-                                        ]
-                                    },
-                                    {"additionalProperties": {"type": "string"}}
-                                ]
-                            }
-                        },
-                        "break_tools_whitelist": {
-                            "type": "array",
-                            "markdownDescription": "Whitelist of tools that cannot break this block",
-                            "items": {
-                                "anyOf": [
-                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
-                                    {
-                                        "type": "string",
-                                        "enum": [
-                                            "HAND",
-                                            "hand",
-                                            "pickaxe",
-                                            "PICKAXE",
-                                            "axe",
-                                            "AXE",
-                                            "SHOVEL",
-                                            "shovel",
-                                            "hoe",
-                                            "HOE",
-                                            "sword",
-                                            "SWORD"
-                                        ]
-                                    },
-                                    {"additionalProperties": {"type": "string"}}
-                                ]
-                            }
-                        },
-                        "events_tools_whitelist": {
-                            "type": "array",
-                            "markdownDescription": "Whitelist of tools that can run events on this block (placed_block.interact)",
-                            "items": {
-                                "anyOf": [
-                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
-                                    {
-                                        "type": "string",
-                                        "enum": [
-                                            "HAND",
-                                            "hand",
-                                            "pickaxe",
-                                            "PICKAXE",
-                                            "axe",
-                                            "AXE",
-                                            "SHOVEL",
-                                            "shovel",
-                                            "hoe",
-                                            "HOE",
-                                            "sword",
-                                            "SWORD"
-                                        ]
-                                    },
-                                    {"additionalProperties": {"type": "string"}}
-                                ]
-                            }
-                        },
-                        "events_tools_blacklist": {
-                            "type": "array",
-                            "markdownDescription": "Blacklist of tools that can't run events on this block (placed_block.interact)",
-                            "items": {
-                                "anyOf": [
-                                    {"$ref": "#/$defs/bukkit_materials_and_customitems"},
-                                    {
-                                        "type": "string",
-                                        "enum": [
-                                            "HAND",
-                                            "hand",
-                                            "pickaxe",
-                                            "PICKAXE",
-                                            "axe",
-                                            "AXE",
-                                            "SHOVEL",
-                                            "shovel",
-                                            "hoe",
-                                            "HOE",
-                                            "sword",
-                                            "SWORD"
-                                        ]
-                                    },
-                                    {"additionalProperties": {"type": "string"}}
-                                ]
-                            }
-                        }
-                    }
-                },
+                "block": {"$ref": "#/$defs/behaviour.block"},
                 "bow": {
                     "properties": {
                         "glow_arrows": {"type": "boolean", "default": false},
@@ -10804,7 +10519,8 @@ attribute_modifiers:
                             "markdownDescription": "The tree_populator to spawn on right click."
                         }
                     }
-                }
+                },
+                "block": {"$ref": "#/$defs/behaviour.block"}
             }
         },
         "behaviour.music_disc": {
@@ -11187,6 +10903,293 @@ attribute_modifiers:
                     "type": "integer",
                     "markdownDescription": "(default `1`) amount of durability to decrement when the entity is spawned."
                 },
+            }
+        },
+        "behaviour.block": {
+            "$id": "behaviour.block",
+            "required": ["placed_model"],
+            "properties": {
+                "placed_model": {
+                    "type": "object",
+                    "required": ["type"],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "REAL_NOTE",
+                                "REAL_TRANSPARENT",
+                                "REAL_WIRE",
+                                "TILE",
+                                "REAL",
+                                "FIRE"
+                            ],
+                            "default": "REAL_NOTE",
+                            "markdownDescription": "(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
+                        },
+                        "break_particles": {
+                            "markdownDescription": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
+                            "type": "string",
+                            "enum": ["VANILLA", "BLOCK", "ITEM"]
+                        },
+                        "break_particles_material": {
+                            "markdownDescription": "Alternative to 'break_particles' property.\n\nSpecify which texture the break particle will have (more control compared to break_particles).\n**Accepts only vanilla blocks and custom items!**",
+                            "$ref": "#/$defs/bukkit_and_custom_blocks"
+                        },
+                        "shift_up": {
+                            "type": "boolean",
+                            "markdownDescription": "This allows to make some blocks placed one block up. This is useful for REAL_WIRE blocks to create tall plants."
+                        },
+                        "placeable_on_other_real_wire": {
+                            "type": "boolean",
+                            "markdownDescription": "This allows to make this REAL_WIRE block placeable on top of another REAL_WIRE block."
+                        },
+                        "placeable_on_water": {
+                            "type": "boolean",
+                            "markdownDescription": "This allows to make this block placeable directly on water surface."
+                        },
+                        "placeable_on_lava": {
+                            "type": "boolean",
+                            "markdownDescription": "This allows to make this block placeable directly on lava surface."
+                        },
+                        "custom_variants" : {
+                            "type": "object",
+                            "kind": 5,
+                            "detail": "(Custom block variant)",
+                            "additionalProperties": {
+                                "type": "object",
+                                "$ref": "#/$defs/custom_block_variant"
+                            },
+                            "properties": {
+                                "variant_1": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/custom_block_variant"
+                                },
+                                "variant_2": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/custom_block_variant"
+                                },
+                                "variant_3": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/custom_block_variant"
+                                },
+                                "variant_xxx": {
+                                    "type": "object",
+                                    "$ref": "#/$defs/custom_block_variant"
+                                }
+                            }
+                        },
+                        "rotx": {
+                            "type": "integer",
+                            "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
+                        },
+                        "roty": {
+                            "type": "integer",
+                            "markdownDescription": "This allows you to specify a rotation for a particular model. This is an option for expert users.\nThe specified rotation is STATIC, it's not dynamic. This is useful only if you want to create multiple variants of the same block without having to create a separate model manually."
+                        },
+                        "directional_mode": {
+                            "type": "string",
+                            "markdownDescription": "Enables dynamic rotation of the block.\n\nThis is useful for blocks that need to be rotated based on the direction of the player.\n\n**Warning!** Creating directional blocks will occupy 4 or 6 slots per block. Use with caution.",
+                            "enum": [
+                                "FURNACE",
+                                "DROPPER",
+                                "LOG"
+                            ]
+                        }
+                    }
+                },
+                "hardness": {"markdownDescription": "Mining hardness", "type": "number"},
+                "blast_resistance": {
+                    "markdownDescription": "Explosion resistance. It is hardness*3 by default if you don't set blast_resistance.",
+                    "type": "number"
+                },
+                "no_explosion": {
+                    "markdownDescription": "Totally immune from explosions, ignoring blast_resistance",
+                    "type": "boolean"
+                },
+                "sound": {
+                    "properties": {
+                        "break": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        },
+                        "place": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        },
+                        "hit": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        },
+                        "step": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        },
+                        "fall": {
+                            "properties": {
+                                "name": {"$ref": "#/$defs/vanilla_and_custom_sound"},
+                                "volume": {"type": "number"},
+                                "pitch": {"type": "number"}
+                            }
+                        }
+                    }
+                },
+                "cancel_drop": {
+                    "type": "boolean",
+                    "markdownDescription": "(**OLD NAME**, use the new `drop_when_mined` instead.). This option allows you to avoid the block from being dropped when broken by players.",
+                    "deprecated": true,
+                    "doNotSuggest": true
+                },
+                "drop_when_mined": {
+                    "type": "boolean",
+                    "markdownDescription": "Set if the block should drop when mined by a player.",
+                    "default": true
+                },
+                "drop_on_silk_touch": {
+                    "type": "boolean",
+                    "markdownDescription": "Set if the block should drop when mined by a player with silk touch enchanted tool.",
+                },
+                "drop_on_shears": {
+                    "type": "boolean",
+                    "markdownDescription": "Set if the block should drop when mined by a player with shears.",
+                },
+                "light_level": {
+                    "type": "integer",
+                    "markdownDescription": "Set this to make the block emit light.",
+                    "minimum": 1,
+                    "maximum": 15
+                },
+                "permission_suffix": {
+                    "properties": {
+                        "break": {
+                            "type": "string",
+                            "markdownDescription": "Partial permission used to allow a player to break the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.break.iasurvival.ruby_block`."
+                        },
+                        "place": {
+                            "type": "string",
+                            "markdownDescription": "Partial permission used to allow a player to place the block.\n\nFor example `iasurvival.ruby_block` is a suffix permission for `ia.user.block.place.iasurvival.ruby_block`."
+                        }
+                    }
+                },
+                "break_tools_blacklist": {
+                    "type": "array",
+                    "markdownDescription": "Blacklist of tools that cannot break this block",
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/$defs/bukkit_materials_and_customitems"},
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "HAND",
+                                    "hand",
+                                    "pickaxe",
+                                    "PICKAXE",
+                                    "axe",
+                                    "AXE",
+                                    "SHOVEL",
+                                    "shovel",
+                                    "hoe",
+                                    "HOE",
+                                    "sword",
+                                    "SWORD"
+                                ]
+                            },
+                            {"additionalProperties": {"type": "string"}}
+                        ]
+                    }
+                },
+                "break_tools_whitelist": {
+                    "type": "array",
+                    "markdownDescription": "Whitelist of tools that cannot break this block",
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/$defs/bukkit_materials_and_customitems"},
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "HAND",
+                                    "hand",
+                                    "pickaxe",
+                                    "PICKAXE",
+                                    "axe",
+                                    "AXE",
+                                    "SHOVEL",
+                                    "shovel",
+                                    "hoe",
+                                    "HOE",
+                                    "sword",
+                                    "SWORD"
+                                ]
+                            },
+                            {"additionalProperties": {"type": "string"}}
+                        ]
+                    }
+                },
+                "events_tools_whitelist": {
+                    "type": "array",
+                    "markdownDescription": "Whitelist of tools that can run events on this block (placed_block.interact)",
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/$defs/bukkit_materials_and_customitems"},
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "HAND",
+                                    "hand",
+                                    "pickaxe",
+                                    "PICKAXE",
+                                    "axe",
+                                    "AXE",
+                                    "SHOVEL",
+                                    "shovel",
+                                    "hoe",
+                                    "HOE",
+                                    "sword",
+                                    "SWORD"
+                                ]
+                            },
+                            {"additionalProperties": {"type": "string"}}
+                        ]
+                    }
+                },
+                "events_tools_blacklist": {
+                    "type": "array",
+                    "markdownDescription": "Blacklist of tools that can't run events on this block (placed_block.interact)",
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/$defs/bukkit_materials_and_customitems"},
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "HAND",
+                                    "hand",
+                                    "pickaxe",
+                                    "PICKAXE",
+                                    "axe",
+                                    "AXE",
+                                    "SHOVEL",
+                                    "shovel",
+                                    "hoe",
+                                    "HOE",
+                                    "sword",
+                                    "SWORD"
+                                ]
+                            },
+                            {"additionalProperties": {"type": "string"}}
+                        ]
+                    }
+                }
             }
         },
         "item_display.translation.rotation": {
