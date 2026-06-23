@@ -1,0 +1,278 @@
+import * as vscode from 'vscode';
+import * as YAML from 'yaml';
+
+import { getYamlParentPathFromText, getYamlSameLevelPropertiesFromText } from './yamlPath';
+import { AssetKind } from './assetPathLayout';
+import { ProjectAssetIndex } from './projectAssetIndex';
+import { vanillaTextureUrl } from './vanillaMinecraftAssets';
+
+interface ItemsAdderCompletionProviderOptions {
+	schemas: any;
+	itemTemplates: any[];
+	vanillaTexturePaths: string[];
+	assetIndex?: ProjectAssetIndex;
+	getDevMode(): boolean;
+}
+
+export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvider {
+	constructor(private readonly options: ItemsAdderCompletionProviderOptions) {}
+
+	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
+		const text = document.getText();
+		const yamlPath = getYamlParentPathFromText(text, position);
+		const items: vscode.CompletionItem[] = [];
+
+		this.addSpecialSuggestions(document, position, yamlPath, items);
+		this.addDynamicEntrySuggestions(document, position, yamlPath, items);
+
+		return items;
+	}
+
+	private addSpecialSuggestions(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		yamlPath: string[],
+		items: vscode.CompletionItem[]
+	): void {
+		if (yamlPath.length === 4 && yamlPath[0] === 'items' && yamlPath[2] === 'consumable' && yamlPath[3] === 'effects') {
+			this.addUniqueEntrySuggestion(document, position, items, 'apply_status_effects');
+			this.addUniqueEntrySuggestion(document, position, items, 'remove_status_effects');
+			this.addUniqueEntrySuggestion(document, position, items, 'play_sound');
+		}
+
+		if (yamlPath.length === 2 && yamlPath[0] === 'sounds') {
+			this.addUniqueEntrySuggestion(document, position, items, 'variant');
+		}
+
+		if (yamlPath.length === 3 && yamlPath[0] === 'items' && yamlPath[2] === 'name') {
+			const name = this.toDisplayName(yamlPath[1]);
+			this.addTextSuggestion(items, name, 'Name shown in inventory tooltip.');
+			this.addTextSuggestion(items, `item-${yamlPath[1]}`, 'Dictionary key for multi-language item name.');
+			this.addTextSuggestion(items, 'Item', 'Name shown in inventory tooltip.');
+		}
+
+		if (yamlPath.length === 2 && yamlPath[0] === 'items') {
+			const usedKeys = getYamlSameLevelPropertiesFromText(document.getText(), position);
+			if (!usedKeys.includes('name')) {
+				this.addTextSuggestion(items, `name: ${this.toDisplayName(yamlPath[1])}`, 'Name shown in inventory tooltip.');
+			}
+		}
+
+		if (yamlPath.length === 1 && yamlPath[0] === 'items') {
+			this.addItemTemplates(items);
+		}
+
+		if (this.isTexturePath(yamlPath)) {
+			this.addVanillaTextureSuggestions(document, position, items);
+			this.addWorkspaceAssetSuggestions(document, position, items, 'texture');
+		}
+
+		if (this.isModelPath(yamlPath)) {
+			this.addWorkspaceAssetSuggestions(document, position, items, 'model');
+		}
+
+		if (
+			yamlPath.length >= 5 &&
+			yamlPath[0] === 'recipes' &&
+			yamlPath[1] === 'crafting_table' &&
+			yamlPath[3] === 'return_items' &&
+			yamlPath[4] === 'replace'
+		) {
+			const currentLine = document.lineAt(position.line).text;
+			if (!currentLine.includes(': ') && !currentLine.endsWith(':')) {
+				for (const material of this.options.schemas.$defs.bukkit_materials.enum) {
+					this.addEntrySuggestion(items, material, 'Material to replace.', false, vscode.CompletionItemKind.EnumMember);
+				}
+			}
+		}
+	}
+
+	private addDynamicEntrySuggestions(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		yamlPath: string[],
+		items: vscode.CompletionItem[]
+	): void {
+		const schemaNode = this.schemaNodeAtPath(yamlPath);
+		const properties = schemaNode?.properties;
+		if (!properties) {
+			return;
+		}
+
+		const usedKeys = getYamlSameLevelPropertiesFromText(document.getText(), position);
+		for (const key of Object.keys(properties)) {
+			const property = this.resolveRef(properties[key]);
+			if (property?.doNotSuggest) {
+				continue;
+			}
+
+			if (!key.startsWith('my_')) {
+				continue;
+			}
+
+			const uniqueKey = this.uniqueKey(`${key}_1`, usedKeys);
+			this.addEntrySuggestion(items, uniqueKey, this.descriptionFor(property, 'New entry.'));
+		}
+	}
+
+	private schemaNodeAtPath(yamlPath: string[]): any | undefined {
+		let current = this.resolveRef(this.options.schemas);
+		for (const segment of yamlPath) {
+			current = this.resolveRef(current);
+			if (!current) {
+				return undefined;
+			}
+
+			if (current.properties?.[segment]) {
+				current = current.properties[segment];
+				continue;
+			}
+
+			if (current.additionalProperties) {
+				current = current.additionalProperties;
+				continue;
+			}
+
+			return undefined;
+		}
+
+		return this.resolveRef(current);
+	}
+
+	private resolveRef(schemaNode: any): any {
+		if (!schemaNode?.$ref) {
+			return schemaNode;
+		}
+
+		const refKey = String(schemaNode.$ref).split('/').pop();
+		return refKey ? this.options.schemas.$defs?.[refKey] ?? schemaNode : schemaNode;
+	}
+
+	private descriptionFor(schemaNode: any, fallback: string): string {
+		const resolved = this.resolveRef(schemaNode);
+		return resolved?.markdownDescription ?? resolved?.description ?? fallback;
+	}
+
+	private addUniqueEntrySuggestion(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		items: vscode.CompletionItem[],
+		key: string
+	): void {
+		const usedKeys = getYamlSameLevelPropertiesFromText(document.getText(), position);
+		this.addEntrySuggestion(items, this.uniqueKey(key, usedKeys), 'New entry.');
+	}
+
+	private uniqueKey(baseKey: string, usedKeys: string[]): string {
+		let key = baseKey;
+		let index = 1;
+		while (usedKeys.includes(key)) {
+			key = `${baseKey}_${index}`;
+			index++;
+		}
+		return key;
+	}
+
+	private addEntrySuggestion(
+		items: vscode.CompletionItem[],
+		name: string,
+		description: string,
+		addNewLine = true,
+		kind = vscode.CompletionItemKind.Property
+	): void {
+		const item = new vscode.CompletionItem(name, kind);
+		item.detail = description;
+		item.insertText = addNewLine ? `${name}:\n  ` : `${name}: `;
+		items.push(item);
+	}
+
+	private addTextSuggestion(items: vscode.CompletionItem[], name: string, description: string): void {
+		const item = new vscode.CompletionItem(name, vscode.CompletionItemKind.Text);
+		item.detail = description;
+		item.insertText = name;
+		items.push(item);
+	}
+
+	private addItemTemplates(items: vscode.CompletionItem[]): void {
+		for (const template of this.options.itemTemplates) {
+			if (template.devMode && !this.options.getDevMode()) {
+				continue;
+			}
+
+			const item = new vscode.CompletionItem(template.label, vscode.CompletionItemKind.Class);
+			item.sortText = `~${template.label}`;
+			item.detail = template.detail ?? template.label;
+			item.insertText = YAML.stringify(template.object);
+			items.push(item);
+		}
+	}
+
+	private addVanillaTextureSuggestions(document: vscode.TextDocument, position: vscode.Position, items: vscode.CompletionItem[]): void {
+		for (const texturePath of this.options.vanillaTexturePaths) {
+			const namespacedPath = `minecraft:${texturePath}`;
+			const item = new vscode.CompletionItem(namespacedPath, vscode.CompletionItemKind.File);
+			item.detail = 'Vanilla texture';
+			item.insertText = this.withArrayPrefix(document, position, namespacedPath);
+			item.documentation = new vscode.MarkdownString(
+				`\`assets/minecraft/textures/${texturePath}\`\n\n![Texture Preview](${vanillaTextureUrl(texturePath)}|width=100)`
+			);
+			items.push(item);
+		}
+	}
+
+	private addWorkspaceAssetSuggestions(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		items: vscode.CompletionItem[],
+		kind: AssetKind
+	): void {
+		const namespace = this.readNamespace(document);
+		if (!namespace || !this.options.assetIndex) {
+			return;
+		}
+
+		for (const asset of this.options.assetIndex.list(kind, namespace)) {
+			const label = kind === 'model' ? asset.path.replace(/\.json$/, '') : asset.path;
+			const item = new vscode.CompletionItem(label, vscode.CompletionItemKind.File);
+			item.insertText = this.withArrayPrefix(document, position, label);
+			item.documentation = new vscode.MarkdownString(`\`${asset.fullPath.replace(/\\/g, '/')}\``);
+			items.push(item);
+		}
+	}
+
+	private withArrayPrefix(document: vscode.TextDocument, position: vscode.Position, insertText: string): string {
+		const currentLine = document.lineAt(position.line).text.trim();
+		const previousLine = position.line > 0 ? document.lineAt(position.line - 1).text.trim() : '';
+		if (!currentLine.includes('-') && previousLine.startsWith('-')) {
+			return `- ${insertText}`;
+		}
+
+		return insertText;
+	}
+
+	private isTexturePath(yamlPath: string[]): boolean {
+		const target = yamlPath[yamlPath.length - 1];
+		return yamlPath[0] === 'items' &&
+			(yamlPath[2] === 'resource' || yamlPath[2] === 'graphics') &&
+			(target === 'texture' || target === 'textures' || target === 'icon');
+	}
+
+	private isModelPath(yamlPath: string[]): boolean {
+		return yamlPath[0] === 'items' && yamlPath[2] === 'resource' && yamlPath[yamlPath.length - 1] === 'model_path';
+	}
+
+	private readNamespace(document: vscode.TextDocument): string | undefined {
+		const infoNamespace = document.getText().match(/^\s*namespace:\s*["']?([^"'\s]+)["']?/m)?.[1];
+		if (infoNamespace) {
+			return infoNamespace;
+		}
+
+		const pathParts = document.uri.fsPath.replace(/\\/g, '/').split('/');
+		const contentsIndex = pathParts.lastIndexOf('contents');
+		return contentsIndex >= 0 ? pathParts[contentsIndex + 1] : undefined;
+	}
+
+	private toDisplayName(entryId: string): string {
+		return entryId.replace(/_/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
+	}
+}

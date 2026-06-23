@@ -13,12 +13,14 @@ interface MemberInfo {
 }
 
 const repositories = [
-  // "https://repo.maven.apache.org/maven2/",
-  "https://hub.spigotmc.org/nexus/service/rest/repository/browse/snapshots/",
-  // "https://repo.papermc.io/repository/maven-public/",
-  // "https://repo.papermc.io/repository/maven-snapshots/",
-  // "https://oss.sonatype.org/content/groups/public/"
+	// "https://repo.maven.apache.org/maven2/",
+	"https://hub.spigotmc.org/nexus/service/rest/repository/browse/snapshots/",
+	// "https://repo.papermc.io/repository/maven-public/",
+	// "https://repo.papermc.io/repository/maven-snapshots/",
+	// "https://oss.sonatype.org/content/groups/public/"
 ];
+const USER_AGENT_HEADER = 'User-Agent';
+const USER_AGENT = 'Mozilla/5.0 (compatible; JavaDocResolver/1.0)';
 
 export class JavaDocResolver {
   private static instance: JavaDocResolver;
@@ -199,7 +201,7 @@ export class JavaDocResolver {
       const metadataUrl = `${repo}${groupId.replace(/\./g, '/')}/${artifactId}/${version}/`;
       try {
         const folderHtml = await new Promise<string>((resolve, reject) => {
-          https.get(metadataUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; JavaDocResolver/1.0)' } }, (res) => {
+					https.get(metadataUrl, { headers: { [USER_AGENT_HEADER]: USER_AGENT } }, (res) => {
             if (res.statusCode !== 200) {
               return reject(new Error(`Failed to fetch metadata from ${metadataUrl}, status code: ${res.statusCode}`));
             }
@@ -210,14 +212,18 @@ export class JavaDocResolver {
         });
 
         const subfolders = [...folderHtml.matchAll(/href="(\d[^\/]*)\//g)].map(m => m[1]);
-        if (subfolders.length === 0) continue;
+				if (subfolders.length === 0) {
+					continue;
+				}
 
         const randomSnapshot = subfolders[Math.floor(Math.random() * subfolders.length)];
         const snapshotUrl = `${metadataUrl}${randomSnapshot}/`;
 
         const snapshotHtml = await new Promise<string>((resolve, reject) => {
-          https.get(snapshotUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; JavaDocResolver/1.0)' } }, (res) => {
-            if (res.statusCode !== 200) return reject(new Error(`Failed to fetch snapshot data from ${snapshotUrl}`));
+					https.get(snapshotUrl, { headers: { [USER_AGENT_HEADER]: USER_AGENT } }, (res) => {
+						if (res.statusCode !== 200) {
+							return reject(new Error(`Failed to fetch snapshot data from ${snapshotUrl}`));
+						}
             let data = '';
             res.on('data', chunk => data += chunk);
             res.on('end', () => resolve(data));
@@ -225,7 +231,9 @@ export class JavaDocResolver {
         });
 
         const match = snapshotHtml.match(/href="([^\"]+-sources\.jar)"/);
-        if (!match) continue;
+				if (!match) {
+					continue;
+				}
 
         const jarUrl = match[1];
         const jarFileName = path.basename(jarUrl);
@@ -233,7 +241,7 @@ export class JavaDocResolver {
 
         await new Promise<void>((resolve, reject) => {
           const file = fs.createWriteStream(tmpJarPath);
-          https.get(jarUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; JavaDocResolver/1.0)' } }, (res) => {
+					https.get(jarUrl, { headers: { [USER_AGENT_HEADER]: USER_AGENT } }, (res) => {
             if (res.statusCode !== 200) {
               file.close();
               fs.unlinkSync(tmpJarPath);
@@ -424,4 +432,3 @@ function typeToCompletionKind(type: string | undefined): vscode.CompletionItemKi
       return vscode.CompletionItemKind.Text;
   }
 }
-

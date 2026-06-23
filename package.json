@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.2.41",
+  "version": "0.3.0",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -26,6 +26,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
+    "update-schema-enums": "node scripts/update-schema-enums.js",
     "package": "vsce package",
     "publish": "vsce publish"
   },
@@ -88,6 +89,48 @@
         "language": "jspp",
         "scopeName": "source.jspp",
         "path": "./syntaxes/jspp.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ia-vscode.outdentWithoutAcceptingSuggestion",
+        "title": "ItemsAdder: Outdent Without Accepting Suggestion"
+      },
+      {
+        "command": "ia-vscode.playSound",
+        "title": "ItemsAdder: Play Sound"
+      },
+      {
+        "command": "ia-vscode.stopSound",
+        "title": "ItemsAdder: Stop Sound"
+      },
+      {
+        "command": "ia-vscode.openAssetSource",
+        "title": "ItemsAdder: Open Asset Source"
+      },
+      {
+        "command": "ia-vscode.openUrlInVscode",
+        "title": "ItemsAdder: Open URL in VS Code"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "shift+tab",
+        "command": "ia-vscode.outdentWithoutAcceptingSuggestion",
+        "when": "editorTextFocus && suggestWidgetVisible && ia-vscode.itemsAdderResourceConfig"
+      },
+      {
+        "key": "tab",
+        "command": "tab",
+        "when": "editorTextFocus && suggestWidgetVisible && !suggestWidgetHasFocusedSuggestion && ia-vscode.itemsAdderResourceConfig"
+      },
+      {
+        "key": "space",
+        "command": "type",
+        "args": {
+          "text": " "
+        },
+        "when": "editorTextFocus && suggestWidgetVisible && !suggestWidgetHasFocusedSuggestion && ia-vscode.itemsAdderResourceConfig"
       }
     ]
   }
