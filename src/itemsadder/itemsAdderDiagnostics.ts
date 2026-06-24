@@ -44,6 +44,7 @@ export class ItemsAdderDiagnosticsProvider {
 			return { issues, assetDecorations };
 		}
 		this.collectNamespaceIssues(doc, fileNamespace, issues, options);
+		this.collectInfoIssues(doc, issues);
 
 		const itemsNode = doc.get('items', true);
 		if (itemsNode && YAML.isCollection(itemsNode)) {
@@ -67,8 +68,25 @@ export class ItemsAdderDiagnosticsProvider {
 			}
 		}
 
+		this.collectRecipeIssues(doc.get('recipes', true), issues);
 		this.collectFlowIssues(text, issues);
 		return { issues, assetDecorations };
+	}
+
+	private collectInfoIssues(doc: YAML.Document.Parsed<YAML.ParsedNode, true>, issues: ItemsAdderDiagnosticIssue[]): void {
+		const infoNode = doc.get('info', true);
+		if (!YAML.isMap(infoNode)) {
+			return;
+		}
+
+		if (infoNode.has('dictionary-lang') && !doc.has('dictionary')) {
+			this.pushNodeIssue(
+				issues,
+				infoNode.get('dictionary-lang', true),
+				'`info.dictionary-lang` is used only with the top-level `dictionary` property.',
+				'warning'
+			);
+		}
 	}
 
 	private collectItemIssues(
@@ -226,6 +244,122 @@ export class ItemsAdderDiagnosticsProvider {
 				severity: options.isDocumentDirty ? 'warning' : 'error'
 			});
 		}
+	}
+
+	private collectRecipeIssues(recipesNode: unknown, issues: ItemsAdderDiagnosticIssue[]): void {
+		if (!YAML.isMap(recipesNode)) {
+			return;
+		}
+
+		const craftingTableNode = recipesNode.get('crafting_table', true);
+		if (!YAML.isMap(craftingTableNode)) {
+			return;
+		}
+
+		for (const item of craftingTableNode.items) {
+			if (!YAML.isPair(item) || !YAML.isMap(item.value)) {
+				continue;
+			}
+
+			this.collectCraftingRecipeIssues(item.value, issues);
+		}
+	}
+
+	private collectCraftingRecipeIssues(recipeNode: YAML.YAMLMap, issues: ItemsAdderDiagnosticIssue[]): void {
+		if (this.isScalarValue(recipeNode.get('shapeless', true), true)) {
+			for (const item of recipeNode.items) {
+				if (!YAML.isPair(item) || !YAML.isScalar(item.key) || typeof item.key.value !== 'string') {
+					continue;
+				}
+
+				if (!/^pattern(?:$|_)/.test(item.key.value)) {
+					continue;
+				}
+
+				this.pushNodeIssue(issues, item.key, '`shapeless: true` recipes cannot use `pattern` properties.', 'error');
+			}
+			return;
+		}
+
+		this.collectCraftingRecipeIngredientSymbolIssues(recipeNode, issues);
+	}
+
+	private collectCraftingRecipeIngredientSymbolIssues(recipeNode: YAML.YAMLMap, issues: ItemsAdderDiagnosticIssue[]): void {
+		const ingredientKeys = this.craftingRecipeIngredientKeys(recipeNode.get('ingredients', true));
+		if (ingredientKeys.size === 0) {
+			return;
+		}
+
+		const patternSymbols = new Set<string>();
+		const reportedMissingIngredients = new Set<string>();
+		for (const item of recipeNode.items) {
+			if (!YAML.isPair(item) || !YAML.isScalar(item.key) || typeof item.key.value !== 'string') {
+				continue;
+			}
+
+			if (!/^pattern(?:$|_)/.test(item.key.value)) {
+				continue;
+			}
+
+			for (const patternEntry of this.craftingRecipePatternEntries(item.value)) {
+				for (const symbol of patternEntry.value) {
+					if (symbol === 'X' || symbol === ' ') {
+						continue;
+					}
+
+					patternSymbols.add(symbol);
+					if (!ingredientKeys.has(symbol) && !reportedMissingIngredients.has(symbol)) {
+						reportedMissingIngredients.add(symbol);
+						issues.push({
+							range: patternEntry.range,
+							message: `Pattern symbol \`${symbol}\` does not have a matching ingredient.`,
+							severity: 'error'
+						});
+					}
+				}
+			}
+		}
+
+		for (const [symbol, range] of ingredientKeys) {
+			if (!patternSymbols.has(symbol)) {
+				issues.push({
+					range,
+					message: `Ingredient symbol \`${symbol}\` does not appear in any pattern.`,
+					severity: 'error'
+				});
+			}
+		}
+	}
+
+	private craftingRecipeIngredientKeys(ingredientsNode: unknown): Map<string, TextRange> {
+		const keys = new Map<string, TextRange>();
+		if (!YAML.isMap(ingredientsNode)) {
+			return keys;
+		}
+
+		for (const item of ingredientsNode.items) {
+			if (!YAML.isPair(item) || !YAML.isScalar(item.key) || typeof item.key.value !== 'string') {
+				continue;
+			}
+
+			const range = this.getNodeRange(item.key);
+			if (range) {
+				keys.set(item.key.value, range);
+			}
+		}
+		return keys;
+	}
+
+	private craftingRecipePatternEntries(node: unknown): { value: string; range: TextRange }[] {
+		if (YAML.isSeq(node)) {
+			return node.items.flatMap(item => {
+				const range = this.getNodeRange(item);
+				return YAML.isScalar(item) && typeof item.value === 'string' && range ? [{ value: item.value, range }] : [];
+			});
+		}
+
+		const range = this.getNodeRange(node);
+		return YAML.isScalar(node) && typeof node.value === 'string' && range ? [{ value: node.value, range }] : [];
 	}
 
 	private checkTextureNode(

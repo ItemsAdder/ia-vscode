@@ -38,6 +38,38 @@ suite('ItemsAdder diagnostics', () => {
 		));
 	});
 
+	test('warns dictionary-lang without dictionary section', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'  dictionary-lang: en',
+			'items: {}'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.ok(result.issues.some(issue =>
+			issue.severity === 'warning' &&
+			issue.message === '`info.dictionary-lang` is used only with the top-level `dictionary` property.'
+		));
+	});
+
+	test('allows dictionary-lang with dictionary section', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'  dictionary-lang: en',
+			'dictionary:',
+			'  display-name-test: Test'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.ok(!result.issues.some(issue =>
+			issue.message === '`info.dictionary-lang` is used only with the top-level `dictionary` property.'
+		));
+	});
+
 	test('does not require material on legacy armor specific_properties', () => {
 		const text = [
 			'info:',
@@ -106,6 +138,83 @@ suite('ItemsAdder diagnostics', () => {
 		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
 
 		assert.ok(!result.issues.some(issue => issue.message === '`generate: true` requires `texture` or `textures` property.'));
+	});
+
+	test('reports pattern on shapeless crafting table recipes', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'recipes:',
+			'  crafting_table:',
+			'    deadmau5_hat:',
+			'      shapeless: true',
+			'      pattern:',
+			'        - BXB',
+			'      ingredients:',
+			'        B: LIGHT_BLUE_WOOL',
+			'      result:',
+			'        item: iawearables:deadmau5_hat',
+			'        amount: 1'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.ok(result.issues.some(issue =>
+			issue.severity === 'error' &&
+			issue.message === '`shapeless: true` recipes cannot use `pattern` properties.'
+		));
+	});
+
+	test('reports pattern symbols without matching ingredients', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'recipes:',
+			'  crafting_table:',
+			'    deadmau5_hat:',
+			'      pattern:',
+			'        - BXB',
+			'        - XBX',
+			'        - XXZ',
+			'      ingredients:',
+			'        B: LIGHT_BLUE_WOOL',
+			'      result:',
+			'        item: iawearables:deadmau5_hat',
+			'        amount: 1'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.ok(result.issues.some(issue =>
+			issue.severity === 'error' &&
+			issue.message === 'Pattern symbol `Z` does not have a matching ingredient.'
+		));
+		assert.ok(!result.issues.some(issue => issue.message === 'Pattern symbol `X` does not have a matching ingredient.'));
+	});
+
+	test('reports ingredients not used by any pattern', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'recipes:',
+			'  crafting_table:',
+			'    deadmau5_hat:',
+			'      pattern:',
+			'        - BXB',
+			'      ingredients:',
+			'        B: LIGHT_BLUE_WOOL',
+			'        Z: LIGHT_BLUE_WOOL',
+			'      result:',
+			'        item: iawearables:deadmau5_hat',
+			'        amount: 1'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.ok(result.issues.some(issue =>
+			issue.severity === 'error' &&
+			issue.message === 'Ingredient symbol `Z` does not appear in any pattern.'
+		));
 	});
 
 	test('reports multiple flow conditions in one action', () => {

@@ -21,6 +21,7 @@ export interface MinecraftTextColorLinePreview {
 }
 
 const TEXT_PREVIEW_PROPERTIES = new Set(['name', 'display_name', 'item_name']);
+const TECHNICAL_NAME_PARENT_KEYS = new Set(['play_sound']);
 
 const LEGACY_COLORS = new Map<string, string>([
 	['0', '#000000'],
@@ -85,6 +86,10 @@ export function findMinecraftTextColorLinePreviews(text: string): MinecraftTextC
 			return;
 		}
 
+		if (!isFormattedTextPreviewLine(lines, line, lineText)) {
+			return;
+		}
+
 		tokens.forEach((token, index) => {
 			const nextTokenStart = tokens[index + 1]?.start ?? lineText.length;
 			const rawPreview = lineText.slice(token.end, nextTokenStart);
@@ -120,7 +125,7 @@ export function findMinecraftTextColorLinePreviews(text: string): MinecraftTextC
 
 function plainTextLinePreview(lines: string[], line: number, lineText: string): MinecraftTextColorLinePreview | undefined {
 	const direct = lineText.match(/^(\s*)([A-Za-z_][\w-]*)\s*:\s*(.+?)\s*$/);
-	if (direct && TEXT_PREVIEW_PROPERTIES.has(direct[2])) {
+	if (direct && shouldPreviewDirectTextProperty(lines, line, direct[2], direct[1].length)) {
 		const scalar = readPlainScalarValue(lineText, direct[0].indexOf(direct[3]));
 		return scalarPreview(line, scalar);
 	}
@@ -132,6 +137,53 @@ function plainTextLinePreview(lines: string[], line: number, lineText: string): 
 	}
 
 	return undefined;
+}
+
+function isFormattedTextPreviewLine(lines: string[], line: number, lineText: string): boolean {
+	const direct = lineText.match(/^(\s*)([A-Za-z_][\w-]*)\s*:\s*(.+?)\s*$/);
+	if (direct) {
+		return shouldPreviewDirectTextProperty(lines, line, direct[2], direct[1].length);
+	}
+
+	const item = lineText.match(/^(\s*)-\s+(.+?)\s*$/);
+	if (item) {
+		return isInsideLore(lines, line, item[1].length);
+	}
+
+	return true;
+}
+
+function shouldPreviewDirectTextProperty(lines: string[], line: number, property: string, indent: number): boolean {
+	if (!TEXT_PREVIEW_PROPERTIES.has(property)) {
+		return false;
+	}
+	if (property !== 'name') {
+		return true;
+	}
+
+	const parentKeys = parentKeysForLine(lines, line, indent);
+	return !parentKeys.some(parentKey => TECHNICAL_NAME_PARENT_KEYS.has(parentKey));
+}
+
+function parentKeysForLine(lines: string[], line: number, indent: number): string[] {
+	const parents: { indent: number; key: string }[] = [];
+	for (let index = 0; index < line; index++) {
+		const lineText = lines[index] ?? '';
+		const match = lineText.match(/^(\s*)([^:#][^:]*):\s*$/);
+		if (!match) {
+			continue;
+		}
+
+		const parentIndent = match[1].length;
+		while (parents.length > 0 && parents[parents.length - 1].indent >= parentIndent) {
+			parents.pop();
+		}
+		if (parentIndent < indent) {
+			parents.push({ indent: parentIndent, key: match[2].trimEnd() });
+		}
+	}
+
+	return parents.map(parent => parent.key);
 }
 
 function scalarPreview(

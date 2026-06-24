@@ -3,7 +3,7 @@ import * as YAML from 'yaml';
 
 import { firstFramePngPath } from './animatedPngFirstFrame';
 import { AssetPathResolver, AssetResolution } from './assetPathResolver';
-import { findDisabledBlockRanges, findItemBlockRanges } from './decorationRanges';
+import { findCollectionBlockRanges, findDisabledBlockRanges } from './decorationRanges';
 import { findDictionaryReferenceRanges } from './dictionaryReferences';
 import { EditorDiagnosticsController } from './editorDiagnosticsController';
 import { findMinecraftTextColorLinePreviews, formatMinecraftTextPreviewParts } from './minecraftTextColors';
@@ -33,6 +33,13 @@ interface YamlKeyEntry {
 	parentPath: string[];
 }
 
+interface ImplicitNamespaceReference {
+	line: number;
+	character: number;
+	value: string;
+	kind: string;
+}
+
 export class EditorDecorationController {
 	private readonly diagnosticsController: EditorDiagnosticsController;
 	private readonly genericDecorations: vscode.TextEditorDecorationType[];
@@ -59,6 +66,7 @@ export class EditorDecorationController {
 	private dictionaryFormattedPreviewDecorations: vscode.TextEditorDecorationType[] = [];
 	private dictionaryFormattedOriginalDecorations: vscode.TextEditorDecorationType[] = [];
 	private fontImageDecorations: vscode.TextEditorDecorationType[] = [];
+	private implicitNamespaceDecorations: vscode.TextEditorDecorationType[] = [];
 
 	constructor(private readonly options: EditorDecorationControllerOptions) {
 		this.diagnosticsController = new EditorDiagnosticsController({
@@ -164,6 +172,7 @@ export class EditorDecorationController {
 		this.applyEventActionDecorations(editor, text);
 		this.applyDeprecatedPropertyMarkers(editor, text);
 		this.applyFontImagePreviews(editor, text, doc);
+		this.applyImplicitNamespaceHints(editor, text, doc);
 		this.applyDictionaryFormattedPreviews(editor, text);
 		this.applyTextColorPreviews(editor, text);
 		this.assetDecorations = this.diagnosticsController.update(doc, text, editor, this.options.diagnostics, this.assetDecorations);
@@ -171,6 +180,8 @@ export class EditorDecorationController {
 
 	public updateTextPreviews(editor: vscode.TextEditor): void {
 		const text = editor.document.getText();
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		this.applyImplicitNamespaceHints(editor, text, doc);
 		this.applyDictionaryFormattedPreviews(editor, text);
 		this.applyTextColorPreviews(editor, text);
 	}
@@ -204,11 +215,16 @@ export class EditorDecorationController {
 		decoration.dispose();
 	});
 	this.dictionaryFormattedOriginalDecorations = [];
-	this.fontImageDecorations.forEach(decoration => {
-		editor?.setDecorations(decoration, []);
-		decoration.dispose();
-	});
-	this.fontImageDecorations = [];
+		this.fontImageDecorations.forEach(decoration => {
+			editor?.setDecorations(decoration, []);
+			decoration.dispose();
+		});
+		this.fontImageDecorations = [];
+		this.implicitNamespaceDecorations.forEach(decoration => {
+			editor?.setDecorations(decoration, []);
+			decoration.dispose();
+		});
+		this.implicitNamespaceDecorations = [];
 	}
 
 	public dispose(): void {
@@ -298,7 +314,7 @@ export class EditorDecorationController {
 		});
 		this.alternatingDecorations.push(decorationTypeA, decorationTypeB);
 
-		const ranges = findItemBlockRanges(text);
+		const ranges = findCollectionBlockRanges(text, this.options.schemas);
 		const decorationsA: vscode.DecorationOptions[] = [];
 		const decorationsB: vscode.DecorationOptions[] = [];
 		const lines = text.split('\n');
@@ -423,6 +439,281 @@ export class EditorDecorationController {
 				)
 			}]);
 		}
+	}
+
+	private applyImplicitNamespaceHints(editor: vscode.TextEditor, text: string, doc: YAML.Document.Parsed<YAML.ParsedNode, true>): void {
+		this.implicitNamespaceDecorations.forEach(decoration => decoration.dispose());
+		this.implicitNamespaceDecorations = [];
+
+		const namespace = this.readNamespace(doc);
+		if (!namespace) {
+			return;
+		}
+
+		const references = this.findImplicitNamespaceReferences(text)
+			.filter(reference => !this.isSelectionOnLine(editor, reference.line));
+		if (references.length === 0) {
+			return;
+		}
+
+		const decorationType = vscode.window.createTextEditorDecorationType({
+			before: {
+				contentText: `${namespace}:`,
+				color: '#6A9955',
+				fontStyle: 'italic'
+			}
+		});
+		this.implicitNamespaceDecorations.push(decorationType);
+
+		editor.setDecorations(decorationType, references.map(reference => {
+			const position = new vscode.Position(reference.line, reference.character);
+			return {
+				range: new vscode.Range(position, position),
+				hoverMessage: `Implicit ${reference.kind} namespace: \`${namespace}:${reference.value}\``
+			};
+		}));
+	}
+
+	private findImplicitNamespaceReferences(text: string): ImplicitNamespaceReference[] {
+		const entries = this.yamlKeyEntries(text);
+		const lines = text.split('\n');
+		const references: ImplicitNamespaceReference[] = [];
+
+		for (const entry of entries) {
+			const kind = this.implicitNamespaceKindForScalar(entry);
+			if (!kind) {
+				continue;
+			}
+
+			const scalar = this.readScalarValue(lines[entry.line] ?? '', entry.keyEnd);
+			if (!scalar || !this.isImplicitNamespaceValue(scalar.value)) {
+				continue;
+			}
+
+			references.push({
+				line: entry.line,
+				character: this.scalarContentStart(lines[entry.line] ?? '', scalar.startCharacter),
+				value: scalar.value,
+				kind
+			});
+		}
+
+		lines.forEach((lineText, line) => {
+			const scalar = this.readSequenceScalarValue(lineText);
+			if (!scalar || !this.isImplicitNamespaceValue(scalar.value)) {
+				return;
+			}
+
+			const parentPath = this.parentPathForSequenceItem(entries, line, scalar.indent);
+			const kind = this.implicitNamespaceKindForSequence(parentPath);
+			if (!kind) {
+				return;
+			}
+
+			references.push({
+				line,
+				character: scalar.startCharacter,
+				value: scalar.value,
+				kind
+			});
+		});
+
+		return references;
+	}
+
+	private implicitNamespaceKindForScalar(entry: YamlKeyEntry): string | undefined {
+		const schemaKind = this.implicitNamespaceKindForPath([...entry.parentPath, entry.key]);
+		if (schemaKind) {
+			return schemaKind;
+		}
+
+		const parent = entry.parentPath[entry.parentPath.length - 1];
+		const key = entry.key;
+
+		if (key === 'path' && entry.parentPath[0] === 'sounds') {
+			return 'sound';
+		}
+		if (key === 'path' && entry.parentPath[0] === 'font_images') {
+			return 'texture';
+		}
+		if (key === 'texture' || key === 'icon' || parent === 'textures') {
+			return 'texture';
+		}
+		if (key === 'model' || key === 'model_path' || parent === 'models') {
+			return 'model';
+		}
+		if (key === 'sound' || key === 'play_sound' || key.endsWith('_sound') || (key === 'song' && parent === 'jukebox_disc') || parent === 'sounds') {
+			return 'sound';
+		}
+		if (key === 'item' || key === 'itemstack' || key === 'ingredient' || key === 'result' || key === 'drop' || parent === 'items') {
+			return 'item';
+		}
+		if (key === 'block' || key === 'from' || key === 'to' || parent === 'blocks') {
+			return 'block';
+		}
+
+		return undefined;
+	}
+
+	private implicitNamespaceKindForSequence(parentPath: string[]): string | undefined {
+		const parent = parentPath[parentPath.length - 1];
+		const schemaKind = this.implicitNamespaceKindForSequencePath(parentPath);
+		if (schemaKind) {
+			return schemaKind;
+		}
+
+		if (parent === 'textures') {
+			return 'texture';
+		}
+		if (parent === 'models') {
+			return 'model';
+		}
+		if (parent === 'sounds') {
+			return 'sound';
+		}
+		if (parent === 'items') {
+			return 'item';
+		}
+		if (parent === 'blocks') {
+			return 'block';
+		}
+		return undefined;
+	}
+
+	private implicitNamespaceKindForPath(path: string[]): string | undefined {
+		return this.implicitNamespaceKindForSchema(this.schemaNodeAtPath(path), path[path.length - 1], path);
+	}
+
+	private implicitNamespaceKindForSequencePath(parentPath: string[]): string | undefined {
+		const parentSchema = this.schemaNodeAtPath(parentPath);
+		return this.implicitNamespaceKindForSchema(parentSchema?.items ?? parentSchema, parentPath[parentPath.length - 1], parentPath);
+	}
+
+	private implicitNamespaceKindForSchema(schemaNode: any, key: string | undefined, path: string[]): string | undefined {
+		const schema = this.resolveSchemaRef(schemaNode);
+		if (!schema) {
+			return undefined;
+		}
+
+		const id = String(schema.$id ?? '').toLowerCase();
+		const keyName = String(key ?? '').toLowerCase();
+		const text = [
+			schema.title,
+			schema.markdownDescription,
+			schema.description,
+			schema.detail
+		].filter(Boolean).join('\n').toLowerCase();
+
+		if (id === 'bukkit_materials_and_customitems') {
+			return 'item';
+		}
+		if (id === 'bukkit_and_custom_blocks') {
+			return 'block';
+		}
+		if (id === 'vanilla_and_custom_sound') {
+			return 'sound';
+		}
+		if (id === 'custom_and_bukkit_entity_type') {
+			return 'entity';
+		}
+
+		if (text.includes('custom itemsadder block') || text.includes('vanilla/custom blocks')) {
+			return 'block';
+		}
+		if (text.includes('itemsadder custom item') || text.includes('custom item or vanilla material')) {
+			return 'item';
+		}
+		if (text.includes('custom entity') && (keyName === 'entity' || keyName === 'type' || keyName.endsWith('_entity'))) {
+			return 'entity';
+		}
+		if ((keyName === 'texture' || keyName === 'textures' || keyName === 'icon' || keyName.endsWith('_texture')) && text.includes('texture')) {
+			return 'texture';
+		}
+		if ((keyName === 'model' || keyName === 'models' || keyName === 'model_path' || keyName.endsWith('_model')) && text.includes('model')) {
+			return 'model';
+		}
+		if (
+			(keyName === 'sound' || keyName === 'name' || keyName === 'song' || keyName === 'play_sound' || keyName.endsWith('_sound')) &&
+			(text.includes('custom sound') || text.includes('vanilla sound') || text.includes('sound played') || text.includes('declared in the `sounds` section'))
+		) {
+			return 'sound';
+		}
+		if (keyName === 'song' && (text.includes('namespaced id') || path.includes('jukebox_disc'))) {
+			return 'sound';
+		}
+
+		return undefined;
+	}
+
+	private isImplicitNamespaceValue(value: string): boolean {
+		if (!value || value.includes(':')) {
+			return false;
+		}
+		if (/^(https?|file|command):/i.test(value) || value.startsWith('/') || value.startsWith('<')) {
+			return false;
+		}
+		if (/\s|\\/.test(value)) {
+			return false;
+		}
+
+		return !/^[A-Z0-9_]+$/.test(value);
+	}
+
+	private scalarContentStart(line: string, startCharacter: number): number {
+		const quote = line[startCharacter];
+		return quote === '"' || quote === "'" ? startCharacter + 1 : startCharacter;
+	}
+
+	private readSequenceScalarValue(line: string): { indent: number; startCharacter: number; value: string } | undefined {
+		const match = line.match(/^(\s*)-\s*/);
+		if (!match) {
+			return undefined;
+		}
+
+		const indent = match[1].length;
+		const rawStart = match[0].length;
+		if (rawStart >= line.length) {
+			return undefined;
+		}
+
+		const quote = line[rawStart];
+		if (quote === '"' || quote === "'") {
+			const end = line.indexOf(quote, rawStart + 1);
+			if (end === -1) {
+				return undefined;
+			}
+			return {
+				indent,
+				startCharacter: rawStart + 1,
+				value: line.slice(rawStart + 1, end)
+			};
+		}
+
+		const commentStart = line.indexOf(' #', rawStart);
+		const end = commentStart === -1 ? line.length : commentStart;
+		const valueEnd = line.slice(0, end).trimEnd().length;
+		const value = line.slice(rawStart, valueEnd).trim();
+		return value
+			? { indent, startCharacter: rawStart, value }
+			: undefined;
+	}
+
+	private parentPathForSequenceItem(entries: YamlKeyEntry[], line: number, indent: number): string[] {
+		let parent: YamlKeyEntry | undefined;
+		for (const entry of entries) {
+			if (entry.line >= line) {
+				break;
+			}
+			if (entry.indent <= indent) {
+				parent = entry;
+			}
+		}
+
+		return parent ? [...parent.parentPath, parent.key] : [];
+	}
+
+	private isSelectionOnLine(editor: vscode.TextEditor, line: number): boolean {
+		return editor.selections.some(selection => selection.active.line === line);
 	}
 
 	private applyDictionaryFormattedPreviews(editor: vscode.TextEditor, text: string): void {
@@ -738,6 +1029,10 @@ export class EditorDecorationController {
 		const lines = text.split('\n');
 
 		lines.forEach((lineText, line) => {
+			if (/^\s*-\s+/.test(lineText)) {
+				return;
+			}
+
 			const match = lineText.match(/^(\s*)([^:#][^:]*):/);
 			if (!match) {
 				return;

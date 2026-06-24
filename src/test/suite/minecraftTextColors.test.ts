@@ -86,6 +86,24 @@ suite('Minecraft text colors', () => {
 		]);
 	});
 
+	test('does not preview technical play_sound name values', () => {
+		const previews = findMinecraftTextColorLinePreviews([
+			'play_sound:',
+			'  name: iawearables:entity.creeper.primed',
+			'  volume: 1',
+			'  pitch: 1'
+		].join('\n'));
+		assert.deepStrictEqual(previews, []);
+	});
+
+	test('does not preview formatted technical play_sound name values', () => {
+		const previews = findMinecraftTextColorLinePreviews([
+			'play_sound:',
+			'  name: <red>entity.creeper.primed'
+		].join('\n'));
+		assert.deepStrictEqual(previews, []);
+	});
+
 	test('builds plain lore preview with normal white default style', () => {
 		const previews = findMinecraftTextColorLinePreviews(['lore:', '  - Simple lore'].join('\n'));
 
