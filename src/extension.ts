@@ -7,8 +7,10 @@ import { EditorDecorationController } from './itemsadder/editorDecorationControl
 import { ItemsAdderDictionaryIndex } from './itemsadder/itemsAdderDictionaryIndex';
 import { ItemsAdderCompletionProvider } from './itemsadder/itemsAdderCompletionProvider';
 import { ItemsAdderSoundCodeLensProvider, ItemsAdderSoundHoverProvider, ItemsAdderSoundPlayer } from './itemsadder/itemsAdderSoundPlayer';
+import { JavaScriptSupportConfigurator } from './itemsadder/javaScriptSupportConfigurator';
 import { ProjectAssetIndex } from './itemsadder/projectAssetIndex';
 import { SchemaHoverProvider } from './itemsadder/schemaHoverProvider';
+import { ScriptPathHoverProvider } from './itemsadder/scriptPathHoverProvider';
 import { VANILLA_MINECRAFT_ASSETS_VERSION, VANILLA_TEXTURES_API_ROOT } from './itemsadder/vanillaMinecraftAssets';
 import { registerJsppLanguageFeatures } from './jspp';
 import { schemas } from './schemas';
@@ -24,6 +26,8 @@ let activeEditor: vscode.TextEditor | undefined;
 let timeout: ReturnType<typeof setTimeout> | undefined;
 let lastAutoSuggestKey: string | undefined;
 let decorationController: EditorDecorationController | undefined;
+let javaScriptSupportConfigurator: JavaScriptSupportConfigurator | undefined;
+let itemsAdderStatusBarItem: vscode.StatusBarItem | undefined;
 
 const config = vscode.workspace.getConfiguration('ia-vscode');
 let neverWarnAboutCopilot = config.get<boolean>('neverWarnAboutCopilot');
@@ -73,6 +77,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(dictionaryIndex);
 	const soundPlayer = new ItemsAdderSoundPlayer();
 	context.subscriptions.push(soundPlayer);
+	javaScriptSupportConfigurator = new JavaScriptSupportConfigurator();
 
 	const diagnostics = vscode.languages.createDiagnosticCollection('ia_diagnostics');
 	context.subscriptions.push(diagnostics);
@@ -107,6 +112,42 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 			await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
 		}
 	}));
+	context.subscriptions.push(vscode.commands.registerCommand('ia-vscode.configureJavaScriptSupport', async () => {
+		await javaScriptSupportConfigurator?.configureWorkspace();
+	}));
+	context.subscriptions.push(vscode.commands.registerCommand('ia-vscode.cleanJavaLanguageServerWorkspace', async () => {
+		try {
+			await vscode.commands.executeCommand('java.clean.workspace');
+		} catch {
+			void vscode.window.showWarningMessage('Java extension command not available. Install or activate Extension Pack for Java.');
+		}
+	}));
+	context.subscriptions.push(vscode.commands.registerCommand('ia-vscode.showItemsAdderMenu', async () => {
+		const action = await vscode.window.showQuickPick(
+			[
+				{
+					label: '$(settings-gear) Configure Java Script Support',
+					description: 'Setup Paper API and ItemsAdder API autocomplete'
+				},
+				{
+					label: '$(trash) Clean Java Language Server Workspace',
+					description: 'Clear Java LS cache and reload project metadata'
+				}
+			],
+			{ placeHolder: 'ItemsAdder' }
+		);
+		if (action?.label.includes('Configure Java Script Support')) {
+			await vscode.commands.executeCommand('ia-vscode.configureJavaScriptSupport');
+		} else if (action?.label.includes('Clean Java Language Server Workspace')) {
+			await vscode.commands.executeCommand('ia-vscode.cleanJavaLanguageServerWorkspace');
+		}
+	}));
+	itemsAdderStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	itemsAdderStatusBarItem.text = '$(symbol-misc) ItemsAdder';
+	itemsAdderStatusBarItem.tooltip = 'ItemsAdder tools';
+	itemsAdderStatusBarItem.command = 'ia-vscode.showItemsAdderMenu';
+	itemsAdderStatusBarItem.show();
+	context.subscriptions.push(itemsAdderStatusBarItem);
 	context.subscriptions.push(vscode.commands.registerCommand('ia-vscode.playSound', (soundPath: string, label?: string) => {
 		soundPlayer.play(soundPath, label);
 	}));
@@ -133,6 +174,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(vscode.languages.registerHoverProvider(
 		{ language: 'yaml' },
 		new ItemsAdderSoundHoverProvider({ assetIndex, vanillaTexturePaths })
+	));
+	context.subscriptions.push(vscode.languages.registerHoverProvider(
+		{ language: 'yaml' },
+		new ScriptPathHoverProvider()
 	));
 	decorationController = new EditorDecorationController({
 		context,
@@ -365,6 +410,8 @@ function maybeTriggerSuggestionsOnEmptyLine(editor: vscode.TextEditor): void {
 }
 
 async function handleDocumentRefresh(document: vscode.TextDocument): Promise<void> {
+	await javaScriptSupportConfigurator?.maybePromptForJavaScript(document);
+
 	if (!isItemsAdderResourceConfig(document)) {
 		return;
 	}

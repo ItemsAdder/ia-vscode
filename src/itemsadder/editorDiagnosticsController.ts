@@ -5,6 +5,7 @@ import { firstFramePngPath } from './animatedPngFirstFrame';
 import { AssetPathResolver } from './assetPathResolver';
 import { ItemsAdderDiagnosticsProvider, ItemsAdderDiagnosticSeverity } from './itemsAdderDiagnostics';
 import { ProjectAssetIndex } from './projectAssetIndex';
+import { ScriptPathResolver } from './scriptPathResolver';
 
 export interface EditorDiagnosticsControllerOptions {
 	extensionContext: vscode.ExtensionContext;
@@ -38,10 +39,18 @@ export class EditorDiagnosticsController {
 				assetIndex: this.options.assetIndex
 			})
 			: undefined;
+		const scriptResolver = fileNamespace
+			? new ScriptPathResolver({
+				workspaceFolders,
+				documentPath: editor.document.uri.fsPath,
+				fileNamespace
+			})
+			: undefined;
 
 		const result = this.provider.collect(doc, text, {
 			isDocumentDirty: editor.document.isDirty,
 			assetResolver,
+			scriptResolver,
 			expectedNamespace: this.readNamespaceFromPath(editor.document.uri.fsPath)
 		});
 

@@ -51,7 +51,9 @@
     "yaml": "^2.7.0"
   },
   "activationEvents": [
-    "onLanguage:yaml"
+    "onLanguage:yaml",
+    "onLanguage:jspp",
+    "onLanguage:java"
   ],
   "extensionDependencies": [
     "redhat.vscode-yaml"
@@ -111,6 +113,14 @@
       {
         "command": "ia-vscode.openUrlInVscode",
         "title": "ItemsAdder: Open URL in VS Code"
+      },
+      {
+        "command": "ia-vscode.configureJavaScriptSupport",
+        "title": "ItemsAdder: Configure Java Script Support"
+      },
+      {
+        "command": "ia-vscode.cleanJavaLanguageServerWorkspace",
+        "title": "ItemsAdder: Clean Java Language Server Workspace"
       }
     ],
     "keybindings": [

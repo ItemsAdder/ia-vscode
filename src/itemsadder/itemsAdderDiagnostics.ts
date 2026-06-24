@@ -1,6 +1,7 @@
 import * as YAML from 'yaml';
 
 import { AssetPathResolver, AssetResolution } from './assetPathResolver';
+import { ScriptPathResolver } from './scriptPathResolver';
 
 export type ItemsAdderDiagnosticSeverity = 'error' | 'warning';
 
@@ -29,6 +30,7 @@ export interface ItemsAdderDiagnosticsResult {
 export interface ItemsAdderDiagnosticsOptions {
 	isDocumentDirty: boolean;
 	assetResolver?: AssetPathResolver;
+	scriptResolver?: ScriptPathResolver;
 	expectedNamespace?: string;
 }
 
@@ -51,6 +53,17 @@ export class ItemsAdderDiagnosticsProvider {
 				}
 
 				this.collectItemIssues(pair.value, issues, assetDecorations, options);
+			}
+		}
+
+		const entitiesNode = doc.get('entities', true);
+		if (entitiesNode && YAML.isCollection(entitiesNode)) {
+			for (const pair of entitiesNode.items) {
+				if (!YAML.isPair(pair) || !YAML.isMap(pair.value)) {
+					continue;
+				}
+
+				this.collectScriptIssues(pair.value.get('script', true), issues, options);
 			}
 		}
 
@@ -118,6 +131,7 @@ export class ItemsAdderDiagnosticsProvider {
 		}
 
 		this.collectAssetIssues(resourceNode, issues, assetDecorations, options);
+		this.collectScriptIssues(itemNode.get('script', true), issues, options);
 	}
 
 	private collectGraphicsIssues(
@@ -183,6 +197,35 @@ export class ItemsAdderDiagnosticsProvider {
 		}
 
 		this.checkModelNode(resourceNode.get('model_path', true), issues, assetDecorations, severity, options.assetResolver);
+	}
+
+	private collectScriptIssues(
+		scriptNode: unknown,
+		issues: ItemsAdderDiagnosticIssue[],
+		options: ItemsAdderDiagnosticsOptions
+	): void {
+		if (!options.scriptResolver?.isDocumentInWorkspace() || !YAML.isMap(scriptNode)) {
+			return;
+		}
+
+		if (this.isScalarValue(scriptNode.get('enabled', true), false)) {
+			return;
+		}
+
+		const pathNode = scriptNode.get('path', true);
+		const range = this.getNodeRange(pathNode);
+		if (!range || !YAML.isScalar(pathNode) || typeof pathNode.value !== 'string') {
+			return;
+		}
+
+		const resolution = options.scriptResolver.resolve(pathNode.value);
+		if (!resolution.found) {
+			issues.push({
+				range,
+				message: 'Script file not found. Expected a `.jspp` or `.java` file in this namespace.',
+				severity: options.isDocumentDirty ? 'warning' : 'error'
+			});
+		}
 	}
 
 	private checkTextureNode(
