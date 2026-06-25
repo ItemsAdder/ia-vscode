@@ -104,6 +104,19 @@ suite('Minecraft text colors', () => {
 		assert.deepStrictEqual(previews, []);
 	});
 
+	test('does not preview script name values', () => {
+		const previews = findMinecraftTextColorLinePreviews([
+			'items:',
+			'  test_interact_jspp:',
+			'    events:',
+			'      interact:',
+			'        right:',
+			'          script:',
+			'            name: testjsppbossbar_issue'
+		].join('\n'));
+		assert.deepStrictEqual(previews, []);
+	});
+
 	test('builds plain lore preview with normal white default style', () => {
 		const previews = findMinecraftTextColorLinePreviews(['lore:', '  - Simple lore'].join('\n'));
 

@@ -740,7 +740,7 @@ export class EditorDecorationController {
 			if (parts.length === 0) {
 				continue;
 			}
-			const isActive = this.isSelectionInPreviewContext(editor, text, reference.line, reference.startCharacter, reference.endCharacter);
+			const isActive = this.isSelectionInPreviewContext(editor, reference.line);
 			const shouldReplaceOriginal = !isActive;
 			const previewCharacter = shouldReplaceOriginal ? reference.startCharacter : reference.endCharacter;
 			if (shouldReplaceOriginal) {
@@ -817,7 +817,7 @@ export class EditorDecorationController {
 				continue;
 			}
 
-			const isActive = this.isSelectionInPreviewContext(editor, text, preview.line, preview.startCharacter, preview.endCharacter);
+			const isActive = this.isSelectionInPreviewContext(editor, preview.line);
 			const previewCharacter = isActive ? preview.character : preview.startCharacter;
 			if (!isActive) {
 				hiddenOriginals.push(new vscode.Range(
@@ -872,21 +872,10 @@ export class EditorDecorationController {
 
 	private isSelectionInPreviewContext(
 		editor: vscode.TextEditor,
-		text: string,
-		line: number,
-		startCharacter: number,
-		endCharacter: number
+		line: number
 	): boolean {
 		const active = editor.selection.active;
-		if (active.line === line && active.character >= startCharacter && active.character <= endCharacter) {
-			return true;
-		}
-
-		const lines = text.split('\n');
-		const parentBlock = this.closestParentBlock(lines, line);
-		return parentBlock
-			? active.line >= parentBlock.startLine && active.line <= parentBlock.endLine
-			: active.line === line;
+		return active.line === line;
 	}
 
 	private hasResolvedDictionaryPreview(text: string, preview: { line: number; startCharacter: number; endCharacter: number }): boolean {

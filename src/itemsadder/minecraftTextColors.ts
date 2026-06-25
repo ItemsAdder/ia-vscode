@@ -21,7 +21,7 @@ export interface MinecraftTextColorLinePreview {
 }
 
 const TEXT_PREVIEW_PROPERTIES = new Set(['name', 'display_name', 'item_name']);
-const TECHNICAL_NAME_PARENT_KEYS = new Set(['play_sound']);
+const TECHNICAL_NAME_PARENT_KEYS = new Set(['play_sound', 'script']);
 
 const LEGACY_COLORS = new Map<string, string>([
 	['0', '#000000'],
