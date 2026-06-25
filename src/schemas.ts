@@ -2,8 +2,8 @@
 
 type SchemaObject = Record<string, any>;
 
-const baseSchema = require('../src/schemas.json');
-const schemaEnums = require('../src/schemaEnums.json');
+const baseSchema = require('./schemas.json');
+const schemaEnums = require('./schemaEnums.json');
 
 export const schemas = normalizeSchemaForLanguageServer({
 	...baseSchema,
