@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as https from 'https';
 import * as vscode from 'vscode';
-import { Uri } from 'vscode';
 
 import { EditorDecorationController } from './itemsadder/editorDecorationController';
 import { ItemsAdderDictionaryIndex } from './itemsadder/itemsAdderDictionaryIndex';
@@ -12,13 +11,17 @@ import { ProjectAssetIndex } from './itemsadder/projectAssetIndex';
 import { SchemaHoverProvider } from './itemsadder/schemaHoverProvider';
 import { ScriptPathHoverProvider } from './itemsadder/scriptPathHoverProvider';
 import { VANILLA_MINECRAFT_ASSETS_VERSION, VANILLA_TEXTURES_API_ROOT } from './itemsadder/vanillaMinecraftAssets';
+import { isItemsAdderPluginConfig, itemsAdderPluginConfigSchema } from './itemsAdderPluginConfig';
 import { registerJsppLanguageFeatures } from './jspp';
 import { schemas } from './schemas';
 import { items as vscodeItemsSuggestions } from './vscodeSuggestions';
 
 const DEBUG = false;
 const SCHEME = 'itemsadder';
+const RESOURCE_SCHEMA_URI = `${SCHEME}://schema/itemsadder-resource`;
+const PLUGIN_CONFIG_SCHEMA_URI = `${SCHEME}://schema/itemsadder-plugin-config`;
 const JSON_SCHEMA = JSON.stringify(stripSchemaHoverMetadata(schemas));
+const ITEMSADDER_PLUGIN_CONFIG_SCHEMA = JSON.stringify(stripSchemaHoverMetadata(itemsAdderPluginConfigSchema));
 const DOWNLOAD_VANILLA_TEXTURES_LIST = false;
 const ITEMSADDER_CONTEXT_KEY = 'ia-vscode.itemsAdderResourceConfig';
 
@@ -157,6 +160,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
 	const completionProvider = new ItemsAdderCompletionProvider({
 		schemas,
+		pluginConfigSchema: itemsAdderPluginConfigSchema,
 		itemTemplates: vscodeItemsSuggestions,
 		vanillaTexturePaths,
 		assetIndex,
@@ -165,7 +169,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider, ''));
 	context.subscriptions.push(vscode.languages.registerHoverProvider(
 		{ language: 'yaml' },
-		new SchemaHoverProvider({ schemas })
+		new SchemaHoverProvider({ schemas, pluginConfigSchema: itemsAdderPluginConfigSchema })
 	));
 	context.subscriptions.push(vscode.languages.registerCodeLensProvider(
 		{ language: 'yaml' },
@@ -193,7 +197,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		await handleDocumentRefresh(document);
 	}
 
-	if (activeEditor && isItemsAdderResourceConfig(activeEditor.document)) {
+	if (activeEditor && isItemsAdderManagedConfig(activeEditor.document)) {
 		triggerUpdateDecorations();
 	}
 	await updateItemsAdderContext(activeEditor);
@@ -203,9 +207,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 			console.log('Document changed.');
 		}
 
-		if (activeEditor && event.document === activeEditor.document && isItemsAdderResourceConfig(event.document)) {
+		if (activeEditor && event.document === activeEditor.document && isItemsAdderManagedConfig(event.document)) {
 			triggerUpdateDecorations(true);
-			maybeTriggerSuggestionsOnEmptyLine(activeEditor);
+			if (isItemsAdderManagedConfig(event.document)) {
+				maybeTriggerSuggestionsOnEmptyLine(activeEditor);
+			}
 		}
 		if (activeEditor && event.document === activeEditor.document) {
 			void updateItemsAdderContext(activeEditor);
@@ -243,20 +249,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		}
 		await updateItemsAdderContext(editor);
 
-		if (isItemsAdderResourceConfig(editor.document)) {
-		await setWordBasedSuggestions(false);
-		await setCopilot(false);
-		triggerUpdateDecorations();
-		maybeTriggerSuggestionsOnEmptyLine(editor);
-		return;
-	}
+		if (isItemsAdderManagedConfig(editor.document)) {
+			await setWordBasedSuggestions(false);
+			if (isItemsAdderResourceConfig(editor.document)) {
+				await setCopilot(false);
+			}
+			maybeTriggerSuggestionsOnEmptyLine(editor);
+			triggerUpdateDecorations();
+			return;
+		}
 
 		decorationController?.clear(editor);
 		await restoreOriginalSettings();
 	}));
 
 	context.subscriptions.push(vscode.workspace.onDidCloseTextDocument(async document => {
-		if (isItemsAdderResourceConfig(document)) {
+		if (isItemsAdderManagedConfig(document)) {
 			await restoreOriginalSettings();
 		}
 	}));
@@ -285,29 +293,42 @@ async function registerYamlSchema(): Promise<void> {
 	yamlExtensionAPI.registerContributor(
 		SCHEME,
 		(resource: string) => {
-			if (!resource.endsWith('.yml')) {
+			if (!resource.endsWith('.yml') && !resource.endsWith('.yaml')) {
 				return undefined;
 			}
 
 			const document = vscode.workspace.textDocuments.find(doc => doc.uri.toString() === resource);
-			if (document && !isItemsAdderResourceConfig(document)) {
-				return undefined;
+			if (document) {
+				if (isItemsAdderPluginConfig(document)) {
+					return PLUGIN_CONFIG_SCHEMA_URI;
+				}
+
+				if (isItemsAdderResourceConfig(document)) {
+					return RESOURCE_SCHEMA_URI;
+				}
 			}
 
-			return `${SCHEME}://schema/itemsadder-resource`;
+			return undefined;
 		},
 		(schemaUri: string) => {
-			const parsedUri = Uri.parse(schemaUri);
-			if (parsedUri.scheme !== SCHEME || !parsedUri.path || !parsedUri.path.startsWith('/')) {
+			if (!schemaUri.startsWith(`${SCHEME}://`)) {
 				return undefined;
 			}
 
-			return Promise.resolve(JSON_SCHEMA);
+			if (schemaUri === PLUGIN_CONFIG_SCHEMA_URI) {
+				return Promise.resolve(ITEMSADDER_PLUGIN_CONFIG_SCHEMA);
+			}
+
+			if (schemaUri === RESOURCE_SCHEMA_URI) {
+				return Promise.resolve(JSON_SCHEMA);
+			}
+
+			return undefined;
 		},
-		'ItemsAdder Resource'
+		'ItemsAdder'
 	);
 
-	console.log('Registered YAML schema for ItemsAdder Resources.');
+	console.log('Registered YAML schemas for ItemsAdder.');
 }
 
 async function loadVanillaTexturePaths(context: vscode.ExtensionContext): Promise<string[]> {
@@ -379,7 +400,7 @@ function triggerUpdateDecorations(throttle = false): void {
 }
 
 function updateDecorations(): void {
-	if (!activeEditor || !isItemsAdderResourceConfig(activeEditor.document)) {
+	if (!activeEditor || !isItemsAdderManagedConfig(activeEditor.document)) {
 		return;
 	}
 
@@ -388,7 +409,7 @@ function updateDecorations(): void {
 
 function maybeTriggerSuggestionsOnEmptyLine(editor: vscode.TextEditor): void {
 	const position = editor.selection.active;
-	if (!isItemsAdderResourceConfig(editor.document) || editor.document.lineAt(position.line).text.trim() !== '') {
+	if (!isItemsAdderManagedConfig(editor.document) || editor.document.lineAt(position.line).text.trim() !== '') {
 		lastAutoSuggestKey = undefined;
 		return;
 	}
@@ -412,12 +433,14 @@ function maybeTriggerSuggestionsOnEmptyLine(editor: vscode.TextEditor): void {
 async function handleDocumentRefresh(document: vscode.TextDocument): Promise<void> {
 	await javaScriptSupportConfigurator?.maybePromptForJavaScript(document);
 
-	if (!isItemsAdderResourceConfig(document)) {
+	if (!isItemsAdderManagedConfig(document)) {
 		return;
 	}
 
 	await setWordBasedSuggestions(false);
-	await setCopilot(false);
+	if (isItemsAdderResourceConfig(document)) {
+		await setCopilot(false);
+	}
 }
 
 function isItemsAdderResourceConfig(document: vscode.TextDocument): boolean {
@@ -439,6 +462,10 @@ function isItemsAdderResourceConfig(document: vscode.TextDocument): boolean {
 	}
 
 	return false;
+}
+
+function isItemsAdderManagedConfig(document: vscode.TextDocument): boolean {
+	return isItemsAdderResourceConfig(document) || isItemsAdderPluginConfig(document);
 }
 
 async function fetchJson(url: string): Promise<any> {

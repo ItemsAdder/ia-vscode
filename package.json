@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -27,6 +27,7 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
     "update-schema-enums": "node scripts/update-schema-enums.js",
+    "update-itemsadder-config-schema": "node scripts/update-itemsadder-config-schema.js",
     "package": "vsce package",
     "publish": "vsce publish"
   },

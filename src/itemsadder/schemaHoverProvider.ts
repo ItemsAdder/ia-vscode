@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 
+import { isItemsAdderPluginConfigText } from '../itemsAdderPluginConfig';
+
 interface SchemaHoverProviderOptions {
 	schemas: any;
+	pluginConfigSchema?: any;
 }
 
 interface PropertyAtPosition {
@@ -19,7 +22,10 @@ export class SchemaHoverProvider implements vscode.HoverProvider {
 			return undefined;
 		}
 
-		const schemaNode = this.schemaNodeAtPath(property.path);
+		const schema = isItemsAdderPluginConfigText(document.getText())
+			? this.options.pluginConfigSchema ?? this.options.schemas
+			: this.options.schemas;
+		const schemaNode = this.schemaNodeAtPath(property.path, schema);
 		if (!schemaNode) {
 			return undefined;
 		}
@@ -83,10 +89,10 @@ export class SchemaHoverProvider implements vscode.HoverProvider {
 		return parents.reverse().map(parent => parent.key);
 	}
 
-	private schemaNodeAtPath(path: string[]): any | undefined {
-		let current = this.resolveRef(this.options.schemas);
+	private schemaNodeAtPath(path: string[], schema: any): any | undefined {
+		let current = this.resolveRef(schema, schema);
 		for (const segment of path) {
-			current = this.resolveRef(current);
+			current = this.resolveRef(current, schema);
 			if (!current) {
 				return undefined;
 			}
@@ -115,7 +121,7 @@ export class SchemaHoverProvider implements vscode.HoverProvider {
 			return undefined;
 		}
 
-		return this.resolveRef(current);
+		return this.resolveRef(current, schema);
 	}
 
 	private patternSchemaFor(schemaNode: any, segment: string): any | undefined {
@@ -133,13 +139,13 @@ export class SchemaHoverProvider implements vscode.HoverProvider {
 		return undefined;
 	}
 
-	private resolveRef(schemaNode: any): any {
+	private resolveRef(schemaNode: any, rootSchema: any): any {
 		if (!schemaNode?.$ref) {
 			return schemaNode;
 		}
 
 		const refKey = String(schemaNode.$ref).split('/').pop();
-		return refKey ? this.options.schemas.$defs?.[refKey] ?? schemaNode : schemaNode;
+		return refKey ? rootSchema.$defs?.[refKey] ?? schemaNode : schemaNode;
 	}
 
 	private descriptionFor(schemaNode: any): string {

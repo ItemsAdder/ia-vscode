@@ -2,6 +2,7 @@ import * as YAML from 'yaml';
 
 import { AssetPathResolver, AssetResolution } from './assetPathResolver';
 import { ScriptPathResolver } from './scriptPathResolver';
+import { itemsAdderPluginConfigSchema } from '../itemsAdderPluginConfig';
 
 export type ItemsAdderDiagnosticSeverity = 'error' | 'warning';
 
@@ -34,10 +35,48 @@ export interface ItemsAdderDiagnosticsOptions {
 	expectedNamespace?: string;
 }
 
+const HOSTING_PROVIDERS = [
+	['resource-pack', 'hosting', 'self-host'],
+	['resource-pack', 'hosting', 'simple_self_host'],
+	['resource-pack', 'hosting', 'external-host'],
+	['resource-pack', 'hosting', 'lobfile'],
+	['resource-pack', 'hosting', 'no-host'],
+	['resource-pack', 'hosting', 'auto-external-host']
+];
+
+const COOLDOWN_BOSSBAR_COLORS = new Set(['PINK', 'BLUE', 'RED', 'GREEN', 'YELLOW', 'PURPLE', 'WHITE']);
+const COOLDOWN_BOSSBAR_STYLES = new Set(['SOLID', 'SEGMENTED_6', 'SEGMENTED_10', 'SEGMENTED_12', 'SEGMENTED_20']);
+const PLAYER_STATS_SAVE_TYPES = new Set(['CUSTOM_NBT', 'PLAYER_DAT']);
+const PLUGIN_CONFIG_MANUAL_SCHEMA_PATHS = new Set([
+	'cooldown_bars.bossbar.color',
+	'cooldown_bars.bossbar.style',
+	'player_stats.save_type',
+	'crops.rendering.max_shown_per_player',
+	'crops.rendering.billboard.distance',
+	'crops.rendering.tick_interval',
+	'crops.rendering.radius_blocks',
+	'crops.max_crops_in_area',
+	'crops.area_limit_radius',
+	'server.port',
+	'resource-pack.hosting.self-host.pack-port',
+	'resource-pack.hosting.self-host.protection.rate_limit.max_requests',
+	'resource-pack.hosting.self-host.protection.rate_limit.period_seconds',
+	'resource-pack.hosting.self-host.protection.rate_limit.cooldown.duration_minutes',
+	'resource-pack.hosting.self-host.protection.rate_limit.cooldown.trigger_on_failed_times',
+	'resource-pack.hosting.simple_self_host.optimization.max_downloads_per_ip',
+	'resource-pack.hosting.simple_self_host.optimization.max_speed_in_megabyte_ps'
+]);
+
 export class ItemsAdderDiagnosticsProvider {
 	public collect(doc: YAML.Document.Parsed<YAML.ParsedNode, true>, text: string, options: ItemsAdderDiagnosticsOptions): ItemsAdderDiagnosticsResult {
 		const issues: ItemsAdderDiagnosticIssue[] = [];
 		const assetDecorations: ItemsAdderAssetDecoration[] = [];
+
+		if (this.isPluginConfig(doc)) {
+			this.collectPluginConfigIssues(doc, issues);
+			return { issues, assetDecorations };
+		}
+
 		const fileNamespace = this.getNamespace(doc);
 
 		if (!fileNamespace) {
@@ -87,6 +126,185 @@ export class ItemsAdderDiagnosticsProvider {
 				'warning'
 			);
 		}
+	}
+
+private collectPluginConfigIssues(doc: YAML.Document.Parsed<YAML.ParsedNode, true>, issues: ItemsAdderDiagnosticIssue[]): void {
+	this.collectPluginConfigSchemaIssues(doc.contents, itemsAdderPluginConfigSchema, [], issues);
+
+	this.collectMutuallyExclusiveEnabledIssues(
+		doc,
+			HOSTING_PROVIDERS,
+			'Only one resource pack hosting method can be enabled at a time.',
+			issues
+		);
+		this.collectMutuallyExclusiveEnabledIssues(
+			doc,
+			[
+				['blocks', 'convert-vanilla-blocks'],
+				['blocks', 'fix-glitched-blocks']
+			],
+			'Use either `blocks.convert-vanilla-blocks` or `blocks.fix-glitched-blocks`, not both.',
+			issues
+		);
+		this.collectMutuallyExclusiveEnabledIssues(
+			doc,
+			[
+				['advanced', 'legacy_shader_armor_conversion', 'append_new_equipment_tag'],
+				['advanced', 'legacy_shader_armor_conversion', 'completely_convert_to_new_equipment_tag']
+			],
+			'Use either `append_new_equipment_tag` or `completely_convert_to_new_equipment_tag`, not both.',
+			issues
+		);
+
+		this.collectMutuallyExclusiveBooleanIssues(
+			doc,
+			[
+				['resource-pack', 'zip', 'emotes', '1_21_5_to_1_21_9_shaders'],
+				['resource-pack', 'zip', 'emotes', '1_21_4_plus_modern_method']
+			],
+			'Only one emotes resource pack method is needed.',
+			'warning',
+			issues
+		);
+
+		this.collectEnumIssue(doc, ['cooldown_bars', 'bossbar', 'color'], COOLDOWN_BOSSBAR_COLORS, 'Invalid cooldown bossbar color.', issues);
+		this.collectEnumIssue(doc, ['cooldown_bars', 'bossbar', 'style'], COOLDOWN_BOSSBAR_STYLES, 'Invalid cooldown bossbar style.', issues);
+		this.collectEnumIssue(doc, ['player_stats', 'save_type'], PLAYER_STATS_SAVE_TYPES, '`player_stats.save_type` must be `CUSTOM_NBT` or `PLAYER_DAT`.', issues);
+
+		this.collectIntegerRangeIssue(doc, ['crops', 'rendering', 'max_shown_per_player'], 200, 1800, issues);
+		this.collectIntegerRangeIssue(doc, ['crops', 'rendering', 'billboard', 'distance'], 0, 10, issues);
+		this.collectIntegerRangeIssue(doc, ['crops', 'rendering', 'tick_interval'], 0, 10, issues);
+		this.collectIntegerRangeIssue(doc, ['crops', 'rendering', 'radius_blocks'], 16, 64, issues);
+	this.collectIntegerRangeIssue(doc, ['crops', 'max_crops_in_area'], 0, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['crops', 'area_limit_radius'], 16, 64, issues);
+	this.collectIntegerRangeIssue(doc, ['server', 'port'], 1, 65535, issues, true);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'self-host', 'pack-port'], 1, 65535, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'self-host', 'protection', 'rate_limit', 'max_requests'], 1, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'self-host', 'protection', 'rate_limit', 'period_seconds'], 1, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'self-host', 'protection', 'rate_limit', 'cooldown', 'duration_minutes'], 0, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'self-host', 'protection', 'rate_limit', 'cooldown', 'trigger_on_failed_times'], 1, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'simple_self_host', 'optimization', 'max_downloads_per_ip'], 1, undefined, issues);
+	this.collectIntegerRangeIssue(doc, ['resource-pack', 'hosting', 'simple_self_host', 'optimization', 'max_speed_in_megabyte_ps'], 1, undefined, issues);
+
+	this.collectHostAddressIssue(doc, ['server', 'address'], issues);
+		this.collectHostAddressIssue(doc, ['resource-pack', 'hosting', 'simple_self_host', 'server_address'], issues);
+	}
+
+	private collectMutuallyExclusiveEnabledIssues(
+		doc: YAML.Document.Parsed<YAML.ParsedNode, true>,
+		paths: string[][],
+		message: string,
+		issues: ItemsAdderDiagnosticIssue[]
+	): void {
+		this.collectMutuallyExclusiveBooleanIssues(doc, paths.map(path => [...path, 'enabled']), message, 'error', issues);
+	}
+
+	private collectMutuallyExclusiveBooleanIssues(
+		doc: YAML.Document.Parsed<YAML.ParsedNode, true>,
+		paths: string[][],
+		message: string,
+		severity: ItemsAdderDiagnosticSeverity,
+		issues: ItemsAdderDiagnosticIssue[]
+	): void {
+		const enabled = paths
+			.map(path => ({ path, node: doc.getIn(path, true) }))
+			.filter(entry => this.isScalarValue(entry.node, true));
+
+		if (enabled.length <= 1) {
+			return;
+		}
+
+		for (const entry of enabled) {
+			this.pushNodeIssue(issues, entry.node, message, severity);
+		}
+	}
+
+	private collectEnumIssue(
+		doc: YAML.Document.Parsed<YAML.ParsedNode, true>,
+		path: string[],
+		allowedValues: Set<string>,
+		message: string,
+		issues: ItemsAdderDiagnosticIssue[]
+	): void {
+		const node = doc.getIn(path, true);
+		if (!YAML.isScalar(node) || typeof node.value !== 'string') {
+			return;
+		}
+
+		if (!allowedValues.has(node.value.toUpperCase())) {
+			this.pushNodeIssue(issues, node, `${message} Allowed values: ${[...allowedValues].join(', ')}.`, 'error');
+		}
+	}
+
+	private collectIntegerRangeIssue(
+		doc: YAML.Document.Parsed<YAML.ParsedNode, true>,
+		path: string[],
+		min: number | undefined,
+		max: number | undefined,
+		issues: ItemsAdderDiagnosticIssue[],
+		allowAuto = false
+	): void {
+		const node = doc.getIn(path, true);
+		if (!YAML.isScalar(node)) {
+			return;
+		}
+
+		if (allowAuto && node.value === 'auto') {
+			return;
+		}
+
+		const value = typeof node.value === 'number' ? node.value : Number(node.value);
+		if (!Number.isInteger(value)) {
+			this.pushNodeIssue(issues, node, `\`${path.join('.')}\` must be an integer${allowAuto ? ' or `auto`' : ''}.`, 'error');
+			return;
+		}
+
+		if ((min !== undefined && value < min) || (max !== undefined && value > max)) {
+			const range = min !== undefined && max !== undefined ? `${min}-${max}` : min !== undefined ? `>= ${min}` : `<= ${max}`;
+			this.pushNodeIssue(issues, node, `\`${path.join('.')}\` should be ${range}.`, 'warning');
+		}
+	}
+
+	private collectHostAddressIssue(
+		doc: YAML.Document.Parsed<YAML.ParsedNode, true>,
+		path: string[],
+		issues: ItemsAdderDiagnosticIssue[]
+	): void {
+		const node = doc.getIn(path, true);
+	if (!YAML.isScalar(node) || typeof node.value !== 'string' || node.value === 'auto') {
+		return;
+	}
+
+	const value = node.value.trim();
+	if (
+		value !== node.value ||
+		/^https?:\/\//i.test(value) ||
+		value.includes('/') ||
+		/\s/.test(value) ||
+		!this.isValidHostAddress(value)
+	) {
+		this.pushNodeIssue(issues, node, `\`${path.join('.')}\` must be \`auto\`, \`host\` or \`host:port\` without protocol or path.`, 'error');
+	}
+}
+
+private isValidHostAddress(value: string): boolean {
+	const match = value.match(/^([a-z0-9.-]+)(?::([0-9]+))?$/i);
+	if (!match) {
+		return false;
+	}
+	if (!/[a-z0-9]/i.test(match[1])) {
+		return false;
+	}
+	if (match[2] === undefined) {
+		return true;
+	}
+	const port = Number(match[2]);
+	return Number.isInteger(port) && port >= 1 && port <= 65535;
+}
+
+	private isPluginConfig(doc: YAML.Document.Parsed<YAML.ParsedNode, true>): boolean {
+		const resourcePackNode = doc.get('resource-pack', true);
+		return YAML.isMap(resourcePackNode) && resourcePackNode.has('uuid');
 	}
 
 	private collectItemIssues(
@@ -529,6 +747,91 @@ export class ItemsAdderDiagnosticsProvider {
 		}
 
 		return typeof namespaceNode === 'string' ? namespaceNode : undefined;
+	}
+
+	private collectPluginConfigSchemaIssues(node: unknown, schemaNode: any, path: string[], issues: ItemsAdderDiagnosticIssue[]): void {
+		if (!schemaNode) {
+			return;
+		}
+
+		const currentPath = path.join('.');
+		if (currentPath && !PLUGIN_CONFIG_MANUAL_SCHEMA_PATHS.has(currentPath)) {
+			const message = this.pluginConfigSchemaIssueMessage(node, schemaNode, currentPath);
+			if (message) {
+				this.pushNodeIssue(issues, node, message, 'error');
+				return;
+			}
+		}
+
+		if (YAML.isMap(node) && schemaNode.properties) {
+			for (const pair of node.items) {
+				if (!YAML.isPair(pair)) {
+					continue;
+				}
+				const key = YAML.isScalar(pair.key) ? String(pair.key.value) : String(pair.key);
+				const childSchema = schemaNode.properties[key] ?? schemaNode.additionalProperties;
+				if (childSchema && childSchema !== true) {
+					this.collectPluginConfigSchemaIssues(pair.value, childSchema, [...path, key], issues);
+				}
+			}
+			return;
+		}
+
+		if (YAML.isSeq(node) && schemaNode.items) {
+			for (const item of node.items) {
+				this.collectPluginConfigSchemaIssues(item, schemaNode.items, path, issues);
+			}
+		}
+	}
+
+	private pluginConfigSchemaIssueMessage(node: unknown, schemaNode: any, path: string): string | undefined {
+		if (Array.isArray(schemaNode.anyOf)) {
+			return schemaNode.anyOf.some((entry: any) => !this.pluginConfigSchemaIssueMessage(node, entry, path))
+				? undefined
+				: `\`${path}\` has invalid value.`;
+		}
+
+		const value = YAML.isScalar(node) ? node.value : undefined;
+		if (Array.isArray(schemaNode.enum) && !schemaNode.enum.includes(value)) {
+			return `\`${path}\` must be one of: ${schemaNode.enum.map((entry: unknown) => `\`${String(entry)}\``).join(', ')}.`;
+		}
+		if (schemaNode.const !== undefined && value !== schemaNode.const) {
+			return `\`${path}\` must be \`${String(schemaNode.const)}\`.`;
+		}
+		if (schemaNode.type && !this.nodeMatchesSchemaType(node, schemaNode.type)) {
+			return `\`${path}\` must be ${this.schemaTypeLabel(schemaNode.type)}.`;
+		}
+
+		return undefined;
+	}
+
+	private nodeMatchesSchemaType(node: unknown, type: string): boolean {
+		if (type === 'object') {
+			return YAML.isMap(node);
+		}
+		if (type === 'array') {
+			return YAML.isSeq(node);
+		}
+		if (!YAML.isScalar(node)) {
+			return false;
+		}
+		if (type === 'string') {
+			return typeof node.value === 'string';
+		}
+		if (type === 'boolean') {
+			return typeof node.value === 'boolean';
+		}
+		if (type === 'integer') {
+			return typeof node.value === 'number' && Number.isInteger(node.value);
+		}
+		if (type === 'number') {
+			return typeof node.value === 'number';
+		}
+		return true;
+	}
+
+	private schemaTypeLabel(type: string): string {
+		return type === 'integer' ? 'an integer' : `a ${type}`;
 	}
 
 	private pushNodeIssue(

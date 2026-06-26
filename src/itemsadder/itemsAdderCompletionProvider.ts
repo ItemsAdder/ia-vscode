@@ -5,9 +5,11 @@ import { getYamlParentPathFromText, getYamlSameLevelPropertiesFromText } from '.
 import { AssetKind } from './assetPathLayout';
 import { ProjectAssetIndex } from './projectAssetIndex';
 import { vanillaTextureUrl } from './vanillaMinecraftAssets';
+import { isItemsAdderPluginConfigText } from '../itemsAdderPluginConfig';
 
 interface ItemsAdderCompletionProviderOptions {
 	schemas: any;
+	pluginConfigSchema?: any;
 	itemTemplates: any[];
 	vanillaTexturePaths: string[];
 	assetIndex?: ProjectAssetIndex;
@@ -19,6 +21,10 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 
 	public provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
 		const text = document.getText();
+		if (isItemsAdderPluginConfigText(text)) {
+			return this.providePluginConfigCompletionItems(document, position);
+		}
+
 		const yamlPath = getYamlParentPathFromText(text, position);
 		const items: vscode.CompletionItem[] = [];
 
@@ -26,6 +32,82 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 		this.addDynamicEntrySuggestions(document, position, yamlPath, items);
 
 		return items;
+	}
+
+	private providePluginConfigCompletionItems(document: vscode.TextDocument, position: vscode.Position): vscode.CompletionItem[] {
+		const schema = this.options.pluginConfigSchema;
+		if (!schema) {
+			return [];
+		}
+
+		const currentLine = document.lineAt(position.line).text;
+		const valueMatch = currentLine.match(/^(\s*[^:#][^:]*:\s*)(.*)$/);
+		const yamlPath = getYamlParentPathFromText(document.getText(), position);
+		const items: vscode.CompletionItem[] = [];
+
+		if (valueMatch && position.character >= valueMatch[1].length) {
+			const key = currentLine.slice(0, currentLine.indexOf(':')).trim();
+			this.addSchemaValueSuggestions(schema, [...yamlPath, key], items);
+			return items;
+		}
+
+		this.addSchemaPropertySuggestions(schema, document, position, yamlPath, items);
+		return items;
+	}
+
+	private addSchemaPropertySuggestions(
+		schema: any,
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		yamlPath: string[],
+		items: vscode.CompletionItem[]
+	): void {
+		const schemaNode = this.schemaNodeAtPathFrom(schema, yamlPath);
+		const properties = schemaNode?.properties;
+		if (!properties) {
+			return;
+		}
+
+		const usedKeys = getYamlSameLevelPropertiesFromText(document.getText(), position);
+		for (const [key, property] of Object.entries(properties)) {
+			if (usedKeys.includes(key)) {
+				continue;
+			}
+			const resolved = this.resolveRefFrom(property, schema);
+			this.addEntrySuggestion(items, key, this.descriptionForFrom(resolved, schema, 'Config property.'));
+		}
+	}
+
+	private addSchemaValueSuggestions(schema: any, yamlPath: string[], items: vscode.CompletionItem[]): void {
+		const schemaNode = this.schemaNodeAtPathFrom(schema, yamlPath);
+		const values = this.valueSuggestionsFor(schemaNode, schema);
+		for (const value of values) {
+			const item = new vscode.CompletionItem(value, vscode.CompletionItemKind.Value);
+			item.insertText = value;
+			items.push(item);
+		}
+	}
+
+	private valueSuggestionsFor(schemaNode: any, rootSchema: any): string[] {
+		const resolved = this.resolveRefFrom(schemaNode, rootSchema);
+		if (!resolved) {
+			return [];
+		}
+
+		if (Array.isArray(resolved.enum)) {
+			return resolved.enum.map((value: any) => String(value));
+		}
+		if (resolved.const !== undefined) {
+			return [String(resolved.const)];
+		}
+		if (resolved.type === 'boolean') {
+			return ['true', 'false'];
+		}
+		if (Array.isArray(resolved.anyOf)) {
+			return Array.from(new Set<string>(resolved.anyOf.flatMap((entry: any) => this.valueSuggestionsFor(entry, rootSchema))));
+		}
+
+		return [];
 	}
 
 	private addSpecialSuggestions(
@@ -116,9 +198,13 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 	}
 
 	private schemaNodeAtPath(yamlPath: string[]): any | undefined {
-		let current = this.resolveRef(this.options.schemas);
+		return this.schemaNodeAtPathFrom(this.options.schemas, yamlPath);
+	}
+
+	private schemaNodeAtPathFrom(schema: any, yamlPath: string[]): any | undefined {
+		let current = this.resolveRefFrom(schema, schema);
 		for (const segment of yamlPath) {
-			current = this.resolveRef(current);
+			current = this.resolveRefFrom(current, schema);
 			if (!current) {
 				return undefined;
 			}
@@ -136,20 +222,28 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 			return undefined;
 		}
 
-		return this.resolveRef(current);
+		return this.resolveRefFrom(current, schema);
 	}
 
 	private resolveRef(schemaNode: any): any {
+		return this.resolveRefFrom(schemaNode, this.options.schemas);
+	}
+
+	private resolveRefFrom(schemaNode: any, rootSchema: any): any {
 		if (!schemaNode?.$ref) {
 			return schemaNode;
 		}
 
 		const refKey = String(schemaNode.$ref).split('/').pop();
-		return refKey ? this.options.schemas.$defs?.[refKey] ?? schemaNode : schemaNode;
+		return refKey ? rootSchema.$defs?.[refKey] ?? schemaNode : schemaNode;
 	}
 
 	private descriptionFor(schemaNode: any, fallback: string): string {
-		const resolved = this.resolveRef(schemaNode);
+		return this.descriptionForFrom(schemaNode, this.options.schemas, fallback);
+	}
+
+	private descriptionForFrom(schemaNode: any, rootSchema: any, fallback: string): string {
+		const resolved = this.resolveRefFrom(schemaNode, rootSchema);
 		return resolved?.markdownDescription ?? resolved?.description ?? fallback;
 	}
 

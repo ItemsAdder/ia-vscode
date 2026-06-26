@@ -54,6 +54,113 @@ suite('ItemsAdder diagnostics', () => {
 		));
 	});
 
+	test('reports multiple enabled plugin config hosting methods', () => {
+		const text = [
+			'resource-pack:',
+			'  uuid: "d69238f2-b7ce-30b0-8262-17cd9490f29d"',
+			'  hosting:',
+			'    simple_self_host:',
+			'      enabled: true',
+			'    external-host:',
+			'      enabled: true'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+
+		assert.strictEqual(result.issues.filter(issue =>
+			issue.severity === 'error' &&
+			issue.message === 'Only one resource pack hosting method can be enabled at a time.'
+		).length, 2);
+	});
+
+	test('reports plugin config settings rules from Settings.java', () => {
+		const text = [
+			'resource-pack:',
+			'  uuid: "d69238f2-b7ce-30b0-8262-17cd9490f29d"',
+			'  zip:',
+			'    emotes:',
+			'      1_21_5_to_1_21_9_shaders: true',
+			'      1_21_4_plus_modern_method: true',
+			'blocks:',
+			'  convert-vanilla-blocks:',
+			'    enabled: true',
+			'  fix-glitched-blocks:',
+			'    enabled: true',
+			'advanced:',
+			'  legacy_shader_armor_conversion:',
+			'    append_new_equipment_tag:',
+			'      enabled: true',
+			'    completely_convert_to_new_equipment_tag:',
+			'      enabled: true',
+			'cooldown_bars:',
+			'  bossbar:',
+			'    color: ORANGE',
+			'    style: STRIPED',
+			'player_stats:',
+			'  save_type: SQL',
+			'server:',
+			'  port: abc',
+			'  address: https://example.com/',
+			'crops:',
+			'  rendering:',
+			'    radius_blocks: 200'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+		const messages = result.issues.map(issue => issue.message);
+
+		assert.ok(messages.includes('Use either `blocks.convert-vanilla-blocks` or `blocks.fix-glitched-blocks`, not both.'));
+		assert.ok(messages.includes('Use either `append_new_equipment_tag` or `completely_convert_to_new_equipment_tag`, not both.'));
+		assert.ok(messages.includes('Only one emotes resource pack method is needed.'));
+		assert.ok(messages.some(message => message.startsWith('Invalid cooldown bossbar color.')));
+		assert.ok(messages.some(message => message.startsWith('Invalid cooldown bossbar style.')));
+		assert.ok(messages.some(message => message.startsWith('`player_stats.save_type` must be')));
+		assert.ok(messages.includes('`server.port` must be an integer or `auto`.'));
+	assert.ok(messages.includes('`server.address` must be `auto`, `host` or `host:port` without protocol or path.'));
+	assert.ok(messages.includes('`crops.rendering.radius_blocks` should be 16-64.'));
+});
+
+test('reports invalid plugin config hosting address and numeric values', () => {
+	const text = [
+		'resource-pack:',
+		'  uuid: "d69238f2-b7ce-30b0-8262-17cd9490f29d"',
+		'  hosting:',
+		'    simple_self_host:',
+		'      server_address: https://example.com/path',
+		'    self-host:',
+		'      server-ip: 127.0.0.1',
+		'      pack-port: 8163a',
+		'      protection:',
+		'        rate_limit:',
+		'          cooldown:',
+		'            trigger_on_failed_times: hjbhj'
+	].join('\n');
+	const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+	const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+	const messages = result.issues.map(issue => issue.message);
+
+	assert.ok(messages.includes('`resource-pack.hosting.simple_self_host.server_address` must be `auto`, `host` or `host:port` without protocol or path.'));
+	assert.ok(messages.includes('`resource-pack.hosting.self-host.pack-port` must be an integer.'));
+	assert.ok(messages.includes('`resource-pack.hosting.self-host.protection.rate_limit.cooldown.trigger_on_failed_times` must be an integer.'));
+});
+
+test('reports plugin config schema type errors', () => {
+	const text = [
+		'resource-pack:',
+		'  uuid: "d69238f2-b7ce-30b0-8262-17cd9490f29d"',
+		'  kick-player-on-fail: nope',
+		'recipes:',
+		'  crafting:',
+		'    enabled: nope'
+	].join('\n');
+	const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+	const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, { isDocumentDirty: false });
+	const messages = result.issues.map(issue => issue.message);
+
+	assert.ok(messages.includes('`resource-pack.kick-player-on-fail` must be a boolean.'));
+	assert.ok(messages.includes('`recipes.crafting.enabled` must be a boolean.'));
+});
+
 	test('allows dictionary-lang with dictionary section', () => {
 		const text = [
 			'info:',

@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 
 import { SchemaHoverProvider } from '../../itemsadder/schemaHoverProvider';
+import { itemsAdderPluginConfigSchema } from '../../itemsAdderPluginConfig';
 import { schemas } from '../../schemas';
 
 suite('Schema hover provider', () => {
@@ -44,5 +45,24 @@ suite('Schema hover provider', () => {
 		assert.ok(hover);
 		const content = String(hover.contents[0]);
 		assert.strictEqual(content.match(/Warning: deprecated property/g)?.length, 1);
+	});
+
+	test('shows plugin config schema hover documentation', async () => {
+		const document = await vscode.workspace.openTextDocument({
+			language: 'yaml',
+			content: [
+				'resource-pack:',
+				'  uuid: test',
+				'  hosting:',
+				'    lobfile:',
+				'      enabled: true'
+			].join('\n')
+		});
+		const provider = new SchemaHoverProvider({ schemas, pluginConfigSchema: itemsAdderPluginConfigSchema });
+
+		const hover = provider.provideHover(document, new vscode.Position(3, 5));
+
+		assert.ok(hover);
+		assert.ok(String(hover.contents[0]).includes('LobFile'));
 	});
 });
