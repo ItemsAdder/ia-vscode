@@ -40,7 +40,8 @@
           ],
           "markdownDescription": "(default: `auto`)"
         }
-      }
+      },
+      "markdownDescription": "Server address and port detection settings used for generated resource pack URLs and network-aware plugin features."
     },
     "resource-pack": {
       "type": "object",
@@ -243,9 +244,11 @@
                               "default": 5,
                               "markdownDescription": "(default: `5`)"
                             }
-                          }
+                          },
+                          "markdownDescription": "Cooldown, in seconds, before the same address can retry after hitting the self-host rate limit."
                         }
-                      }
+                      },
+                      "markdownDescription": "Rate limit protection for the self-hosted resource pack endpoint."
                     }
                   },
                   "markdownDescription": "Protection and rate limit settings for the self-hosted pack endpoint."
@@ -265,7 +268,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Title shown in the Minecraft resource pack prompt when ItemsAdder sends the pack to players."
         },
         "fix_force_unicode_font_images": {
           "type": "boolean",
@@ -280,7 +284,7 @@
         "notify_other_plugins_resourcepacks": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Notifies if other plugins are sending a resource pack to players. This is useful for debugging and compatibility."
         },
         "protect-player": {
           "type": "object",
@@ -306,7 +310,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Prevents or limits player actions while the required resource pack is being applied."
         },
         "command": {
           "type": "object",
@@ -317,7 +322,8 @@
               "default": 60,
               "markdownDescription": "(default: `60`)"
             }
-          }
+          },
+          "markdownDescription": "Settings for the resource pack command and its cooldown behavior."
         },
         "custom-font": {
           "type": "object",
@@ -360,7 +366,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Thin font generation settings for the ItemsAdder resource pack."
         },
         "zip": {
           "type": "object",
@@ -395,22 +402,23 @@
                   "default": true,
                   "markdownDescription": "(default: `true`)"
                 }
-              }
+              },
+              "markdownDescription": "Adds zip protection markers to discourage manual extraction of the generated resource pack."
             },
             "compress-png-files": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Compresses PNG files in the generated resource pack zip using `pngquant`."
             },
             "compress-json-files": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Compress JSON files in the generated resource pack zip using `json-minify`."
             },
             "compress-shader-files": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Compress shader files in the generated resource pack zip using `glsl-minify`."
             },
             "compress_sounds": {
               "type": "object",
@@ -419,14 +427,15 @@
                 "enabled": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "(default: `true`)"
+                  "markdownDescription": "(default: `true`) Compresses sound files in the generated resource pack zip using `ffmpeg`."
                 },
                 "bitrate_quality": {
                   "type": "integer",
                   "default": 100,
-                  "markdownDescription": "(default: `100`)"
+                  "markdownDescription": "(default: `100`) Bitrate quality for sound compression. Higher values preserve more audio quality but result in larger file sizes."
                 }
-              }
+              },
+              "markdownDescription": "Audio compression settings used while generating the resource pack zip."
             },
             "custom_armors_shaders_legacy": {
               "type": "object",
@@ -439,7 +448,7 @@
                     "overwrite_leather_layers": {
                       "type": "boolean",
                       "default": true,
-                      "markdownDescription": "(default: `true`)"
+                      "markdownDescription": "(default: `true`) Overwrites vanilla leather armor layers with custom ones."
                     },
                     "generate_shader": {
                       "type": "object",
@@ -448,16 +457,18 @@
                         "1_21_4_lower": {
                           "type": "boolean",
                           "default": true,
-                          "markdownDescription": "(default: `true`)"
+                          "markdownDescription": "(default: `true`) Enables legacy shader generation for Minecraft versions 1.21.4 and lower."
                         },
                         "1_21_5_plus": {
                           "type": "boolean",
                           "default": true,
-                          "markdownDescription": "(default: `true`)"
+                          "markdownDescription": "(default: `true`) Enables shader generation for Minecraft versions 1.21.5 and higher."
                         }
-                      }
+                      },
+                      "markdownDescription": "Minecraft-version-specific switches for generating legacy vanilla armor shader files."
                     }
-                  }
+                  },
+                  "markdownDescription": "Legacy custom armor shader generation for vanilla clients."
                 },
                 "optifine": {
                   "type": "object",
@@ -472,11 +483,14 @@
                           "default": false,
                           "markdownDescription": "(default: `false`)"
                         }
-                      }
+                      },
+                      "markdownDescription": "Minecraft-version-specific switches for generating OptiFine CIT files for custom armor."
                     }
-                  }
+                  },
+                  "markdownDescription": "OptiFine CIT compatibility generation for legacy custom armor resource packs. [Issue context](https://github.com/PluginBugs/Issues-ItemsAdder/issues/4004)"
                 }
-              }
+              },
+              "markdownDescription": "Legacy custom armor shader and CIT generation options for older clients and compatibility packs."
             },
             "emotes": {
               "type": "object",
@@ -485,19 +499,20 @@
                 "legacy_shaders": {
                   "type": "boolean",
                   "default": false,
-                  "markdownDescription": "(default: `false`)"
+                  "markdownDescription": "(default: `false`) Enables legacy shader generation for ItemsAdder emotes. This is only needed for Minecraft versions 1.21.4 and lower."
                 },
                 "1_21_5_to_1_21_9_shaders": {
                   "type": "boolean",
                   "default": false,
-                  "markdownDescription": "(default: `false`)"
+                  "markdownDescription": "(default: `false`) Enables shader generation for ItemsAdder emotes for Minecraft versions 1.21.5 to 1.21.9."
                 },
                 "1_21_4_plus_modern_method": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "(default: `true`)"
+                  "markdownDescription": "(default: `true`) Enables the modern shader generation method for ItemsAdder emotes for Minecraft versions 1.21.4 and higher."
                 }
-              }
+              },
+              "markdownDescription": "Resource pack shader and model compatibility options for ItemsAdder emotes."
             },
             "models": {
               "type": "object",
@@ -506,12 +521,12 @@
                 "fix_dark_in_inventory": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "(default: `true`)"
+                  "markdownDescription": "(default: `true`) Fixes the issue where items appear dark in the inventory."
                 },
                 "fix_missing_particle": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "(default: `true`)"
+                  "markdownDescription": "(default: `true`) Fixes the issue where particles are missing from custom items."
                 },
                 "fix_1_21_11_plus_atlas_items_models": {
                   "type": "object",
@@ -520,7 +535,7 @@
                     "enabled": {
                       "type": "boolean",
                       "default": true,
-                      "markdownDescription": "(default: `true`)"
+                      "markdownDescription": "(default: `true`) Enables the fix for Minecraft 1.21.11+ item models."
                     },
                     "models": {
                       "type": "array",
@@ -528,11 +543,14 @@
                         "type": "string",
                         "default": "paper",
                         "markdownDescription": "(default: `paper`)"
-                      }
+                      },
+                      "markdownDescription": "Model names affected by the Minecraft 1.21.11+ item atlas compatibility fix."
                     }
-                  }
+                  },
+                  "markdownDescription": "Fixes Minecraft 1.21.11+ item model atlas issues when merged models use item textures. [Issue context](https://github.com/PluginBugs/Issues-ItemsAdder/issues/5282)"
                 }
-              }
+              },
+              "markdownDescription": "Model generation fixes applied while building the resource pack zip."
             },
             "ignore-files-ext": {
               "type": "array",
@@ -540,7 +558,8 @@
                 "type": "string",
                 "default": "db",
                 "markdownDescription": "(default: `db`)"
-              }
+              },
+              "markdownDescription": "File extensions ignored when ItemsAdder builds the generated resource pack zip."
             },
             "contents-folders-priority": {
               "type": "array",
@@ -548,7 +567,8 @@
                 "type": "string",
                 "default": "vanilla",
                 "markdownDescription": "(default: `vanilla`)"
-              }
+              },
+              "markdownDescription": "Content folder priority order used when multiple packs define the same generated resource pack asset."
             },
             "merge_other_plugins_resourcepacks_folders": {
               "type": "array",
@@ -580,9 +600,11 @@
                   "default": 11000,
                   "markdownDescription": "(default: `11000`)"
                 }
-              }
+              },
+              "markdownDescription": "Starting CustomModelData values per material, or `ALL`, used for generated item models."
             }
-          }
+          },
+          "markdownDescription": "Generated item model settings for ItemsAdder custom items."
         },
         "custom_blocks_sounds_patch": {
           "type": "object",
@@ -603,7 +625,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Patches generated resource pack sound data so custom blocks can use step, break, place, and related sounds."
         },
         "pre_1_21_2_shaders_fix": {
           "type": "object",
@@ -614,7 +637,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Compatibility shader fix for clients older than Minecraft 1.21.2."
         }
       },
       "markdownDescription": "Resource pack download, hosting, protection, prompt, font and zip generation settings."
@@ -652,29 +676,30 @@
             "note": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Enables ItemsAdder custom block features for note blocks."
             },
             "mushroom": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Enables ItemsAdder custom block features for mushroom blocks."
             },
             "chorus": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Enables ItemsAdder custom block features for chorus blocks."
             },
             "wire": {
               "type": "boolean",
               "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `false`) Enables ItemsAdder custom block features for wire blocks."
             },
             "fire": {
               "type": "boolean",
               "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `false`) Enables ItemsAdder custom block features for fire blocks."
             }
-          }
+          },
+          "markdownDescription": "Feature toggles for ItemsAdder custom block implementations and their backing vanilla block types."
         },
         "worlds": {
           "type": "array",
@@ -682,7 +707,8 @@
             "type": "string",
             "default": "*",
             "markdownDescription": "(default: `*`)"
-          }
+          },
+          "markdownDescription": "World allow or deny patterns where ItemsAdder custom block features are active."
         },
         "cancel-break-wrong-tool": {
           "type": "object",
@@ -691,14 +717,15 @@
             "enabled": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Cancel custom block breaking when the player uses a wrong tool."
             },
             "send-actionbar": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Send an action bar message to the player when they try to break a custom block with a wrong tool."
             }
-          }
+          },
+          "markdownDescription": "Cancels custom block breaking when the player uses a wrong tool and optionally shows feedback."
         },
         "fix-liquids-flow": {
           "type": "boolean",
@@ -717,12 +744,12 @@
             "enabled": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Repair glitched custom blocks in chunks."
             },
             "only-new-chunks": {
               "type": "boolean",
               "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `false`) Only repair glitched blocks in newly generated chunks."
             }
           },
           "markdownDescription": "Repair glitched custom blocks in chunks. Do not enable together with vanilla block conversion."
@@ -734,12 +761,12 @@
             "enabled": {
               "type": "boolean",
               "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `false`) Convert matching vanilla blocks into ItemsAdder custom blocks."
             },
             "only-new-chunks": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Only convert vanilla blocks in newly generated chunks."
             }
           },
           "markdownDescription": "Convert matching vanilla blocks into ItemsAdder custom blocks. Do not enable together with glitched block fixing."
@@ -764,12 +791,12 @@
         "fix-show-attack-and-damage-as-lore": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Shows attack and damage values as lore for ItemsAdder custom items."
         },
         "hide-custom-durability-lore": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Hides custom durability lore for ItemsAdder custom items."
         },
         "fix_trades_guis_match_custom_items": {
           "type": "object",
@@ -778,19 +805,15 @@
             "itemsadder_trade_machines": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
-            },
-            "vanilla_villagers": {
-              "type": "boolean",
-              "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `true`) Makes ItemsAdder items work in trade machines even when renamed or modified."
             },
             "other_plugins": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Makes ItemsAdder items work in trade machines from other plugins even when renamed or modified."
             }
-          }
+          },
+          "markdownDescription": "Makes trade and GUI item matching aware of ItemsAdder custom item metadata."
         },
         "optimizations": {
           "type": "object",
@@ -803,21 +826,23 @@
                 "enabled": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "(default: `true`)"
+                  "markdownDescription": "(default: `true`) Kicks players who spam quickbar or hotbar item interactions above the configured threshold."
                 },
                 "ms": {
                   "type": "integer",
                   "default": 200,
-                  "markdownDescription": "(default: `200`)"
+                  "markdownDescription": "(default: `200`) Time window in milliseconds to count quickbar or hotbar item interactions."
                 },
                 "clicks": {
                   "type": "integer",
                   "default": 6,
-                  "markdownDescription": "(default: `6`)"
+                  "markdownDescription": "(default: `6`) Maximum number of interactions allowed within the time window."
                 }
-              }
+              },
+              "markdownDescription": "Kicks players who spam quickbar or hotbar item interactions above the configured threshold."
             }
-          }
+          },
+          "markdownDescription": "Performance and anti-spam settings for custom item interactions."
         },
         "update-legacy-items": {
           "type": "object",
@@ -826,14 +851,15 @@
             "enabled": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Enable automatic updating of old ItemsAdder versions item metadata to the current format."
             },
             "update_durability": {
               "type": "boolean",
               "default": true,
-              "markdownDescription": "(default: `true`)"
+              "markdownDescription": "(default: `true`) Updates the durability of old ItemsAdder items to the current format."
             }
-          }
+          },
+          "markdownDescription": "Updates old ItemsAdder item metadata to the current format when items are detected."
         },
         "auto_update": {
           "type": "object",
@@ -862,9 +888,10 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Enables ItemsAdder custom liquid features."
         }
-      }
+      },
+      "markdownDescription": "Global feature toggle for ItemsAdder custom liquids."
     },
     "huds": {
       "type": "object",
@@ -873,7 +900,7 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Enables ItemsAdder HUD features."
         },
         "force_color": {
           "type": "object",
@@ -882,14 +909,15 @@
             "enabled": {
               "type": "boolean",
               "default": false,
-              "markdownDescription": "(default: `false`)"
+              "markdownDescription": "(default: `false`) Forces a global text color for ItemsAdder HUD rendering."
             },
             "color": {
               "type": "string",
               "default": "#FFFFFF",
-              "markdownDescription": "(default: `#FFFFFF`)"
+              "markdownDescription": "(default: `#FFFFFF`) Hex color code used for forced global text color in ItemsAdder HUD rendering."
             }
-          }
+          },
+          "markdownDescription": "Forces a global text color for ItemsAdder HUD rendering."
         }
       },
       "markdownDescription": "Global HUD feature settings. HUDs can also display ItemsAdder custom player stats."
@@ -901,12 +929,12 @@
         "enabled": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "(default: `true`)"
+          "markdownDescription": "(default: `true`) Enables ItemsAdder cooldown bar features."
         },
         "refresh_ticks": {
           "type": "integer",
           "default": 1,
-          "markdownDescription": "(default: `1`)"
+          "markdownDescription": "(default: `1`) The number of ticks between cooldown bar updates."
         },
         "bossbar": {
           "type": "object",
@@ -938,7 +966,8 @@
               ],
               "markdownDescription": "(default: `SOLID`) Bukkit bossbar style."
             }
-          }
+          },
+          "markdownDescription": "BossBar renderer settings for ItemsAdder cooldown bars."
         }
       },
       "markdownDescription": "Global cooldown bar rendering options."
@@ -952,7 +981,8 @@
           "default": true,
           "markdownDescription": "(default: `true`)"
         }
-      }
+      },
+      "markdownDescription": "Global loot behavior settings for ItemsAdder custom drops."
     },
     "compatibility": {
       "type": "object",
@@ -967,7 +997,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "WorldGuard compatibility settings for ItemsAdder regions, flags, furniture, and custom interactions."
         },
         "advanced_enchantments": {
           "type": "object",
@@ -978,9 +1009,11 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "AdvancedEnchantments compatibility for enchantments used by ItemsAdder custom items."
         }
-      }
+      },
+      "markdownDescription": "Compatibility toggles for external plugins and legacy integrations."
     },
     "cache_font_images_and_effects_replacements": {
       "type": "boolean",
@@ -1050,7 +1083,8 @@
                 "type": "string",
                 "default": "home",
                 "markdownDescription": "(default: `home`)"
-              }
+              },
+              "markdownDescription": "Commands where ItemsAdder font image replacement is disabled."
             }
           },
           "markdownDescription": "Controls font image replacement in commands and command blocks."
@@ -1129,7 +1163,8 @@
               "default": 3600,
               "markdownDescription": "(default: `3600`)"
             }
-          }
+          },
+          "markdownDescription": "Font image replacement settings for scoreboard team prefixes and suffixes."
         }
       },
       "markdownDescription": "Global support settings for ItemsAdder font images, glyphs, emojis, GUI glyphs and related placeholders. [Docs](https://itemsadder.devs.beer/adding-content/font-images)"
@@ -1167,7 +1202,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Enables ItemsAdder text effects in chat messages. [Docs](https://itemsadder.devs.beer/plugin-usage/plugin-configuration/text-effects-1.17+)"
         },
         "customitem_name_and_lore": {
           "type": "object",
@@ -1178,7 +1214,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Enables ItemsAdder text effects in custom item names and lore."
         },
         "sign": {
           "type": "object",
@@ -1189,7 +1226,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Enables ItemsAdder text effects on signs."
         },
         "book": {
           "type": "object",
@@ -1200,7 +1238,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Enables ItemsAdder text effects in books."
         },
         "anvil": {
           "type": "object",
@@ -1211,7 +1250,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Enables ItemsAdder text effects in anvil rename text."
         }
       },
       "markdownDescription": "Special animated and coloring text effects. Requires Minecraft 1.17+ clients and resource pack regeneration with `/iazip`. [Docs](https://itemsadder.devs.beer/plugin-usage/plugin-configuration/text-effects-1.17+)"
@@ -1253,7 +1293,8 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Custom entity emote compatibility settings."
             },
             "max_per_chunk": {
               "type": "integer",
@@ -1274,7 +1315,8 @@
                   "default": true,
                   "markdownDescription": "(default: `true`)"
                 }
-              }
+              },
+              "markdownDescription": "Advanced custom entity packet and performance options. Change only when you understand the impact."
             }
           },
           "markdownDescription": "Global settings for ItemsAdder custom entities."
@@ -1293,7 +1335,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Global settings for ItemsAdder furniture entities and furniture placement behavior."
         }
       },
       "markdownDescription": "Global limits and compatibility options for ItemsAdder custom entities, furniture and vehicles. [Docs](https://itemsadder.devs.beer/adding-content/entities)"
@@ -1372,7 +1415,8 @@
                   "default": 8,
                   "markdownDescription": "(default: `8`)"
                 }
-              }
+              },
+              "markdownDescription": "Checkerboard rendering options for custom crops, used to reduce visual repetition and improve crop visibility."
             }
           },
           "markdownDescription": "Performance-related rendering options for custom crops."
@@ -1470,9 +1514,11 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Controls when ItemsAdder custom recipes are unlocked for players."
             }
-          }
+          },
+          "markdownDescription": "Controls registration and unlock behavior for ItemsAdder custom recipes. [Docs](https://itemsadder.devs.beer/adding-content/recipes)"
         },
         "remove-vanilla-recipes": {
           "type": "object",
@@ -1497,7 +1543,8 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Vanilla materials or recipe keys to remove from the server recipe registry."
             }
           },
           "markdownDescription": "Remove selected vanilla recipes from the server."
@@ -1543,7 +1590,8 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Appends the new equipment tag while keeping legacy armor shader data."
             },
             "completely_convert_to_new_equipment_tag": {
               "type": "object",
@@ -1559,9 +1607,11 @@
                   "default": "IRON",
                   "markdownDescription": "(default: `IRON`)"
                 }
-              }
+              },
+              "markdownDescription": "Fully converts legacy shader armor data to the new equipment tag format."
             }
-          }
+          },
+          "markdownDescription": "Migration options for converting legacy shader armor data to newer equipment-based formats."
         },
         "update_resource_to_graphics": {
           "type": "boolean",
@@ -1582,7 +1632,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "FFmpeg integration settings used by ItemsAdder for media conversion tasks such as audio processing."
         },
         "on_registries_changes": {
           "type": "object",
@@ -1597,7 +1648,8 @@
                   "default": true,
                   "markdownDescription": "(default: `true`)"
                 }
-              }
+              },
+              "markdownDescription": "Automatically reconnects players when registry changes require a clean client-server state."
             },
             "kick": {
               "type": "object",
@@ -1608,11 +1660,14 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Kicks players when registry changes require manual reconnection."
             }
-          }
+          },
+          "markdownDescription": "Actions to run when Minecraft registries change and clients may need to refresh server state."
         }
-      }
+      },
+      "markdownDescription": "Advanced ItemsAdder behavior and migration settings. Change only when needed for compatibility or debugging."
     },
     "debug": {
       "type": "object",
@@ -1651,9 +1706,11 @@
                   "default": false,
                   "markdownDescription": "(default: `false`)"
                 }
-              }
+              },
+              "markdownDescription": "Debug logging for resource pack compression operations."
             }
-          }
+          },
+          "markdownDescription": "Debug logging for resource pack generation, compression, overlays, and player installation."
         },
         "items": {
           "type": "object",
@@ -1714,7 +1771,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom item loading, reloading, warnings, loots, HUDs, armors, and related systems."
         },
         "recipes": {
           "type": "object",
@@ -1740,7 +1798,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom recipe loading, disabled recipes, vanilla recipe removal, and packet-size fixes."
         },
         "blocks": {
           "type": "object",
@@ -1760,7 +1819,8 @@
                   "default": 0,
                   "markdownDescription": "(default: `0`)"
                 }
-              }
+              },
+              "markdownDescription": "Logs custom block save/load operations, optionally only when they exceed a minimum duration."
             },
             "log-convert-vanilla-blocks": {
               "type": "boolean",
@@ -1782,7 +1842,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom block conversion, saving, loading, and unusual break handling."
         },
         "blocks-populators": {
           "type": "object",
@@ -1808,7 +1869,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for block populators while loading or skipping world generation rules."
         },
         "trees-populators": {
           "type": "object",
@@ -1834,7 +1896,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom tree populators."
         },
         "surface-decorators": {
           "type": "object",
@@ -1860,7 +1923,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for surface decorator generation."
         },
         "cave-decorators": {
           "type": "object",
@@ -1886,7 +1950,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for cave decorator generation."
         },
         "player-stats": {
           "type": "object",
@@ -1897,7 +1962,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom player stat loading, saving, and updates."
         },
         "performance": {
           "type": "object",
@@ -1908,7 +1974,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for performance-sensitive ItemsAdder operations."
         },
         "huds": {
           "type": "object",
@@ -1919,7 +1986,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for HUD loading and rendering behavior."
         },
         "other": {
           "type": "object",
@@ -1940,7 +2008,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Miscellaneous debug logging for ItemsAdder systems not covered by more specific sections."
         },
         "categories": {
           "type": "object",
@@ -1971,7 +2040,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for category and GUI category loading."
         },
         "entities": {
           "type": "object",
@@ -1997,7 +2067,8 @@
               "default": false,
               "markdownDescription": "(default: `false`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for custom entities, furniture, and related entity systems."
         },
         "issues": {
           "type": "object",
@@ -2008,7 +2079,8 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Extra diagnostics useful when reporting ItemsAdder issues."
         },
         "scripts": {
           "type": "object",
@@ -2024,9 +2096,11 @@
               "default": true,
               "markdownDescription": "(default: `true`)"
             }
-          }
+          },
+          "markdownDescription": "Debug logging for ItemsAdder script loading and execution."
         }
-      }
+      },
+      "markdownDescription": "Debug logging settings for ItemsAdder systems. Enable only while diagnosing issues."
     }
   }
 }
