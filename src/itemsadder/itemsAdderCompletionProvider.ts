@@ -1,8 +1,10 @@
 import * as vscode from 'vscode';
 import * as YAML from 'yaml';
 
+import { definitionKindsForPath } from './definitionReferences';
 import { getYamlParentPathFromText, getYamlSameLevelPropertiesFromText } from './yamlPath';
 import { AssetKind } from './assetPathLayout';
+import { displayWorkspacePath } from './pathDisplay';
 import { ProjectAssetIndex } from './projectAssetIndex';
 import { vanillaTextureUrl } from './vanillaMinecraftAssets';
 import { isItemsAdderPluginConfigText } from '../itemsAdderPluginConfig';
@@ -152,6 +154,8 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 		if (this.isModelPath(yamlPath)) {
 			this.addWorkspaceAssetSuggestions(document, position, items, 'model');
 		}
+
+		this.addWorkspaceDefinitionSuggestions(document, position, yamlPath, items);
 
 		if (
 			yamlPath.length >= 5 &&
@@ -325,13 +329,89 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 			return;
 		}
 
-		for (const asset of this.options.assetIndex.list(kind, namespace)) {
-			const label = kind === 'model' ? asset.path.replace(/\.json$/, '') : asset.path;
+		const replacementRange = this.currentScalarReplacementRange(document, position);
+		for (const asset of this.options.assetIndex.list(kind)) {
+			const assetLabel = this.workspaceAssetLabel(asset.path, kind);
+			const label = asset.namespace === namespace ? assetLabel : `${asset.namespace}:${assetLabel}`;
 			const item = new vscode.CompletionItem(label, vscode.CompletionItemKind.File);
 			item.insertText = this.withArrayPrefix(document, position, label);
-			item.documentation = new vscode.MarkdownString(`\`${asset.fullPath.replace(/\\/g, '/')}\``);
+			if (replacementRange) {
+				item.range = replacementRange;
+			}
+			item.documentation = this.workspaceAssetDocumentation(asset.fullPath, label, kind);
 			items.push(item);
 		}
+	}
+
+	private currentScalarReplacementRange(document: vscode.TextDocument, position: vscode.Position): vscode.Range | undefined {
+		const line = document.lineAt(position.line).text;
+		const keyValueMatch = line.match(/^(\s*[^:#][^:]*:\s*)(.*)$/);
+		const arrayMatch = line.match(/^(\s*-\s+)(.*)$/);
+		const prefixLength = keyValueMatch?.[1].length ?? arrayMatch?.[1].length;
+		const rawValue = keyValueMatch?.[2] ?? arrayMatch?.[2];
+		if (prefixLength === undefined || rawValue === undefined) {
+			return undefined;
+		}
+
+		const leadingSpaces = rawValue.length - rawValue.trimStart().length;
+		const startCharacter = prefixLength + leadingSpaces;
+		if (position.character < startCharacter) {
+			return undefined;
+		}
+
+		return new vscode.Range(position.line, startCharacter, position.line, position.character);
+	}
+
+	private workspaceAssetLabel(assetPath: string, kind: AssetKind): string {
+		if (kind === 'texture') {
+			return assetPath.replace(/\.png$/, '');
+		}
+
+		if (kind === 'model') {
+			return assetPath.replace(/\.json$/, '');
+		}
+
+		return assetPath.replace(/\.ogg$/, '');
+	}
+
+	private workspaceAssetDocumentation(fullPath: string, assetPath: string, kind: AssetKind): vscode.MarkdownString {
+		const normalizedPath = fullPath.replace(/\\/g, '/');
+		const displayPath = displayWorkspacePath(normalizedPath, kind);
+		if (kind !== 'texture') {
+			return new vscode.MarkdownString(`\`${displayPath}\``);
+		}
+
+		return new vscode.MarkdownString(
+			`Texture: \`${assetPath}\`\n\nFile: \`${displayPath}\`\n\n![Texture Preview](${vscode.Uri.file(fullPath).toString()}|width=100)`
+		);
+	}
+
+	private addWorkspaceDefinitionSuggestions(
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		yamlPath: string[],
+		items: vscode.CompletionItem[]
+	): void {
+		const namespace = this.readNamespace(document);
+		if (!namespace || !this.options.assetIndex) {
+			return;
+		}
+
+		const seenLabels = new Set<string>();
+		for (const kind of definitionKindsForPath(yamlPath)) {
+			for (const definition of this.options.assetIndex.listDefinitions(kind)) {
+				const label = definition.namespace === namespace ? definition.id : `${definition.namespace}:${definition.id}`;
+				if (seenLabels.has(label)) {
+					continue;
+				}
+				seenLabels.add(label);
+			const item = new vscode.CompletionItem(label, vscode.CompletionItemKind.Reference);
+			item.detail = `ItemsAdder ${kind.replace('_', ' ')}`;
+			item.insertText = this.withArrayPrefix(document, position, label);
+			item.documentation = new vscode.MarkdownString(`\`${displayWorkspacePath(definition.fullPath)}\``);
+			items.push(item);
+		}
+	}
 	}
 
 	private withArrayPrefix(document: vscode.TextDocument, position: vscode.Position, insertText: string): string {

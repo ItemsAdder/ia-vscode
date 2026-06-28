@@ -4,6 +4,7 @@ import * as YAML from 'yaml';
 import { firstFramePngPath } from './animatedPngFirstFrame';
 import { AssetPathResolver } from './assetPathResolver';
 import { ItemsAdderDiagnosticsProvider, ItemsAdderDiagnosticSeverity } from './itemsAdderDiagnostics';
+import { displayWorkspacePath } from './pathDisplay';
 import { ProjectAssetIndex } from './projectAssetIndex';
 import { ScriptPathResolver } from './scriptPathResolver';
 
@@ -51,6 +52,7 @@ export class EditorDiagnosticsController {
 			isDocumentDirty: editor.document.isDirty,
 			assetResolver,
 			scriptResolver,
+			definitionIndex: this.options.assetIndex,
 			expectedNamespace: this.readNamespaceFromPath(editor.document.uri.fsPath)
 		});
 
@@ -102,7 +104,7 @@ export class EditorDiagnosticsController {
 
 		const markdown = new vscode.MarkdownString(undefined, true);
 		markdown.isTrusted = true;
-		markdown.appendMarkdown(`Found file: \`${assetPath}\``);
+		markdown.appendMarkdown(`Found file: \`${displayWorkspacePath(assetPath)}\``);
 		const args = encodeURIComponent(JSON.stringify([assetPath]));
 		markdown.appendMarkdown(`\n\n[Open asset source](command:ia-vscode.openAssetSource?${args})`);
 		return markdown;

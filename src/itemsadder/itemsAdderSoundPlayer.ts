@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { AssetPathResolver } from './assetPathResolver';
+import { displayWorkspacePath } from './pathDisplay';
 import { ProjectAssetIndex } from './projectAssetIndex';
 
 interface ItemsAdderSoundCodeLensProviderOptions {
@@ -103,7 +104,7 @@ export class ItemsAdderSoundHoverProvider implements vscode.HoverProvider {
 
 		const markdown = new vscode.MarkdownString(undefined, true);
 		markdown.isTrusted = true;
-		markdown.appendMarkdown(`Found file: \`${resolution.assetPath}\``);
+		markdown.appendMarkdown(`Found file: \`${displayWorkspacePath(resolution.assetPath, 'sound')}\``);
 		const args = encodeURIComponent(JSON.stringify([resolution.assetPath]));
 		markdown.appendMarkdown(`\n\n[Open asset source](command:ia-vscode.openAssetSource?${args})`);
 

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 
+import { displayWorkspacePath } from './pathDisplay';
 import { ScriptPathResolver } from './scriptPathResolver';
 import { getYamlParentPathFromText } from './yamlPath';
 
@@ -52,7 +53,7 @@ export class ScriptPathHoverProvider implements vscode.HoverProvider {
 
 		const markdown = new vscode.MarkdownString(undefined, true);
 		markdown.isTrusted = true;
-		markdown.appendMarkdown(`Found ${resolution.language ?? 'script'} script: \`${resolution.scriptPath}\``);
+		markdown.appendMarkdown(`Found ${resolution.language ?? 'script'} script: \`${displayWorkspacePath(resolution.scriptPath)}\``);
 		const args = encodeURIComponent(JSON.stringify([resolution.scriptPath]));
 		markdown.appendMarkdown(`\n\n[Open script source](command:ia-vscode.openAssetSource?${args})`);
 		return new vscode.Hover(markdown);

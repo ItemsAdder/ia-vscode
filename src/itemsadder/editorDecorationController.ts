@@ -8,6 +8,7 @@ import { findDictionaryReferenceRanges } from './dictionaryReferences';
 import { EditorDiagnosticsController } from './editorDiagnosticsController';
 import { findMinecraftTextColorLinePreviews, formatMinecraftTextPreviewParts } from './minecraftTextColors';
 import { ItemsAdderDictionaryIndex } from './itemsAdderDictionaryIndex';
+import { displayWorkspacePath } from './pathDisplay';
 import { ProjectAssetIndex } from './projectAssetIndex';
 import { vanillaTextureUrl } from './vanillaMinecraftAssets';
 
@@ -1005,7 +1006,7 @@ export class EditorDecorationController {
 		markdown.isTrusted = true;
 		markdown.appendMarkdown(title);
 		if (assetPath) {
-			markdown.appendMarkdown(`\n\nFound file: \`${assetPath}\``);
+			markdown.appendMarkdown(`\n\nFound file: \`${displayWorkspacePath(assetPath)}\``);
 			const args = encodeURIComponent(JSON.stringify([assetPath]));
 			markdown.appendMarkdown(`\n\n[Open asset source](command:ia-vscode.openAssetSource?${args})`);
 		}

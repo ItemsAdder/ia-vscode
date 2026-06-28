@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 
 import { ItemsAdderCompletionProvider } from '../../itemsadder/itemsAdderCompletionProvider';
+import { ProjectAssetIndex } from '../../itemsadder/projectAssetIndex';
 import { itemsAdderPluginConfigSchema } from '../../itemsAdderPluginConfig';
 import { schemas } from '../../schemas';
 
@@ -150,5 +151,119 @@ suite('ItemsAdder completion provider', () => {
 		const items = provider.provideCompletionItems(document, new vscode.Position(4, 4));
 
 		assert.ok(items.some(item => item.label === 'enabled'));
+	});
+
+	test('suggests custom indexed items and blocks before typing namespace', async () => {
+		const document = await vscode.workspace.openTextDocument({
+			language: 'yaml',
+			content: [
+				'info:',
+				'  namespace: test',
+				'recipes:',
+				'  crafting_table:',
+				'    carton_box:',
+				'      ingredients:',
+				'        O: '
+			].join('\n')
+		});
+		const assetIndex = {
+			listDefinitions(kind: string) {
+				if (kind === 'block') {
+					return [
+						{ kind: 'block', namespace: 'test', id: 'block3', fullPath: '/workspace/contents/test/blocks.yml' },
+						{ kind: 'block', namespace: 'other', id: 'block4', fullPath: '/workspace/contents/other/blocks.yml' }
+					];
+				}
+				return [];
+			}
+		} as ProjectAssetIndex;
+		const provider = new ItemsAdderCompletionProvider({
+			schemas,
+			itemTemplates: [],
+			vanillaTexturePaths: [],
+			assetIndex,
+			getDevMode: () => false
+		});
+		const items = provider.provideCompletionItems(document, new vscode.Position(6, 11));
+
+		assert.ok(items.some(item => item.label === 'block3'));
+		assert.ok(items.some(item => item.label === 'other:block4'));
+	});
+
+	test('shows custom texture preview in completion documentation', async () => {
+		const document = await vscode.workspace.openTextDocument({
+			language: 'yaml',
+			content: [
+				'info:',
+				'  namespace: test',
+				'items:',
+				'  bug_medal:',
+				'    resource:',
+				'      generate: true',
+				'      textures:',
+				'        - '
+			].join('\n')
+		});
+		const assetIndex = {
+			list(kind: string) {
+				if (kind === 'texture') {
+					return [{ kind: 'texture', namespace: 'test', path: 'item/bug_medal.png', fullPath: '/workspace/contents/test/textures/item/bug_medal.png' }];
+				}
+				return [];
+			}
+		} as ProjectAssetIndex;
+		const provider = new ItemsAdderCompletionProvider({
+			schemas,
+			itemTemplates: [],
+			vanillaTexturePaths: [],
+			assetIndex,
+			getDevMode: () => false
+		});
+		const items = provider.provideCompletionItems(document, new vscode.Position(7, 10));
+		const item = items.find(item => item.label === 'item/bug_medal');
+		const documentation = item?.documentation as vscode.MarkdownString | undefined;
+
+		assert.strictEqual(item?.insertText, '- item/bug_medal');
+		assert.ok(documentation?.value.includes('Texture: `item/bug_medal`'));
+		assert.ok(documentation?.value.includes('![Texture Preview]('));
+		assert.ok(documentation?.value.includes('File: `contents/test/textures/item/bug_medal.png`'));
+		assert.ok(!documentation?.value.includes('File: `/workspace/'));
+	});
+
+	test('suggests textures from other namespaces while typing namespace prefix', async () => {
+		const document = await vscode.workspace.openTextDocument({
+			language: 'yaml',
+			content: [
+				'info:',
+				'  namespace: iageneric',
+				'items:',
+				'  bug_medal:',
+				'    resource:',
+				'      generate: true',
+				'      textures:',
+				'        - iafestivities:'
+			].join('\n')
+		});
+		const assetIndex = {
+			list(kind: string) {
+				if (kind === 'texture') {
+					return [{ kind: 'texture', namespace: 'iafestivities', path: 'item/candy_cane.png', fullPath: '/workspace/contents/iafestivities/textures/item/candy_cane.png' }];
+				}
+				return [];
+			}
+		} as ProjectAssetIndex;
+		const provider = new ItemsAdderCompletionProvider({
+			schemas,
+			itemTemplates: [],
+			vanillaTexturePaths: [],
+			assetIndex,
+			getDevMode: () => false
+		});
+		const items = provider.provideCompletionItems(document, new vscode.Position(7, 24));
+		const item = items.find(item => item.label === 'iafestivities:item/candy_cane');
+
+		assert.strictEqual(item?.insertText, 'iafestivities:item/candy_cane');
+		assert.deepStrictEqual((item?.range as vscode.Range | undefined)?.start, new vscode.Position(7, 10));
+		assert.deepStrictEqual((item?.range as vscode.Range | undefined)?.end, new vscode.Position(7, 24));
 	});
 });

@@ -3,6 +3,7 @@ import * as YAML from 'yaml';
 
 import { AssetPathResolver } from '../../itemsadder/assetPathResolver';
 import { ItemsAdderDiagnosticsProvider } from '../../itemsadder/itemsAdderDiagnostics';
+import { ProjectAssetIndex } from '../../itemsadder/projectAssetIndex';
 
 suite('ItemsAdder diagnostics', () => {
 	test('reports missing material on non-armor resource item', () => {
@@ -423,6 +424,40 @@ test('reports plugin config schema type errors', () => {
 
 		assert.ok(result.issues.some(issue => issue.message === 'Invalid texture key `Bad Key`.'));
 		assert.ok(result.issues.some(issue => issue.message === 'Texture not found!'));
+	});
+
+	test('warns unknown indexed ItemsAdder references', () => {
+		const text = [
+			'info:',
+			'  namespace: test',
+			'items:',
+			'  sword:',
+			'    resource:',
+			'      material: DIAMOND_SWORD',
+			'recipes:',
+			'  crafting_table:',
+			'    sword_recipe:',
+			'      ingredients:',
+			'        A: sword',
+			'      result:',
+			'        item: other:missing'
+		].join('\n');
+		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const definitionIndex = {
+			findDefinition(kind: string, namespace: string, id: string) {
+				if (kind === 'item' && namespace === 'test' && id === 'sword') {
+					return { kind: 'item', namespace, id, fullPath: '/workspace/contents/test/items.yml' };
+				}
+				return undefined;
+			}
+		} as ProjectAssetIndex;
+		const result = new ItemsAdderDiagnosticsProvider().collect(doc, text, {
+			isDocumentDirty: false,
+			definitionIndex
+		});
+
+		assert.ok(!result.issues.some(issue => issue.message.includes('`sword`')));
+		assert.ok(result.issues.some(issue => issue.message === 'Unknown ItemsAdder item or block `other:missing`.'));
 	});
 
 	test('validates item_model as independent model asset', () => {

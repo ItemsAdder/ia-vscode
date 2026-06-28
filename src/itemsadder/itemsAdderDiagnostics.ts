@@ -1,7 +1,16 @@
 import * as YAML from 'yaml';
 
 import { AssetPathResolver, AssetResolution } from './assetPathResolver';
+import {
+	allowsVanillaMaterial,
+	definitionKindLabel,
+	definitionKindsForPath,
+	isDefinitionDeclarationPath,
+	normalizeDefinitionId,
+	splitNamespacedReference
+} from './definitionReferences';
 import { ScriptPathResolver } from './scriptPathResolver';
+import { ProjectAssetIndex } from './projectAssetIndex';
 import { itemsAdderPluginConfigSchema } from '../itemsAdderPluginConfig';
 
 export type ItemsAdderDiagnosticSeverity = 'error' | 'warning';
@@ -32,6 +41,7 @@ export interface ItemsAdderDiagnosticsOptions {
 	isDocumentDirty: boolean;
 	assetResolver?: AssetPathResolver;
 	scriptResolver?: ScriptPathResolver;
+	definitionIndex?: ProjectAssetIndex;
 	expectedNamespace?: string;
 }
 
@@ -108,6 +118,7 @@ export class ItemsAdderDiagnosticsProvider {
 		}
 
 		this.collectRecipeIssues(doc.get('recipes', true), issues);
+		this.collectDefinitionReferenceIssues(doc.contents, [], this.getNamespace(doc), issues, options);
 		this.collectFlowIssues(text, issues);
 		return { issues, assetDecorations };
 	}
@@ -709,6 +720,61 @@ private isValidHostAddress(value: string): boolean {
 					severity: 'error'
 				});
 			}
+		}
+	}
+
+	private collectDefinitionReferenceIssues(
+		node: unknown,
+		path: string[],
+		fileNamespace: string | undefined,
+		issues: ItemsAdderDiagnosticIssue[],
+		options: ItemsAdderDiagnosticsOptions
+	): void {
+		if (!fileNamespace || !options.definitionIndex) {
+			return;
+		}
+
+		if (YAML.isMap(node)) {
+			for (const pair of node.items) {
+				if (!YAML.isPair(pair)) {
+					continue;
+				}
+
+				const key = YAML.isScalar(pair.key) && typeof pair.key.value === 'string' ? pair.key.value : undefined;
+				this.collectDefinitionReferenceIssues(pair.value, key ? [...path, key] : path, fileNamespace, issues, options);
+			}
+			return;
+		}
+
+		if (YAML.isSeq(node)) {
+			for (const item of node.items) {
+				this.collectDefinitionReferenceIssues(item, path, fileNamespace, issues, options);
+			}
+			return;
+		}
+
+		if (!YAML.isScalar(node) || typeof node.value !== 'string') {
+			return;
+		}
+
+		const kinds = definitionKindsForPath(path);
+		if (!kinds.length || isDefinitionDeclarationPath(path)) {
+			return;
+		}
+
+		const rawValue = node.value.trim();
+		if (!rawValue || rawValue.startsWith('<') || (allowsVanillaMaterial(kinds) && /^[A-Z0-9_]+$/.test(rawValue))) {
+			return;
+		}
+
+		const reference = splitNamespacedReference(rawValue, fileNamespace);
+		if (!reference || reference.namespace === 'minecraft') {
+			return;
+		}
+
+		const found = kinds.some(kind => options.definitionIndex?.findDefinition(kind, reference.namespace, normalizeDefinitionId(kind, reference.id)));
+		if (!found) {
+			this.pushNodeIssue(issues, node, `Unknown ItemsAdder ${definitionKindLabel(kinds)} \`${rawValue}\`.`, 'warning');
 		}
 	}
 

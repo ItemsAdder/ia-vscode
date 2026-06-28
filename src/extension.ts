@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as vscode from 'vscode';
 
+import { DefinitionReferenceHoverProvider } from './itemsadder/definitionReferenceHoverProvider';
 import { EditorDecorationController } from './itemsadder/editorDecorationController';
 import { ItemsAdderDictionaryIndex } from './itemsadder/itemsAdderDictionaryIndex';
 import { ItemsAdderCompletionProvider } from './itemsadder/itemsAdderCompletionProvider';
@@ -76,6 +77,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	vanillaTexturePaths = await loadVanillaTexturePaths(context);
 	const assetIndex = new ProjectAssetIndex(() => vscode.workspace.workspaceFolders);
 	context.subscriptions.push(assetIndex);
+	context.subscriptions.push(assetIndex.onDidRebuild(() => {
+		if (activeEditor && isItemsAdderManagedConfig(activeEditor.document)) {
+			triggerUpdateDecorations(true);
+		}
+	}));
 	const dictionaryIndex = new ItemsAdderDictionaryIndex();
 	context.subscriptions.push(dictionaryIndex);
 	const soundPlayer = new ItemsAdderSoundPlayer();
@@ -166,7 +172,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		assetIndex,
 		getDevMode: () => Boolean(config.get('devMode'))
 	});
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider, ''));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider, ':', ' ', '-'));
 	context.subscriptions.push(vscode.languages.registerHoverProvider(
 		{ language: 'yaml' },
 		new SchemaHoverProvider({ schemas, pluginConfigSchema: itemsAdderPluginConfigSchema })
@@ -182,6 +188,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(vscode.languages.registerHoverProvider(
 		{ language: 'yaml' },
 		new ScriptPathHoverProvider()
+	));
+	context.subscriptions.push(vscode.languages.registerHoverProvider(
+		{ language: 'yaml' },
+		new DefinitionReferenceHoverProvider({ assetIndex })
 	));
 	decorationController = new EditorDecorationController({
 		context,
