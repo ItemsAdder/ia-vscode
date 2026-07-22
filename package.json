@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -72,6 +72,56 @@
           "type": "boolean",
           "default": false,
           "description": "Enables dev mode for the extension."
+        },
+        "ia-vscode.enableDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables ItemsAdder editor decorations such as icons, colored text previews, disabled block backgrounds and recipe markers."
+        },
+        "ia-vscode.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables ItemsAdder custom diagnostics in YAML files."
+        },
+        "ia-vscode.enableIndexing": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables workspace indexing for ItemsAdder custom items, blocks, sounds, textures, models, scripts and related autocomplete."
+        },
+        "ia-vscode.enableCustomReferenceAutocomplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables autocomplete for indexed ItemsAdder custom references such as custom items, blocks, sounds, textures, models, scripts and font images."
+        },
+        "ia-vscode.enableImplicitNamespaceHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows the implicit namespace hint before references that omit a namespace."
+        },
+        "ia-vscode.enableTextPreviews": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables rendered previews for Minecraft legacy color codes, MiniMessage text and dictionary translations."
+        },
+        "ia-vscode.enableHoverProviders": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables ItemsAdder hover popups for schema documentation, assets, scripts and indexed custom references."
+        },
+        "ia-vscode.enableSoundTools": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enables ItemsAdder sound hover, codelens and play/stop helpers."
+        },
+        "ia-vscode.enableAutoSuggestionsOnEmptyLine": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically opens suggestions on empty YAML lines in ItemsAdder files."
+        },
+        "ia-vscode.enableStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shows the ItemsAdder status bar menu item."
         }
       }
     },

@@ -19,6 +19,12 @@ interface EditorDecorationControllerOptions {
 	diagnostics: vscode.DiagnosticCollection;
 	assetIndex?: ProjectAssetIndex;
 	dictionaryIndex?: ItemsAdderDictionaryIndex;
+	getSettings(): {
+		enableDecorations: boolean;
+		enableDiagnostics: boolean;
+		enableImplicitNamespaceHints: boolean;
+		enableTextPreviews: boolean;
+	};
 }
 
 interface EnumDecorationSet {
@@ -155,36 +161,54 @@ export class EditorDecorationController {
 	public update(editor: vscode.TextEditor): void {
 		const text = editor.document.getText();
 		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
+		const settings = this.options.getSettings();
 
-		this.applyRegexDecoration(editor, / template:\s*true/g, 'Template item', this.templateDecoration);
-		this.applyRegexDecoration(editor, / variant_of:/g, 'Variant item', this.variantDecoration);
-		this.applyRegexDecoration(editor, / resource:/g, 'The graphical part of item', this.resourceDecoration);
-		this.applyRegexDecoration(editor, / events:/g, 'Events called by item', this.actionDecoration);
-		this.applyRegexDecoration(editor, / behaviours:/g, 'Predefined behaviours item', this.behaviourDecoration);
-		this.applyRegexDecoration(editor, /^\s*anvil_repair:/gm, 'Anvil repair recipes', this.anvilRecipeDecoration);
-		this.applyRegexDecoration(editor, /^\s*crafting_table:/gm, 'Crafting table recipes', this.craftingRecipeDecoration);
-		this.applyRegexDecoration(editor, /^\s*cooking:/gm, 'Furnace cooking recipes', this.furnaceRecipeDecoration);
-		this.applyRegexDecoration(editor, /\btrue\b/g, 'This property **enabled**', this.enabledDecoration);
-		this.applyRegexDecoration(editor, /\bfalse\b/g, 'This property is **disabled**', this.disabledDecoration);
-		this.applyEnumDecorations(editor, text, 'Vanilla material', this.options.schemas.$defs.bukkit_materials.enum, this.materialDecorations);
-		this.applyEnumDecorations(editor, text, 'Vanilla entity type', this.options.schemas.$defs.bukkit_entity_type.enum, this.entityDecorations);
-		this.applyDisabledBlockDecorations(editor, text);
-		this.applyAlternatingItemBackgrounds(editor, text);
-		this.applyEventActionDecorations(editor, text);
-		this.applyDeprecatedPropertyMarkers(editor, text);
-		this.applyFontImagePreviews(editor, text, doc);
-		this.applyImplicitNamespaceHints(editor, text, doc);
-		this.applyDictionaryFormattedPreviews(editor, text);
-		this.applyTextColorPreviews(editor, text);
-		this.assetDecorations = this.diagnosticsController.update(doc, text, editor, this.options.diagnostics, this.assetDecorations);
+		if (settings.enableDecorations) {
+			this.applyRegexDecoration(editor, / template:\s*true/g, 'Template item', this.templateDecoration);
+			this.applyRegexDecoration(editor, / variant_of:/g, 'Variant item', this.variantDecoration);
+			this.applyRegexDecoration(editor, / resource:/g, 'The graphical part of item', this.resourceDecoration);
+			this.applyRegexDecoration(editor, / events:/g, 'Events called by item', this.actionDecoration);
+			this.applyRegexDecoration(editor, / behaviours:/g, 'Predefined behaviours item', this.behaviourDecoration);
+			this.applyRegexDecoration(editor, /^\s*anvil_repair:/gm, 'Anvil repair recipes', this.anvilRecipeDecoration);
+			this.applyRegexDecoration(editor, /^\s*crafting_table:/gm, 'Crafting table recipes', this.craftingRecipeDecoration);
+			this.applyRegexDecoration(editor, /^\s*cooking:/gm, 'Furnace cooking recipes', this.furnaceRecipeDecoration);
+			this.applyRegexDecoration(editor, /\btrue\b/g, 'This property **enabled**', this.enabledDecoration);
+			this.applyRegexDecoration(editor, /\bfalse\b/g, 'This property is **disabled**', this.disabledDecoration);
+			this.applyEnumDecorations(editor, text, 'Vanilla material', this.options.schemas.$defs.bukkit_materials.enum, this.materialDecorations);
+			this.applyEnumDecorations(editor, text, 'Vanilla entity type', this.options.schemas.$defs.bukkit_entity_type.enum, this.entityDecorations);
+			this.applyDisabledBlockDecorations(editor, text);
+			this.applyAlternatingItemBackgrounds(editor, text);
+			this.applyEventActionDecorations(editor, text);
+			this.applyDeprecatedPropertyMarkers(editor, text);
+			this.applyFontImagePreviews(editor, text, doc);
+		}
+		if (settings.enableImplicitNamespaceHints) {
+			this.applyImplicitNamespaceHints(editor, text, doc);
+		}
+		if (settings.enableTextPreviews) {
+			this.applyDictionaryFormattedPreviews(editor, text);
+			this.applyTextColorPreviews(editor, text);
+		}
+		if (settings.enableDiagnostics) {
+			this.assetDecorations = this.diagnosticsController.update(doc, text, editor, this.options.diagnostics, this.assetDecorations);
+		} else {
+			this.options.diagnostics.clear();
+			this.assetDecorations.forEach(decoration => decoration.dispose());
+			this.assetDecorations = [];
+		}
 	}
 
 	public updateTextPreviews(editor: vscode.TextEditor): void {
 		const text = editor.document.getText();
 		const doc = YAML.parseDocument(text, { keepSourceTokens: true });
-		this.applyImplicitNamespaceHints(editor, text, doc);
-		this.applyDictionaryFormattedPreviews(editor, text);
-		this.applyTextColorPreviews(editor, text);
+		const settings = this.options.getSettings();
+		if (settings.enableImplicitNamespaceHints) {
+			this.applyImplicitNamespaceHints(editor, text, doc);
+		}
+		if (settings.enableTextPreviews) {
+			this.applyDictionaryFormattedPreviews(editor, text);
+			this.applyTextColorPreviews(editor, text);
+		}
 	}
 
 	public clear(editor?: vscode.TextEditor): void {

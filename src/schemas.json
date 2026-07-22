@@ -2856,11 +2856,11 @@
               "properties": {
                 "name": {
                   "type": "boolean",
-                  "markdownDescription": "Default: `true`"
+                  "markdownDescription": "Default: `false`"
                 },
                 "lore": {
                   "type": "boolean",
-                  "markdownDescription": "Default: `true`"
+                  "markdownDescription": "Default: `false`"
                 },
                 "enchants": {
                   "type": "boolean",

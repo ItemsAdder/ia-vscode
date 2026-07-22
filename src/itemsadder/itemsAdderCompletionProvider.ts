@@ -16,6 +16,7 @@ interface ItemsAdderCompletionProviderOptions {
 	vanillaTexturePaths: string[];
 	assetIndex?: ProjectAssetIndex;
 	getDevMode(): boolean;
+	getEnableCustomReferenceAutocomplete?(): boolean;
 }
 
 export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvider {
@@ -148,14 +149,18 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 
 		if (this.isTexturePath(yamlPath)) {
 			this.addVanillaTextureSuggestions(document, position, items);
-			this.addWorkspaceAssetSuggestions(document, position, items, 'texture');
+			if (this.getEnableCustomReferenceAutocomplete()) {
+				this.addWorkspaceAssetSuggestions(document, position, items, 'texture');
+			}
 		}
 
-		if (this.isModelPath(yamlPath)) {
+		if (this.isModelPath(yamlPath) && this.getEnableCustomReferenceAutocomplete()) {
 			this.addWorkspaceAssetSuggestions(document, position, items, 'model');
 		}
 
-		this.addWorkspaceDefinitionSuggestions(document, position, yamlPath, items);
+		if (this.getEnableCustomReferenceAutocomplete()) {
+			this.addWorkspaceDefinitionSuggestions(document, position, yamlPath, items);
+		}
 
 		if (
 			yamlPath.length >= 5 &&
@@ -433,6 +438,10 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 
 	private isModelPath(yamlPath: string[]): boolean {
 		return yamlPath[0] === 'items' && yamlPath[2] === 'resource' && yamlPath[yamlPath.length - 1] === 'model_path';
+	}
+
+	private getEnableCustomReferenceAutocomplete(): boolean {
+		return this.options.getEnableCustomReferenceAutocomplete?.() ?? true;
 	}
 
 	private readNamespace(document: vscode.TextDocument): string | undefined {

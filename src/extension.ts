@@ -39,6 +39,35 @@ let originalWordBasedSuggestionsEnabled: any = null;
 let originalCopilotEnabled: boolean | undefined = undefined;
 let vanillaTexturePaths: string[] = [];
 
+interface ItemsAdderExtensionSettings {
+	enableDecorations: boolean;
+	enableDiagnostics: boolean;
+	enableIndexing: boolean;
+	enableCustomReferenceAutocomplete: boolean;
+	enableImplicitNamespaceHints: boolean;
+	enableTextPreviews: boolean;
+	enableHoverProviders: boolean;
+	enableSoundTools: boolean;
+	enableAutoSuggestionsOnEmptyLine: boolean;
+	enableStatusBar: boolean;
+}
+
+function getExtensionSettings(): ItemsAdderExtensionSettings {
+	const currentConfig = vscode.workspace.getConfiguration('ia-vscode');
+	return {
+		enableDecorations: currentConfig.get<boolean>('enableDecorations', true),
+		enableDiagnostics: currentConfig.get<boolean>('enableDiagnostics', true),
+		enableIndexing: currentConfig.get<boolean>('enableIndexing', true),
+		enableCustomReferenceAutocomplete: currentConfig.get<boolean>('enableCustomReferenceAutocomplete', true),
+		enableImplicitNamespaceHints: currentConfig.get<boolean>('enableImplicitNamespaceHints', true),
+		enableTextPreviews: currentConfig.get<boolean>('enableTextPreviews', true),
+		enableHoverProviders: currentConfig.get<boolean>('enableHoverProviders', true),
+		enableSoundTools: currentConfig.get<boolean>('enableSoundTools', true),
+		enableAutoSuggestionsOnEmptyLine: currentConfig.get<boolean>('enableAutoSuggestionsOnEmptyLine', true),
+		enableStatusBar: currentConfig.get<boolean>('enableStatusBar', true)
+	};
+}
+
 function stripSchemaHoverMetadata(schema: any): any {
 	const cloned = JSON.parse(JSON.stringify(schema));
 	stripSchemaNodeHoverMetadata(cloned);
@@ -75,13 +104,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	registerJsppLanguageFeatures(context);
 	await registerYamlSchema();
 	vanillaTexturePaths = await loadVanillaTexturePaths(context);
-	const assetIndex = new ProjectAssetIndex(() => vscode.workspace.workspaceFolders);
-	context.subscriptions.push(assetIndex);
-	context.subscriptions.push(assetIndex.onDidRebuild(() => {
-		if (activeEditor && isItemsAdderManagedConfig(activeEditor.document)) {
-			triggerUpdateDecorations(true);
-		}
-	}));
+	const assetIndex = getExtensionSettings().enableIndexing
+		? new ProjectAssetIndex(() => vscode.workspace.workspaceFolders, () => getExtensionSettings().enableIndexing)
+		: undefined;
+	if (assetIndex) {
+		context.subscriptions.push(assetIndex);
+		context.subscriptions.push(assetIndex.onDidRebuild(() => {
+			if (activeEditor && isItemsAdderManagedConfig(activeEditor.document)) {
+				triggerUpdateDecorations(true);
+			}
+		}));
+	}
 	const dictionaryIndex = new ItemsAdderDictionaryIndex();
 	context.subscriptions.push(dictionaryIndex);
 	const soundPlayer = new ItemsAdderSoundPlayer();
@@ -151,12 +184,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 			await vscode.commands.executeCommand('ia-vscode.cleanJavaLanguageServerWorkspace');
 		}
 	}));
-	itemsAdderStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-	itemsAdderStatusBarItem.text = '$(symbol-misc) ItemsAdder';
-	itemsAdderStatusBarItem.tooltip = 'ItemsAdder tools';
-	itemsAdderStatusBarItem.command = 'ia-vscode.showItemsAdderMenu';
-	itemsAdderStatusBarItem.show();
-	context.subscriptions.push(itemsAdderStatusBarItem);
+	if (getExtensionSettings().enableStatusBar) {
+		itemsAdderStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+		itemsAdderStatusBarItem.text = '$(symbol-misc) ItemsAdder';
+		itemsAdderStatusBarItem.tooltip = 'ItemsAdder tools';
+		itemsAdderStatusBarItem.command = 'ia-vscode.showItemsAdderMenu';
+		itemsAdderStatusBarItem.show();
+		context.subscriptions.push(itemsAdderStatusBarItem);
+	}
 	context.subscriptions.push(vscode.commands.registerCommand('ia-vscode.playSound', (soundPath: string, label?: string) => {
 		soundPlayer.play(soundPath, label);
 	}));
@@ -170,36 +205,47 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 		itemTemplates: vscodeItemsSuggestions,
 		vanillaTexturePaths,
 		assetIndex,
-		getDevMode: () => Boolean(config.get('devMode'))
+		getDevMode: () => Boolean(vscode.workspace.getConfiguration('ia-vscode').get('devMode')),
+		getEnableCustomReferenceAutocomplete: () => {
+			const settings = getExtensionSettings();
+			return settings.enableIndexing && settings.enableCustomReferenceAutocomplete;
+		}
 	});
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider, ':', ' ', '-'));
-	context.subscriptions.push(vscode.languages.registerHoverProvider(
-		{ language: 'yaml' },
-		new SchemaHoverProvider({ schemas, pluginConfigSchema: itemsAdderPluginConfigSchema })
-	));
-	context.subscriptions.push(vscode.languages.registerCodeLensProvider(
-		{ language: 'yaml' },
-		new ItemsAdderSoundCodeLensProvider({ assetIndex, vanillaTexturePaths })
-	));
-	context.subscriptions.push(vscode.languages.registerHoverProvider(
-		{ language: 'yaml' },
-		new ItemsAdderSoundHoverProvider({ assetIndex, vanillaTexturePaths })
-	));
-	context.subscriptions.push(vscode.languages.registerHoverProvider(
-		{ language: 'yaml' },
-		new ScriptPathHoverProvider()
-	));
-	context.subscriptions.push(vscode.languages.registerHoverProvider(
-		{ language: 'yaml' },
-		new DefinitionReferenceHoverProvider({ assetIndex })
-	));
+	if (getExtensionSettings().enableHoverProviders) {
+		context.subscriptions.push(vscode.languages.registerHoverProvider(
+			{ language: 'yaml' },
+			new SchemaHoverProvider({ schemas, pluginConfigSchema: itemsAdderPluginConfigSchema })
+		));
+		context.subscriptions.push(vscode.languages.registerHoverProvider(
+			{ language: 'yaml' },
+			new ScriptPathHoverProvider()
+		));
+		if (assetIndex) {
+			context.subscriptions.push(vscode.languages.registerHoverProvider(
+				{ language: 'yaml' },
+				new DefinitionReferenceHoverProvider({ assetIndex })
+			));
+		}
+	}
+	if (getExtensionSettings().enableSoundTools) {
+		context.subscriptions.push(vscode.languages.registerCodeLensProvider(
+			{ language: 'yaml' },
+			new ItemsAdderSoundCodeLensProvider({ assetIndex, vanillaTexturePaths })
+		));
+		context.subscriptions.push(vscode.languages.registerHoverProvider(
+			{ language: 'yaml' },
+			new ItemsAdderSoundHoverProvider({ assetIndex, vanillaTexturePaths })
+		));
+	}
 	decorationController = new EditorDecorationController({
 		context,
 		schemas,
 		vanillaTexturePaths,
 		diagnostics,
 		assetIndex,
-		dictionaryIndex
+		dictionaryIndex,
+		getSettings: getExtensionSettings
 	});
 	context.subscriptions.push(decorationController);
 
@@ -247,6 +293,21 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => {
 		if (document.languageId === 'yaml' || document.fileName.endsWith('.yml') || document.fileName.endsWith('.yaml')) {
 			dictionaryIndex.scheduleRebuild();
+		}
+	}));
+	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+		if (!event.affectsConfiguration('ia-vscode')) {
+			return;
+		}
+		if (getExtensionSettings().enableStatusBar) {
+			itemsAdderStatusBarItem?.show();
+		} else {
+			itemsAdderStatusBarItem?.hide();
+		}
+		assetIndex?.rebuild();
+		if (activeEditor && isItemsAdderManagedConfig(activeEditor.document)) {
+			decorationController?.clear(activeEditor);
+			triggerUpdateDecorations();
 		}
 	}));
 
@@ -419,7 +480,11 @@ function updateDecorations(): void {
 
 function maybeTriggerSuggestionsOnEmptyLine(editor: vscode.TextEditor): void {
 	const position = editor.selection.active;
-	if (!isItemsAdderManagedConfig(editor.document) || editor.document.lineAt(position.line).text.trim() !== '') {
+	if (
+		!getExtensionSettings().enableAutoSuggestionsOnEmptyLine ||
+		!isItemsAdderManagedConfig(editor.document) ||
+		editor.document.lineAt(position.line).text.trim() !== ''
+	) {
 		lastAutoSuggestKey = undefined;
 		return;
 	}

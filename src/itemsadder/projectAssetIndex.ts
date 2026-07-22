@@ -71,7 +71,10 @@ export class ProjectAssetIndex implements vscode.Disposable {
 	private readonly watcher: vscode.FileSystemWatcher;
 	private rebuildTimeout: ReturnType<typeof setTimeout> | undefined;
 
-	constructor(private readonly workspaceFoldersProvider: () => readonly vscode.WorkspaceFolder[] | undefined) {
+	constructor(
+		private readonly workspaceFoldersProvider: () => readonly vscode.WorkspaceFolder[] | undefined,
+		private readonly enabledProvider: () => boolean = () => true
+	) {
 		this.watcher = vscode.workspace.createFileSystemWatcher('**/*.{png,json,mcmeta,ogg,yml,yaml,java,jspp}');
 		this.watcher.onDidCreate(() => this.scheduleRebuild());
 		this.watcher.onDidChange(() => this.scheduleRebuild());
@@ -102,10 +105,18 @@ export class ProjectAssetIndex implements vscode.Disposable {
 	public rebuild(): void {
 		this.assetsByKey.clear();
 		this.definitionsByKey.clear();
+		if (!this.enabledProvider()) {
+			this.rebuildEmitter.fire();
+			return;
+		}
 
 		for (const folder of this.workspaceFoldersProvider() ?? []) {
 			const workspacePath = folder.uri.fsPath;
 			const files = this.collectWorkspaceFiles(workspacePath);
+			if (!this.isItemsAdderWorkspace(workspacePath, files)) {
+				continue;
+			}
+
 			const snapshot = this.snapshotFiles(files);
 			const cached = this.readCache(workspacePath);
 			if (cached && this.sameSnapshot(cached.files, snapshot)) {
@@ -171,6 +182,34 @@ export class ProjectAssetIndex implements vscode.Disposable {
 
 		visit(workspacePath);
 		return files.sort();
+	}
+
+	private isItemsAdderWorkspace(workspacePath: string, files: string[]): boolean {
+		if (this.pathContainsContents(workspacePath)) {
+			return true;
+		}
+
+		return files.some(fullPath => this.pathContainsContents(fullPath) || this.isItemsAdderYamlFile(fullPath));
+	}
+
+	private pathContainsContents(filePath: string): boolean {
+		return filePath.replace(/\\/g, '/').split('/').includes('contents');
+	}
+
+	private isItemsAdderYamlFile(fullPath: string): boolean {
+		const extension = path.extname(fullPath).toLowerCase();
+		if (extension !== '.yml' && extension !== '.yaml') {
+			return false;
+		}
+
+		try {
+			const text = fs.readFileSync(fullPath, 'utf8');
+			return (
+				/^\s*info:\s*$/m.test(text) && /^\s*namespace:\s*["']?[^"'\s]+/m.test(text)
+			) || /^\s*(items|blocks|armors|sounds|font_images|entities|loots|trees|categories|huds|recipes):\s*$/m.test(text);
+		} catch {
+			return false;
+		}
 	}
 
 	private snapshotFiles(files: string[]): Record<string, IndexedFileSnapshot> {

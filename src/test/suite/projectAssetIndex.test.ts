@@ -40,4 +40,21 @@ suite('Project asset index', () => {
 			index.dispose();
 		}
 	});
+
+	test('does not write cache for non ItemsAdder workspace', () => {
+		const workspacePath = fs.mkdtempSync(path.join(os.tmpdir(), 'ia-index-non-ia-'));
+		fs.writeFileSync(path.join(workspacePath, 'package.json'), '{"name":"not-itemsadder"}');
+
+		const index = new ProjectAssetIndex(() => [{
+			uri: vscode.Uri.file(workspacePath),
+			name: 'workspace',
+			index: 0
+		}]);
+
+		try {
+			assert.ok(!fs.existsSync(path.join(workspacePath, '.vscode', 'itemsadder-index.json')));
+		} finally {
+			index.dispose();
+		}
+	});
 });
