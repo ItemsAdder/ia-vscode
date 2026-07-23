@@ -24,7 +24,7 @@ suite('Schema hover provider', () => {
 		const hover = provider.provideHover(document, new vscode.Position(6, 8));
 
 		assert.ok(hover);
-		assert.ok(String(hover.contents[0]).includes('command:ia-vscode.openUrlInVscode'));
+		assert.ok((hover.contents[0] as vscode.MarkdownString).value.includes('command:ia-vscode.openUrlInVscode'));
 	});
 
 	test('shows deprecated warning once in schema hover', async () => {
@@ -43,7 +43,7 @@ suite('Schema hover provider', () => {
 		const hover = provider.provideHover(document, new vscode.Position(4, 6));
 
 		assert.ok(hover);
-		const content = String(hover.contents[0]);
+		const content = (hover.contents[0] as vscode.MarkdownString).value;
 		assert.strictEqual(content.match(/Warning: deprecated property/g)?.length, 1);
 	});
 
@@ -63,6 +63,6 @@ suite('Schema hover provider', () => {
 		const hover = provider.provideHover(document, new vscode.Position(3, 5));
 
 		assert.ok(hover);
-		assert.ok(String(hover.contents[0]).includes('LobFile'));
+		assert.ok((hover.contents[0] as vscode.MarkdownString).value.includes('LobFile'));
 	});
 });

@@ -46,9 +46,9 @@ suite('Minecraft text colors', () => {
 		assert.deepStrictEqual(previews, [
 			{
 				line: 0,
-				character: 34,
+				character: 33,
 				startCharacter: 6,
-				endCharacter: 34,
+				endCharacter: 33,
 				parts: [
 					{
 						text: 'Infused with Amethyst',

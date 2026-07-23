@@ -6,14 +6,16 @@ export interface TextPosition {
 export function getYamlParentPathFromText(text: string, position: TextPosition): string[] {
 	const lines = text.split('\n');
 	const indentStack: { indent: number; key: string }[] = [];
-	let currentIndent = position.character;
+	const currentLine = lines[position.line] ?? '';
+	const arrayIndent = currentLine.match(/^(\s*)-\s+/)?.[1].length;
+	let currentIndent = arrayIndent === undefined ? position.character : arrayIndent + 1;
 
 	for (let i = position.line; i >= 0; i--) {
 		const line = lines[i] ?? '';
 		const arrayMatch = line.match(/^(\s*)-\s+/);
 		if (arrayMatch) {
 			const indent = arrayMatch[1].length;
-			if (indent < currentIndent) {
+			if (i !== position.line && indent < currentIndent) {
 				currentIndent = indent;
 			}
 			continue;
@@ -31,29 +33,7 @@ export function getYamlParentPathFromText(text: string, position: TextPosition):
 		}
 	}
 
-	const path = indentStack.reverse().map(item => item.key);
-	const currentLine = lines[position.line] ?? '';
-	const valueMatch = currentLine.match(/^(\s*)([^:]+):\s*(.*)/);
-
-	if (valueMatch && valueMatch[3].trim() === '') {
-		path.push(valueMatch[2]);
-	} else if (currentLine.trim().startsWith('-')) {
-		for (let i = position.line - 1; i >= 0; i--) {
-			const line = lines[i] ?? '';
-			const keyMatch = line.match(/^(\s*)([^:]+):/);
-			if (!keyMatch) {
-				continue;
-			}
-
-			const indent = keyMatch[1].length;
-			if (indent < currentIndent) {
-				path.push(keyMatch[2]);
-				break;
-			}
-		}
-	}
-
-	return path;
+	return indentStack.reverse().map(item => item.key);
 }
 
 export function getYamlSameLevelPropertiesFromText(text: string, position: TextPosition): string[] {

@@ -223,7 +223,7 @@ suite('ItemsAdder completion provider', () => {
 		const item = items.find(item => item.label === 'item/bug_medal');
 		const documentation = item?.documentation as vscode.MarkdownString | undefined;
 
-		assert.strictEqual(item?.insertText, '- item/bug_medal');
+		assert.strictEqual(item?.insertText, 'item/bug_medal');
 		assert.ok(documentation?.value.includes('Texture: `item/bug_medal`'));
 		assert.ok(documentation?.value.includes('![Texture Preview]('));
 		assert.ok(documentation?.value.includes('File: `contents/test/textures/item/bug_medal.png`'));

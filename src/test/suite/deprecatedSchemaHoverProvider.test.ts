@@ -23,7 +23,7 @@ suite('Deprecated schema hover provider', () => {
 		const hover = provider.provideHover(document, new vscode.Position(6, 10));
 
 		assert.ok(hover);
-		assert.strictEqual(String(hover.contents[0]), '$(warning) **Warning: deprecated property.**');
+		assert.strictEqual((hover.contents[0] as vscode.MarkdownString).value, '$(warning) **Warning: deprecated property.**');
 	});
 
 	test('does not show deprecated hover away from property key', async () => {

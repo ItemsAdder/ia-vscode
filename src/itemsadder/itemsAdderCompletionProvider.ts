@@ -49,8 +49,7 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 		const items: vscode.CompletionItem[] = [];
 
 		if (valueMatch && position.character >= valueMatch[1].length) {
-			const key = currentLine.slice(0, currentLine.indexOf(':')).trim();
-			this.addSchemaValueSuggestions(schema, [...yamlPath, key], items);
+			this.addSchemaValueSuggestions(schema, yamlPath, items);
 			return items;
 		}
 
@@ -352,8 +351,8 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 		const line = document.lineAt(position.line).text;
 		const keyValueMatch = line.match(/^(\s*[^:#][^:]*:\s*)(.*)$/);
 		const arrayMatch = line.match(/^(\s*-\s+)(.*)$/);
-		const prefixLength = keyValueMatch?.[1].length ?? arrayMatch?.[1].length;
-		const rawValue = keyValueMatch?.[2] ?? arrayMatch?.[2];
+		const prefixLength = arrayMatch?.[1].length ?? keyValueMatch?.[1].length;
+		const rawValue = arrayMatch?.[2] ?? keyValueMatch?.[2];
 		if (prefixLength === undefined || rawValue === undefined) {
 			return undefined;
 		}

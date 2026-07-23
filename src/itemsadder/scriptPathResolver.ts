@@ -65,11 +65,9 @@ export class ScriptPathResolver {
 		const roots = [
 			namespaceRootFromDocument(this.options.documentPath, this.options.fileNamespace),
 			...this.options.workspaceFolders.flatMap(folder => {
-				const roots = [path.join(folder, this.options.fileNamespace)];
-				if (path.basename(folder) !== 'contents') {
-					roots.push(path.join(folder, 'contents', this.options.fileNamespace));
-				}
-				return roots;
+				return path.basename(folder) === 'contents'
+					? [path.join(folder, this.options.fileNamespace)]
+					: [path.join(folder, 'contents', this.options.fileNamespace)];
 			})
 		].filter((root): root is string => Boolean(root));
 

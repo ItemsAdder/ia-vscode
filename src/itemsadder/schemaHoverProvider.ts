@@ -101,6 +101,11 @@ export class SchemaHoverProvider implements vscode.HoverProvider {
 				current = current.properties[segment];
 				continue;
 			}
+			const conditionalProperty = current.then?.properties?.[segment] ?? current.else?.properties?.[segment];
+			if (conditionalProperty) {
+				current = conditionalProperty;
+				continue;
+			}
 
 			const patternSchema = this.patternSchemaFor(current, segment);
 			if (patternSchema) {
