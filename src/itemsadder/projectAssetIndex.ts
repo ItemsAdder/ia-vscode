@@ -112,10 +112,11 @@ export class ProjectAssetIndex implements vscode.Disposable {
 
 		for (const folder of this.workspaceFoldersProvider() ?? []) {
 			const workspacePath = folder.uri.fsPath;
-			const files = this.collectWorkspaceFiles(workspacePath);
-			if (!this.isItemsAdderWorkspace(workspacePath, files)) {
+			if (!this.isItemsAdderWorkspace(workspacePath)) {
+				this.deleteCache(workspacePath);
 				continue;
 			}
+			const files = this.collectWorkspaceFiles(workspacePath);
 
 			const snapshot = this.snapshotFiles(files);
 			const cached = this.readCache(workspacePath);
@@ -184,32 +185,20 @@ export class ProjectAssetIndex implements vscode.Disposable {
 		return files.sort();
 	}
 
-	private isItemsAdderWorkspace(workspacePath: string, files: string[]): boolean {
+	private isItemsAdderWorkspace(workspacePath: string): boolean {
 		if (this.pathContainsContents(workspacePath)) {
 			return true;
 		}
 
-		return files.some(fullPath => this.pathContainsContents(fullPath) || this.isItemsAdderYamlFile(fullPath));
+		try {
+			return fs.statSync(path.join(workspacePath, 'contents')).isDirectory();
+		} catch {
+			return false;
+		}
 	}
 
 	private pathContainsContents(filePath: string): boolean {
 		return filePath.replace(/\\/g, '/').split('/').includes('contents');
-	}
-
-	private isItemsAdderYamlFile(fullPath: string): boolean {
-		const extension = path.extname(fullPath).toLowerCase();
-		if (extension !== '.yml' && extension !== '.yaml') {
-			return false;
-		}
-
-		try {
-			const text = fs.readFileSync(fullPath, 'utf8');
-			return (
-				/^\s*info:\s*$/m.test(text) && /^\s*namespace:\s*["']?[^"'\s]+/m.test(text)
-			) || /^\s*(items|blocks|armors|sounds|font_images|entities|loots|trees|categories|huds|recipes):\s*$/m.test(text);
-		} catch {
-			return false;
-		}
 	}
 
 	private snapshotFiles(files: string[]): Record<string, IndexedFileSnapshot> {
@@ -251,6 +240,14 @@ export class ProjectAssetIndex implements vscode.Disposable {
 			fs.writeFileSync(cachePath, `${JSON.stringify(cache)}\n`);
 		} catch {
 			// Cache is an optimization; indexing still works if it cannot be written.
+		}
+	}
+
+	private deleteCache(workspacePath: string): void {
+		try {
+			fs.unlinkSync(this.cachePath(workspacePath));
+		} catch {
+			// Missing or unwritable cache does not affect indexing.
 		}
 	}
 

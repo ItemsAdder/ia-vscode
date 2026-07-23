@@ -57,4 +57,27 @@ suite('Project asset index', () => {
 			index.dispose();
 		}
 	});
+
+	test('ignores embedded ItemsAdder assets in another project and removes stale cache', () => {
+		const workspacePath = fs.mkdtempSync(path.join(os.tmpdir(), 'ia-index-embedded-'));
+		const embeddedPath = path.join(workspacePath, 'src', 'main', 'resources', 'contents', 'effects', 'configs');
+		const cachePath = path.join(workspacePath, '.vscode', 'itemsadder-index.json');
+		fs.mkdirSync(embeddedPath, { recursive: true });
+		fs.mkdirSync(path.dirname(cachePath), { recursive: true });
+		fs.writeFileSync(path.join(embeddedPath, 'effects.yml'), 'info:\n  namespace: effects\nfont_images:\n  fullscreen: {}\n');
+		fs.writeFileSync(cachePath, '{"version":1}');
+
+		const index = new ProjectAssetIndex(() => [{
+			uri: vscode.Uri.file(workspacePath),
+			name: 'workspace',
+			index: 0
+		}]);
+
+		try {
+			assert.strictEqual(index.findDefinition('font_image', 'effects', 'fullscreen'), undefined);
+			assert.ok(!fs.existsSync(cachePath));
+		} finally {
+			index.dispose();
+		}
+	});
 });
