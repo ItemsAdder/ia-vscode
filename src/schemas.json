@@ -1063,6 +1063,39 @@
           ]
         }
       ],
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "material",
+              "graphics"
+            ],
+            "properties": {
+              "material": {
+                "const": "BUNDLE"
+              },
+              "graphics": {
+                "required": [
+                  "textures"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "graphics": {
+                "properties": {
+                  "textures": {
+                    "required": [
+                      "normal"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
       "properties": {
         "enabled": {
           "markdownDescription": "With this setting you can disable an item completely.\n**Obviously if a player has it in inventory it won't be removed, he still will own it.\nSame thing for blocks, but when broken they won't drop anymore**",
@@ -1355,13 +1388,33 @@
                   "body": {
                     "all": "block/$0.png"
                   }
+                },
+                {
+                  "body": {
+                    "normal": "item/custom_bundle",
+                    "filled": "item/custom_bundle_filled",
+                    "open_back": "item/custom_bundle_open_back",
+                    "open_front": "item/custom_bundle_open_front"
+                  }
                 }
               ],
               "default": {},
               "properties": {
                 "normal": {
                   "type": "string",
-                  "markdownDescription": "Texture for the normal state of the item."
+                  "markdownDescription": "Texture for the normal state of the item. Required for bundles and used for an empty bundle. **Bundle graphics require ItemsAdder 4.0.18+.**"
+                },
+                "filled": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional texture for a non-empty bundle, used when `minecraft:bundle/fullness` is greater than zero. Falls back to `normal`."
+                },
+                "open_back": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional back layer of an open bundle. Shown only in a GUI when `minecraft:bundle/has_selected_item` is true. ItemsAdder generates its model with `minecraft:item/template_bundle_open_back` and renders it before `minecraft:bundle/selected_item` and `open_front`."
+                },
+                "open_front": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional front layer of an open bundle. Shown only in a GUI when `minecraft:bundle/has_selected_item` is true. ItemsAdder generates its model with `minecraft:item/template_bundle_open_front` and renders it after `open_back` and `minecraft:bundle/selected_item`."
                 },
                 "north": {
                   "type": "string",
@@ -1427,7 +1480,19 @@
               "properties": {
                 "normal": {
                   "type": "string",
-                  "markdownDescription": "Model for the normal state of the item."
+                  "markdownDescription": "Model for the normal state of the item. Used for an empty bundle. **Bundle graphics require ItemsAdder 4.0.18+.**"
+                },
+                "filled": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional model for a non-empty bundle, used when `minecraft:bundle/fullness` is greater than zero. Falls back to `normal`."
+                },
+                "open_back": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional back model layer of an open bundle. Shown only in a GUI when `minecraft:bundle/has_selected_item` is true, before `minecraft:bundle/selected_item` and `open_front`."
+                },
+                "open_front": {
+                  "type": "string",
+                  "markdownDescription": "**Requires ItemsAdder 4.0.18+.** Optional front model layer of an open bundle. Shown only in a GUI when `minecraft:bundle/has_selected_item` is true, after `open_back` and `minecraft:bundle/selected_item`."
                 },
                 "pulling_0": {
                   "type": "string",
