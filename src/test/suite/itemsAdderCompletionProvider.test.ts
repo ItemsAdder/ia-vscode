@@ -54,6 +54,32 @@ suite('ItemsAdder completion provider', () => {
 		assert.ok(items.some(item => item.label === 'minecraft:item/diamond.png'));
 	});
 
+	test('suggests textures for Elytra texture properties', async () => {
+		for (const property of ['wings_texture', 'broken_item_texture']) {
+			const document = await vscode.workspace.openTextDocument({
+				language: 'yaml',
+				content: [
+					'info:',
+					'  namespace: test',
+					'items:',
+					'  sky_elytra:',
+					'    elytra:',
+					`      ${property}:`
+				].join('\n')
+			});
+			const provider = new ItemsAdderCompletionProvider({
+				schemas,
+				itemTemplates: [],
+				vanillaTexturePaths: ['entity/equipment/wings/elytra.png'],
+				getDevMode: () => false
+			});
+
+			const items = provider.provideCompletionItems(document, new vscode.Position(5, document.lineAt(5).text.length));
+
+			assert.ok(items.some(item => item.label === 'minecraft:entity/equipment/wings/elytra.png'), property);
+		}
+	});
+
 	test('does not duplicate normal schema property suggestions', async () => {
 		const document = await vscode.workspace.openTextDocument({
 			language: 'yaml',

@@ -431,8 +431,10 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 	private isTexturePath(yamlPath: string[]): boolean {
 		const target = yamlPath[yamlPath.length - 1];
 		return yamlPath[0] === 'items' &&
-			(yamlPath[2] === 'resource' || yamlPath[2] === 'graphics') &&
-			(target === 'texture' || target === 'textures' || target === 'icon');
+			(((yamlPath[2] === 'resource' || yamlPath[2] === 'graphics') &&
+				(target === 'texture' || target === 'textures' || target === 'icon')) ||
+			(yamlPath[2] === 'elytra' &&
+				(target === 'wings_texture' || target === 'broken_item_texture')));
 	}
 
 	private isModelPath(yamlPath: string[]): boolean {

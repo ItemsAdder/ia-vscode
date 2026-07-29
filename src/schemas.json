@@ -1735,6 +1735,63 @@
           "doNotSuggest": true,
           "deprecated": true
         },
+        "elytra": {
+          "type": "object",
+          "markdownDescription": "## Requires Minecraft `1.21.2+` and ItemsAdder `4.0.18+`!\nConfigures this item as a custom Elytra. ItemsAdder automatically creates the required chest equipment, enables gliding and generates the wings equipment model.",
+          "required": [
+            "wings_texture"
+          ],
+          "properties": {
+            "wings_texture": {
+              "type": "string",
+              "markdownDescription": "Texture rendered as wings while this Elytra is equipped. The path is relative to the namespace's `textures` folder. Recommended size: `64x32` or another `2:1` resolution. Example: `entity/equipment/wings/sky_elytra`."
+            },
+            "broken_item_texture": {
+              "type": "string",
+              "markdownDescription": "Optional inventory and hand texture used when the Elytra is broken. If omitted, ItemsAdder looks for `<graphics.texture>_broken`. This does not change the equipped wings texture. Example: `item/sky_elytra_broken`."
+            },
+            "max_flight_ticks": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "markdownDescription": "Maximum continuous gliding time in ticks. `0` means unlimited. There are 20 ticks in one second."
+            },
+            "firework": {
+              "type": "object",
+              "markdownDescription": "Controls firework boosts while gliding with this custom Elytra.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true,
+                  "markdownDescription": "Whether fireworks can boost the player while using this Elytra."
+                },
+                "consume": {
+                  "type": "boolean",
+                  "default": true,
+                  "markdownDescription": "Whether an accepted boost consumes the firework rocket."
+                },
+                "cooldown_ticks": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 0,
+                  "markdownDescription": "Required delay in ticks between accepted firework boosts."
+                }
+              }
+            },
+            "durability_damage_multiplier": {
+              "type": "number",
+              "minimum": 0,
+              "default": 1.0,
+              "markdownDescription": "Multiplier applied to durability damage. `0` disables durability damage for this Elytra."
+            },
+            "collision_damage_multiplier": {
+              "type": "number",
+              "minimum": 0,
+              "default": 1.0,
+              "markdownDescription": "Multiplier applied to `FLY_INTO_WALL` damage. `0` disables wall-collision damage for this Elytra."
+            }
+          }
+        },
         "equipment": {
           "type": "object",
           "markdownDescription": "## Available on `1.21.2+` clients/servers only!\nIf present, this item can be equipped by players in the selected slot.",
@@ -1792,7 +1849,7 @@
             },
             "glider": {
               "type": "boolean",
-              "markdownDescription": "(default: `false`), whether this item can be used to glide (without the ELytra)."
+              "markdownDescription": "(default: `false`), whether this item can be used to glide (without the Elytra)."
             }
           }
         },
@@ -5282,6 +5339,22 @@
         },
         "item_break": {
           "markdownDescription": "Triggered when an item is broken (has 0 durability and disappears)",
+          "$ref": "#/$defs/actions"
+        },
+        "glide_start": {
+          "markdownDescription": "Triggered when the player starts gliding with this custom Elytra.",
+          "$ref": "#/$defs/actions"
+        },
+        "glide_stop": {
+          "markdownDescription": "Triggered when the tracked glide ends, times out or the custom Elytra is unequipped.",
+          "$ref": "#/$defs/actions"
+        },
+        "elytra_boost": {
+          "markdownDescription": "Triggered when a permitted firework boost is used with this custom Elytra.",
+          "$ref": "#/$defs/actions"
+        },
+        "elytra_collision": {
+          "markdownDescription": "Triggered when the player receives `FLY_INTO_WALL` collision damage while using this custom Elytra.",
           "$ref": "#/$defs/actions"
         },
         "placed_block": {
