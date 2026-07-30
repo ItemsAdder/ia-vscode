@@ -2,7 +2,7 @@
   "name": "ia-vscode",
   "displayName": "ia-vscode",
   "description": "ItemsAdder vscode extension",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "publisher": "LoneDev",
   "icon": "images/ia-logo.png",
   "bugs": {
@@ -116,7 +116,7 @@
         "ia-vscode.enableAutoSuggestionsOnEmptyLine": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically opens suggestions on empty YAML lines in ItemsAdder files."
+          "description": "Automatically opens suggestions when moving to another YAML line in ItemsAdder files."
         },
         "ia-vscode.enableStatusBar": {
           "type": "boolean",

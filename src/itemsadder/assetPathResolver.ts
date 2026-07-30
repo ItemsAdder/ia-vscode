@@ -97,7 +97,7 @@ export class AssetPathResolver {
 	}
 
 	private textureCandidates(textureNamespace: string, texturePath: string): string[] {
-		return this.options.workspaceFolders.flatMap(workspacePath => [
+		return this.searchRoots().flatMap(workspacePath => [
 			path.join(workspacePath, this.options.fileNamespace, 'textures', texturePath),
 			path.join(workspacePath, this.options.fileNamespace, 'assets', textureNamespace, 'textures', texturePath),
 			path.join(workspacePath, this.options.fileNamespace, 'resourcepack', 'assets', textureNamespace, 'textures', texturePath),
@@ -114,7 +114,7 @@ export class AssetPathResolver {
 	}
 
 	private modelCandidates(modelNamespace: string, modelPath: string): string[] {
-		return this.options.workspaceFolders.flatMap(workspacePath => [
+		return this.searchRoots().flatMap(workspacePath => [
 			path.join(workspacePath, this.options.fileNamespace, 'models', modelPath),
 			path.join(workspacePath, this.options.fileNamespace, 'assets', modelNamespace, 'models', modelPath),
 			path.join(workspacePath, this.options.fileNamespace, 'resourcepack', 'assets', modelNamespace, 'models', modelPath),
@@ -131,7 +131,7 @@ export class AssetPathResolver {
 	}
 
 	private soundCandidates(soundNamespace: string, soundPath: string): string[] {
-		return this.options.workspaceFolders.flatMap(workspacePath => [
+		return this.searchRoots().flatMap(workspacePath => [
 			path.join(workspacePath, this.options.fileNamespace, 'sounds', soundPath),
 			path.join(workspacePath, this.options.fileNamespace, 'assets', soundNamespace, 'sounds', soundPath),
 			path.join(workspacePath, this.options.fileNamespace, 'resourcepack', 'assets', soundNamespace, 'sounds', soundPath),
@@ -145,5 +145,15 @@ export class AssetPathResolver {
 			path.join(workspacePath, soundNamespace, 'resource_pack', 'assets', soundNamespace, 'sounds', soundPath),
 			path.join(workspacePath, soundNamespace, 'resource_pack', soundNamespace, 'sounds', soundPath)
 		]);
+	}
+
+	private searchRoots(): string[] {
+		const documentPath = this.options.documentPath.replace(/\\/g, '/');
+		const contentsIndex = documentPath.lastIndexOf('/contents/');
+		if (contentsIndex === -1) {
+			return this.options.workspaceFolders;
+		}
+
+		return [path.normalize(documentPath.slice(0, contentsIndex + '/contents'.length)), ...this.options.workspaceFolders];
 	}
 }

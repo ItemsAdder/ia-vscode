@@ -292,4 +292,30 @@ suite('ItemsAdder completion provider', () => {
 		assert.deepStrictEqual((item?.range as vscode.Range | undefined)?.start, new vscode.Position(7, 10));
 		assert.deepStrictEqual((item?.range as vscode.Range | undefined)?.end, new vscode.Position(7, 24));
 	});
+
+	test('does not suggest resource values while typing a property', async () => {
+		const document = await vscode.workspace.openTextDocument({
+			language: 'yaml',
+			content: [
+				'info:',
+				'  namespace: test',
+				'items:',
+				'  gem:',
+				'    resource:',
+				'      textures:',
+				'        - minecraft:item/diamond',
+				'      spec'
+			].join('\n')
+		});
+		const provider = new ItemsAdderCompletionProvider({
+			schemas,
+			itemTemplates: [],
+			vanillaTexturePaths: ['item/diamond.png'],
+			getDevMode: () => false
+		});
+
+		const items = provider.provideCompletionItems(document, new vscode.Position(7, 10));
+
+		assert.ok(!items.some(item => item.label === 'minecraft:item/diamond.png'));
+	});
 });

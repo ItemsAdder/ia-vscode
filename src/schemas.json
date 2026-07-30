@@ -4508,11 +4508,12 @@
                 "REAL_TRANSPARENT",
                 "REAL_WIRE",
                 "TILE",
+                "ENTITY",
                 "REAL",
                 "FIRE"
               ],
               "default": "REAL_NOTE",
-              "markdownDescription": "(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
+              "markdownDescription": "**ENTITY requires ItemsAdder 4.0.18+.**\n\n(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
             },
             "break_particles": {
               "markdownDescription": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
@@ -6196,17 +6197,17 @@
       ],
       "properties": {
         "from": {
-          "$ref": "#/$defs/vanilla_and_custom_blocks"
+          "$ref": "#/$defs/bukkit_and_custom_blocks"
         },
         "from_multiple": {
           "type": "array",
           "markdownDescription": "List of vanilla/custom blocks to replace",
           "items": {
-            "$ref": "#/$defs/vanilla_and_custom_blocks"
+            "$ref": "#/$defs/bukkit_and_custom_blocks"
           }
         },
         "to": {
-          "$ref": "#/$defs/vanilla_and_custom_blocks"
+          "$ref": "#/$defs/bukkit_and_custom_blocks"
         },
         "radius": {
           "type": "object",
@@ -6303,10 +6304,10 @@
       ],
       "properties": {
         "from": {
-          "$ref": "#/$defs/vanilla_and_custom_blocks"
+          "$ref": "#/$defs/bukkit_and_custom_blocks"
         },
         "to": {
-          "$ref": "#/$defs/vanilla_and_custom_blocks"
+          "$ref": "#/$defs/bukkit_and_custom_blocks"
         },
         "decrement_durability": {
           "type": "integer",
@@ -6670,7 +6671,7 @@
       ],
       "properties": {
         "block": {
-          "$ref": "#/$defs/vanilla_and_custom_blocks"
+          "$ref": "#/$defs/bukkit_and_custom_blocks"
         },
         "target": {
           "type": "string",
@@ -6821,7 +6822,7 @@
           "$ref": "#/$defs/summon_entity"
         },
         "^execute_command(.*)$": {
-          "$ref": "#/$defs/execute_command"
+          "$ref": "#/$defs/entity_execute_command"
         },
         "^script(.*)$": {
           "$ref": "#/$defs/entity_script"
@@ -8450,6 +8451,12 @@
           }
         }
       }
+    },
+    "consumable_effect_clear_all_status_effects": {
+      "$id": "consumable_effect_clear_all_status_effects",
+      "type": "object",
+      "markdownDescription": "Clears all status effects when the item is consumed completely",
+      "additionalProperties": false
     },
     "consumable_effect_play_sound": {
       "$id": "consumable_effect_play_sound",

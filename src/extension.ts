@@ -211,7 +211,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 			return settings.enableIndexing && settings.enableCustomReferenceAutocomplete;
 		}
 	});
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider, ':', ' ', '-'));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ language: 'yaml' }, completionProvider));
 	if (getExtensionSettings().enableHoverProviders) {
 		context.subscriptions.push(vscode.languages.registerHoverProvider(
 			{ language: 'yaml' },

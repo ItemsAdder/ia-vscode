@@ -53,6 +53,10 @@ function inlineRefSiblings(node: unknown, root: SchemaObject): unknown {
 		inlineRefSiblings(value, root);
 	}
 
+	if (node !== root) {
+		delete node.$id;
+	}
+
 	return node;
 }
 

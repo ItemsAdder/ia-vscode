@@ -118,6 +118,12 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 		yamlPath: string[],
 		items: vscode.CompletionItem[]
 	): void {
+		const currentLine = document.lineAt(position.line).text;
+		const keyValueMatch = currentLine.match(/^(\s*[^:#][^:]*:\s*)(.*)$/);
+		const arrayMatch = currentLine.match(/^(\s*-\s*)(.*)$/);
+		const valuePrefixLength = arrayMatch?.[1].length ?? keyValueMatch?.[1].length;
+		const isValuePosition = valuePrefixLength !== undefined && position.character >= valuePrefixLength;
+
 		if (yamlPath.length === 4 && yamlPath[0] === 'items' && yamlPath[2] === 'consumable' && yamlPath[3] === 'effects') {
 			this.addUniqueEntrySuggestion(document, position, items, 'apply_status_effects');
 			this.addUniqueEntrySuggestion(document, position, items, 'remove_status_effects');
@@ -128,7 +134,7 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 			this.addUniqueEntrySuggestion(document, position, items, 'variant');
 		}
 
-		if (yamlPath.length === 3 && yamlPath[0] === 'items' && yamlPath[2] === 'name') {
+		if (isValuePosition && yamlPath.length === 3 && yamlPath[0] === 'items' && yamlPath[2] === 'name') {
 			const name = this.toDisplayName(yamlPath[1]);
 			this.addTextSuggestion(items, name, 'Name shown in inventory tooltip.');
 			this.addTextSuggestion(items, `item-${yamlPath[1]}`, 'Dictionary key for multi-language item name.');
@@ -146,18 +152,18 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 			this.addItemTemplates(items);
 		}
 
-		if (this.isTexturePath(yamlPath)) {
+		if (isValuePosition && this.isTexturePath(yamlPath)) {
 			this.addVanillaTextureSuggestions(document, position, items);
 			if (this.getEnableCustomReferenceAutocomplete()) {
 				this.addWorkspaceAssetSuggestions(document, position, items, 'texture');
 			}
 		}
 
-		if (this.isModelPath(yamlPath) && this.getEnableCustomReferenceAutocomplete()) {
+		if (isValuePosition && this.isModelPath(yamlPath) && this.getEnableCustomReferenceAutocomplete()) {
 			this.addWorkspaceAssetSuggestions(document, position, items, 'model');
 		}
 
-		if (this.getEnableCustomReferenceAutocomplete()) {
+		if (isValuePosition && this.getEnableCustomReferenceAutocomplete()) {
 			this.addWorkspaceDefinitionSuggestions(document, position, yamlPath, items);
 		}
 
@@ -168,7 +174,6 @@ export class ItemsAdderCompletionProvider implements vscode.CompletionItemProvid
 			yamlPath[3] === 'return_items' &&
 			yamlPath[4] === 'replace'
 		) {
-			const currentLine = document.lineAt(position.line).text;
 			if (!currentLine.includes(': ') && !currentLine.endsWith(':')) {
 				for (const material of this.options.schemas.$defs.bukkit_materials.enum) {
 					this.addEntrySuggestion(items, material, 'Material to replace.', false, vscode.CompletionItemKind.EnumMember);

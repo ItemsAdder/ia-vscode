@@ -6,6 +6,24 @@ import { itemsAdderPluginConfigSchema } from '../../itemsAdderPluginConfig';
 import { schemas } from '../../schemas';
 
 suite('Schema hover provider', () => {
+	test('keeps internal refs in the root schema scope', () => {
+		assert.strictEqual(schemas.$id, 'itemsadder://schema/itemsadder-resource');
+		assert.strictEqual(JSON.stringify(schemas).match(/"\$id":/g)?.length, 1);
+		assert.strictEqual(
+			schemas.$defs.entity_actions.patternProperties['^execute_command(.*)$'].$ref,
+			'#/$defs/entity_execute_command'
+		);
+		for (const ref of JSON.stringify(schemas).match(/#\/\$defs\/[^\"]+/g) ?? []) {
+			assert.ok(ref.slice('#/$defs/'.length) in schemas.$defs, `Unresolved schema ref: ${ref}`);
+		}
+	});
+
+	test('documents the minimum ItemsAdder version for ENTITY placed models', () => {
+		const type = schemas.$defs['behaviour.block'].properties.placed_model.properties.type;
+		assert.ok(type.enum.includes('ENTITY'));
+		assert.ok(type.markdownDescription.includes('ENTITY requires ItemsAdder 4.0.18+'));
+	});
+
 	test('rewrites schema documentation URLs to VS Code command links', async () => {
 		const document = await vscode.workspace.openTextDocument({
 			language: 'yaml',
