@@ -1737,44 +1737,44 @@
         },
         "elytra": {
           "type": "object",
-          "markdownDescription": "## Requires Minecraft `1.21.2+` and ItemsAdder `4.0.18+`!\nConfigures this item as a custom Elytra. ItemsAdder automatically creates the required chest equipment, enables gliding and generates the wings equipment model.",
+          "markdownDescription": "## Requires Minecraft 1.21.2+ and ItemsAdder 4.0.18+!\nConfigures this item as a custom Elytra. ItemsAdder automatically creates the required chest equipment, enables gliding and generates the wings equipment model.",
           "required": [
             "wings_texture"
           ],
           "properties": {
             "wings_texture": {
               "type": "string",
-              "markdownDescription": "Texture rendered as wings while this Elytra is equipped. The path is relative to the namespace's `textures` folder. Recommended size: `64x32` or another `2:1` resolution. Example: `entity/equipment/wings/sky_elytra`."
+              "markdownDescription": "ItemsAdder 4.0.18+. Texture rendered as wings while this Elytra is equipped. The path is relative to the namespace's `textures` folder. Recommended size: `64x32` or another `2:1` resolution. Example: `entity/equipment/wings/sky_elytra`."
             },
             "broken_item_texture": {
               "type": "string",
-              "markdownDescription": "Optional inventory and hand texture used when the Elytra is broken. If omitted, ItemsAdder looks for `<graphics.texture>_broken`. This does not change the equipped wings texture. Example: `item/sky_elytra_broken`."
+              "markdownDescription": "ItemsAdder 4.0.18+. Optional inventory and hand texture used when the Elytra is broken. If omitted, ItemsAdder looks for `<graphics.texture>_broken`. This does not change the equipped wings texture. Example: `item/sky_elytra_broken`."
             },
             "max_flight_ticks": {
               "type": "integer",
               "minimum": 0,
               "default": 0,
-              "markdownDescription": "Maximum continuous gliding time in ticks. `0` means unlimited. There are 20 ticks in one second."
+              "markdownDescription": "ItemsAdder 4.0.18+. Maximum continuous gliding time in ticks. `0` means unlimited. There are 20 ticks in one second."
             },
             "firework": {
               "type": "object",
-              "markdownDescription": "Controls firework boosts while gliding with this custom Elytra.",
+              "markdownDescription": "ItemsAdder 4.0.18+. Controls firework boosts while gliding with this custom Elytra.",
               "properties": {
                 "enabled": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "Whether fireworks can boost the player while using this Elytra."
+                  "markdownDescription": "ItemsAdder 4.0.18+. Whether fireworks can boost the player while using this Elytra."
                 },
                 "consume": {
                   "type": "boolean",
                   "default": true,
-                  "markdownDescription": "Whether an accepted boost consumes the firework rocket."
+                  "markdownDescription": "ItemsAdder 4.0.18+. Whether an accepted boost consumes the firework rocket."
                 },
                 "cooldown_ticks": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 0,
-                  "markdownDescription": "Required delay in ticks between accepted firework boosts."
+                  "markdownDescription": "ItemsAdder 4.0.18+. Required delay in ticks between accepted firework boosts."
                 }
               }
             },
@@ -1782,13 +1782,13 @@
               "type": "number",
               "minimum": 0,
               "default": 1.0,
-              "markdownDescription": "Multiplier applied to durability damage. `0` disables durability damage for this Elytra."
+              "markdownDescription": "ItemsAdder 4.0.18+. Multiplier applied to durability damage. `0` disables durability damage for this Elytra."
             },
             "collision_damage_multiplier": {
               "type": "number",
               "minimum": 0,
               "default": 1.0,
-              "markdownDescription": "Multiplier applied to `FLY_INTO_WALL` damage. `0` disables wall-collision damage for this Elytra."
+              "markdownDescription": "ItemsAdder 4.0.18+. Multiplier applied to `FLY_INTO_WALL` damage. `0` disables wall-collision damage for this Elytra."
             }
           }
         },
@@ -4513,7 +4513,7 @@
                 "FIRE"
               ],
               "default": "REAL_NOTE",
-              "markdownDescription": "**ENTITY requires ItemsAdder 4.0.18+.**\n\n(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
+              "markdownDescription": "**ENTITY requires ItemsAdder 4.0.18+ and Minecraft server and clients 1.21.4+.**\n\n(USE THE MOUSE SCROLL WHELL for more..)\nThis property can have these value:\n\n**REAL_WIRE**\nuses a real block (tripwire), no lag, no entities, 100% real blocks.\ndownside: Max of 127 blocks in total.\n\n**REAL_TRANSPARENT**\nuses a real block (chorus), no lag, no entities, 100% real blocks, also with transparency support!\ndownside: max of 63 blocks in total\n\n**TILE**\nuses tile blocks (modified spawner with custom skin). It's not an entity but it have some downsides. Good thing is that you can create infinite blocks, there is no amount limit like REAL blocks.\ndownsides:\nnot a 100% real block, it's a retextured spawner\ntexture/model vanishes on high distance, so it will reveal the spawner vanilla texture\nit could cause clientside lag if A LOT of blocks are in the player field of view, but only on lowend PCs.\n\n**REAL_NOTE**\nuses a real block (note_block), no lag, no entities, 100% real blocks.\ndownside: no support for transparency. Max of 750 blocks in total.\n**REAL**\nuses a real block (mushroom), no lag, no entities, 100% real blocks.\ndownside: max of 191 blocks in total\n\n**FIRE**\nthis is a special type of block, it's the fire block.\ndownside: only a max of 14 custom fires is possible, so be sure to create only the ones you need.\n"
             },
             "break_particles": {
               "markdownDescription": "Specify if you want to use the break particle of the material used to create the block (BLOCK), or your a texture (ITEM) or let the game handle it (VANILLA)",
@@ -4589,6 +4589,10 @@
               ]
             }
           }
+        },
+        "fallback_vanilla_block": {
+          "$ref": "#/$defs/bukkit_materials",
+          "markdownDescription": "ItemsAdder 4.0.18+. Vanilla Material used as the backing block. It must be solid, occluding, non-interactable and unaffected by gravity. If omitted, inherits the global `blocks.custom.entity.fallback-vanilla-block` setting."
         },
         "hardness": {
           "markdownDescription": "Mining hardness",
@@ -8545,7 +8549,8 @@
           "markdownDescription": "Jukebox settings",
           "properties": {
             "enabled": {
-              "type": "boolean"
+              "type": "boolean",
+              "markdownDescription": "ItemsAdder 4.0.18+. Default: `true`."
             },
             "description": {
               "type": "string",

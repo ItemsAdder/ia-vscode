@@ -397,6 +397,11 @@
                   "default": true,
                   "markdownDescription": "(default: `true`)"
                 },
+                "protection_4": {
+                  "type": "boolean",
+                  "default": true,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `true`)"
+                },
                 "short_texture_references": {
                   "type": "boolean",
                   "default": true,
@@ -697,6 +702,53 @@
               "type": "boolean",
               "default": false,
               "markdownDescription": "(default: `false`) Enables ItemsAdder custom block features for fire blocks."
+            },
+            "entity": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `true`)"
+                },
+                "render-radius": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "default": 48,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `48`)"
+                },
+                "max-displays-per-player": {
+                  "type": "integer",
+                  "minimum": 9,
+                  "default": 512,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `512`)"
+                },
+                "max-blocks-per-chunk": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 256,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `256`) `0` disables the limit."
+                },
+                "fallback-vanilla-block": {
+                  "type": "string",
+                  "default": "GRAY_CONCRETE",
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `GRAY_CONCRETE`) Vanilla Material used when an entity-backed custom block does not override its fallback. It must be solid, occluding, non-interactable and unaffected by gravity."
+                },
+                "update-interval": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "default": 2,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `2`)"
+                },
+                "warm-slot-timeout": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 40,
+                  "markdownDescription": "ItemsAdder 4.0.18+. (default: `40`)"
+                }
+              },
+              "markdownDescription": "ItemsAdder 4.0.18+. Entity-backed custom block settings. Requires Minecraft server and clients 1.21.4+."
             }
           },
           "markdownDescription": "Feature toggles for ItemsAdder custom block implementations and their backing vanilla block types."
@@ -779,7 +831,7 @@
         "convert_paper_to_block_in_inventory": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "(default: `false`)"
+          "markdownDescription": "ItemsAdder 4.0.18+. (default: `false`)"
         }
       },
       "markdownDescription": "Global custom block conversion, placement, liquid, palette and compatibility settings."
@@ -1420,6 +1472,23 @@
             }
           },
           "markdownDescription": "Performance-related rendering options for custom crops."
+        },
+        "interaction": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "precise_hitbox_targeting": {
+              "type": "boolean",
+              "default": true,
+              "markdownDescription": "ItemsAdder 4.0.18+. (default: `true`)"
+            },
+            "continuous_harvesting_assistance": {
+              "type": "boolean",
+              "default": true,
+              "markdownDescription": "ItemsAdder 4.0.18+. (default: `true`)"
+            }
+          },
+          "markdownDescription": "ItemsAdder 4.0.18+. Custom crop interaction targeting and harvesting assistance."
         }
       },
       "markdownDescription": "Global defaults for custom crop growth and rendering. Custom crops require ItemsAdder 4.0.15+ and Minecraft 1.21.4+. [Docs](https://itemsadder.devs.beer/adding-content/crops)"
@@ -1616,7 +1685,7 @@
         "update_resource_to_graphics": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "(default: `false`)"
+          "markdownDescription": "ItemsAdder 4.0.18+. (default: `false`)"
         },
         "ffmpeg": {
           "type": "object",
